@@ -6,7 +6,7 @@ import { Button } from 'dt-design';
 import { ButtonProps } from '..';
 
 export default function Basic() {
-    const [size, setSize] = useState<ButtonProps['size']>('default');
+    const [size, setSize] = useState<ButtonProps['size']>('middle');
 
     return (
         <Space direction="vertical" size="large">
@@ -44,12 +44,6 @@ export default function Basic() {
                     <Button type="primary" size={size} icon={<UploadOutlined />}>
                         Search
                     </Button>
-                    <Button type="secondary" size={size} icon={<UploadOutlined />}>
-                        Search
-                    </Button>
-                    <Button type="tertiary" size={size} icon={<UploadOutlined />}>
-                        Search
-                    </Button>
                     <Button icon={<UploadOutlined />} size={size}>
                         Search
                     </Button>
@@ -66,8 +60,6 @@ export default function Basic() {
                 <h3>纯图标按钮</h3>
                 <Space>
                     <Button type="primary" size={size} icon={<UploadOutlined />} />
-                    <Button type="secondary" size={size} icon={<UploadOutlined />} />
-                    <Button type="tertiary" size={size} icon={<UploadOutlined />} />
                     <Button size={size} icon={<UploadOutlined />} />
                     <Button size={size} type="dashed" icon={<UploadOutlined />} />
                     <Button size={size} type="link" icon={<UploadOutlined />} />
@@ -79,12 +71,6 @@ export default function Basic() {
                 <Space>
                     <Button size={size} type="primary" disabled>
                         Primary(Disabled)
-                    </Button>
-                    <Button size={size} type="secondary" disabled>
-                        Secondary(Disabled)
-                    </Button>
-                    <Button size={size} type="tertiary" disabled>
-                        Tertiary(Disabled)
                     </Button>
                     <Button size={size} disabled>
                         Default(Disabled)

@@ -4,8 +4,8 @@ import { CopyOutlined } from '@dtinsight/react-icons';
 import { message, Tooltip } from 'antd';
 import classNames from 'classnames';
 
+import { LabelTooltipType, toTooltipProps } from '../_util';
 import useLocale from '../locale/useLocale';
-import { LabelTooltipType, toTooltipProps } from '../utils';
 import './style.scss';
 
 export interface ICopyProps {

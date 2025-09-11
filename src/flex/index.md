@@ -12,8 +12,11 @@ toc: content
 
 ## 示例
 
-<code src='./demos/basic.tsx' title="基础使用"></code>
-<code src='./demos/align.tsx' title="对齐方式"></code>
+<code src='./demos/basic.tsx' title="最简单的用法。">基本布局</code>
+<code src='./demos/align.tsx' title="设置对齐方式。">对齐方式</code>
+<code src='./demos/gap.tsx' title="使用 `gap` 设置元素之间的间距，预设了 `small`、`middle`、`large` 三种尺寸，也可以自定义间距。">设置间隙</code>
+<code src='./demos/wrap.tsx' title="自动换行。">自动换行</code>
+<code src='./demos/combination.tsx' title="嵌套使用，可以实现更复杂的布局。">组合使用</code>
 
 ## API
 

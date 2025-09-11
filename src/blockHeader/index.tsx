@@ -4,8 +4,8 @@ import { Tooltip } from 'antd';
 import { globalConfig } from 'antd/es/config-provider';
 import classNames from 'classnames';
 
+import { LabelTooltipType, toTooltipProps } from '../_util';
 import useLocale from '../locale/useLocale';
-import { LabelTooltipType, toTooltipProps } from '../utils';
 import './style.less';
 
 export declare type SizeType = 'small' | 'middle' | 'large';
@@ -139,7 +139,7 @@ const BlockHeader: React.FC<IBlockHeaderProps> = function (props) {
                                 'collapse__icon--up': currentExpand,
                                 'collapse__icon--down': !currentExpand,
                             })}
-                        />  
+                        />
                     </div>
                 )}
             </div>

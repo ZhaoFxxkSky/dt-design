@@ -1,8 +1,8 @@
 import React, { CSSProperties } from 'react';
 import { AiAvatarColored } from '@dtinsight/react-icons';
 import classNames from 'classnames';
+import { Flex } from 'dt-design';
 
-import Flex from '../../flex';
 import './index.scss';
 
 export interface IWelcomeProps {
