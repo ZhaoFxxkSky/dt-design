@@ -18,6 +18,7 @@ export { default as ErrorBoundary } from './errorBoundary';
 export { default as LoadError } from './errorBoundary/loadError';
 export { default as FilterRules } from './filterRules';
 export { default as Flex } from './flex';
+export type { FlexProps } from './flex/interface';
 export { default as Float } from './float';
 export { default as Form } from './form';
 export { default as Fullscreen } from './fullscreen';

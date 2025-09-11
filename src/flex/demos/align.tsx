@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
-import { Button, Segmented, Slider } from 'antd';
+import React from 'react';
+import { Button, Segmented } from 'antd';
+import type { FlexProps } from 'dt-design';
 import { Flex } from 'dt-design';
-import type { IFlexProps } from 'dt-design/flex';
 
-const alignOptions = ['flex-start', 'center', 'flex-end'];
+const boxStyle: React.CSSProperties = {
+    width: '100%',
+    height: 120,
+    borderRadius: 6,
+    border: '1px solid #40a9ff',
+};
+
 const justifyOptions = [
     'flex-start',
     'center',
@@ -13,47 +19,33 @@ const justifyOptions = [
     'space-evenly',
 ];
 
-export default () => {
-    const [align, setAlign] = useState<IFlexProps['align']>('center');
-    const [justify, setJustify] = useState<IFlexProps['justify']>('center');
-    const [vertical, setVertical] = useState<string>('false');
-    const [gap, setGap] = useState<number>(4);
+const alignOptions = ['flex-start', 'center', 'flex-end'];
+
+const App: React.FC = () => {
+    const [justify, setJustify] = React.useState<FlexProps['justify']>(justifyOptions[0]);
+    const [alignItems, setAlignItems] = React.useState<FlexProps['align']>(alignOptions[0]);
     return (
-        <>
-            <p>Select align :</p>
-            <Segmented
-                value={align}
-                options={alignOptions}
-                onChange={(val) => setAlign(val as IFlexProps['align'])}
-            />
+        <Flex gap="middle" align="start" vertical>
             <p>Select justify :</p>
             <Segmented
-                value={justify}
                 options={justifyOptions}
-                onChange={(val) => setJustify(val as IFlexProps['justify'])}
+                onChange={(value) => setJustify(value as FlexProps['justify'])}
             />
-            <p>Select vertical :</p>
+            <p>Select align :</p>
             <Segmented
-                value={vertical}
-                options={['true', 'false']}
-                onChange={(val) => setVertical(val as string)}
+                options={alignOptions}
+                onChange={(value) => {
+                    setAlignItems(value as FlexProps['align']);
+                }}
             />
-            <p>Select gap :</p>
-            <Slider value={gap} max={20} min={0} onChange={setGap} />
-            <br />
-            <br />
-            <Flex
-                gap={gap}
-                vertical={vertical === 'true'}
-                align={align}
-                justify={justify}
-                style={{ border: '1px solid #5D9EFA', height: 200 }}
-            >
-                <Button>button</Button>
-                <Button>button</Button>
-                <Button>button</Button>
-                <Button>button</Button>
+            <Flex style={boxStyle} justify={justify} align={alignItems}>
+                <Button type="primary">Primary</Button>
+                <Button type="primary">Primary</Button>
+                <Button type="primary">Primary</Button>
+                <Button type="primary">Primary</Button>
             </Flex>
-        </>
+        </Flex>
     );
 };
+
+export default App;

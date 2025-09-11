@@ -1,0 +1,62 @@
+@flex-prefix-cls: ~'@{ant-prefix}-flex';
+
+.@{flex-prefix-cls} {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+  &-vertical {
+    flex-direction: column;
+  }
+
+  &-rtl {
+    direction: rtl;
+  }
+
+  &:empty {
+    display: none;
+  }
+
+  // 间隙预设
+  &-gap-small {
+    gap: @padding-xs;
+  }
+  &-gap-middle {
+    gap: @padding-md;
+  }
+  &-gap-large {
+    gap: @padding-lg;
+  }
+
+  // 换行样式
+  &-wrap-wrap { flex-wrap: wrap; }
+  &-wrap-nowrap { flex-wrap: nowrap; }
+  &-wrap-wrap-reverse { flex-wrap: wrap-reverse; }
+
+  // 对齐样式（完整保留所有对齐方式）
+  &-align-center { align-items: center; }
+  &-align-start { align-items: start; }
+  &-align-end { align-items: end; }
+  &-align-flex-start { align-items: flex-start; }
+  &-align-flex-end { align-items: flex-end; }
+  &-align-self-start { align-items: self-start; }
+  &-align-self-end { align-items: self-end; }
+  &-align-baseline { align-items: baseline; }
+  &-align-normal { align-items: normal; }
+  &-align-stretch { align-items: stretch; }
+
+  // 主轴对齐样式
+  &-justify-flex-start { justify-content: flex-start; }
+  &-justify-flex-end { justify-content: flex-end; }
+  &-justify-start { justify-content: start; }
+  &-justify-end { justify-content: end; }
+  &-justify-center { justify-content: center; }
+  &-justify-space-between { justify-content: space-between; }
+  &-justify-space-around { justify-content: space-around; }
+  &-justify-space-evenly { justify-content: space-evenly; }
+  &-justify-stretch { justify-content: stretch; }
+  &-justify-normal { justify-content: normal; }
+  &-justify-left { justify-content: left; }
+  &-justify-right { justify-content: right; }
+}
