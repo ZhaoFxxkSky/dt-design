@@ -1,0 +1,29 @@
+$prefix: "dt-progress";
+
+.#{$prefix} {
+    &-bar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        z-index: 10000;
+        width: 100%;
+        height: 1px;
+        background: #2491F7;
+        box-shadow: 0 1px 3px #2491F7;
+        animation: dt-progress-loading 1s ease-in-out infinite;
+    }
+    &-img {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 30px;
+        height: 30px;
+        z-index: 10000;
+    }
+}
+
+@keyframes dt-progress-loading {
+    to {
+        transform: translateX(200%);
+    }
+}

@@ -1,0 +1,115 @@
+import React from 'react';
+import { AigcOutlined } from '@dtinsight/react-icons';
+import { Button, Col, Row, Space } from 'antd';
+import { Chat } from 'dt-design';
+
+export default function () {
+    const [disabled, setDisabled] = React.useState(false);
+    return (
+        <Row gutter={[16, 16]}>
+            <Col span={24}>
+                <Button type="primary" onClick={() => setDisabled((p) => !p)}>
+                    切换 disabled
+                </Button>
+            </Col>
+            <Col span={24}>
+                <Space>
+                    <Chat.Button
+                        type="primary"
+                        disabled={disabled}
+                        icon={<AigcOutlined style={{ fontSize: 16 }} />}
+                    />
+                    <Chat.Button
+                        type="primary"
+                        disabled={disabled}
+                        icon={<AigcOutlined style={{ fontSize: 16 }} />}
+                    >
+                        按钮
+                    </Chat.Button>
+                    <Chat.Button
+                        type="default"
+                        disabled={disabled}
+                        icon={<AigcOutlined style={{ fontSize: 16 }} />}
+                    >
+                        按钮
+                    </Chat.Button>
+                    <Chat.Button
+                        type="secondary"
+                        disabled={disabled}
+                        icon={<AigcOutlined style={{ fontSize: 16 }} />}
+                    >
+                        按钮
+                    </Chat.Button>
+                    <Chat.Button
+                        type="secondary"
+                        disabled={disabled}
+                        icon={<AigcOutlined style={{ fontSize: 16 }} />}
+                    >
+                        AI log parsing
+                    </Chat.Button>
+                </Space>
+            </Col>
+            <Col span={24}>
+                <Space>
+                    <Chat.Button
+                        size="small"
+                        type="primary"
+                        disabled={disabled}
+                        icon={<AigcOutlined style={{ fontSize: 16 }} />}
+                    />
+                    <Chat.Button
+                        size="small"
+                        type="primary"
+                        disabled={disabled}
+                        icon={<AigcOutlined style={{ fontSize: 16 }} />}
+                    >
+                        按钮
+                    </Chat.Button>
+                    <Chat.Button
+                        size="small"
+                        type="default"
+                        disabled={disabled}
+                        icon={<AigcOutlined style={{ fontSize: 16 }} />}
+                    >
+                        按钮
+                    </Chat.Button>
+                    <Chat.Button
+                        size="small"
+                        type="secondary"
+                        disabled={disabled}
+                        icon={<AigcOutlined style={{ fontSize: 16 }} />}
+                    >
+                        按钮
+                    </Chat.Button>
+                    <Chat.Button
+                        size="small"
+                        type="secondary"
+                        disabled={disabled}
+                        icon={<AigcOutlined style={{ fontSize: 16 }} />}
+                    >
+                        AI log parsing
+                    </Chat.Button>
+                </Space>
+            </Col>
+            <Col span={24}>
+                <Space>
+                    <Chat.Button
+                        type="secondary"
+                        disabled={disabled}
+                        icon={<AigcOutlined style={{ fontSize: 16 }} />}
+                    >
+                        重新生成
+                    </Chat.Button>
+                    <Chat.Button
+                        size="small"
+                        type="default"
+                        disabled={disabled}
+                        icon={<AigcOutlined style={{ fontSize: 16 }} />}
+                    >
+                        智能解析
+                    </Chat.Button>
+                </Space>
+            </Col>
+        </Row>
+    );
+}

@@ -1,0 +1,144 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Chat CodeBlock Match snapshot: normal 1`] = `
+<DocumentFragment>
+  <div
+    class="dtc__aigc__codeblock jest_test"
+    style="color: red;"
+  >
+    <div
+      class="dtc__aigc__codeblock__header"
+    >
+      <span
+        class="dtc__aigc__codeblock__language"
+      >
+        javascript
+      </span>
+      <div
+        class="dtc__aigc__codeblock__tool"
+      >
+        <span
+          class="dt-copy"
+        >
+          <span
+            class="dt-copy__default-icon"
+            data-mock-icon="CopyOutlined"
+          />
+        </span>
+      </div>
+    </div>
+    <pre
+      style="background: rgb(255, 255, 255); color: rgb(56, 56, 56); font-family: "Fira Code", "Fira Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace; direction: ltr; text-align: left; white-space: pre; word-spacing: normal; word-break: normal; line-height: 1.5; tab-size: 2; hyphens: none; padding: 1em; margin: 0px; overflow: auto; border-radius: 0 0 4px 4px; max-height: 270px;"
+    >
+      <code
+        class="language-javascript"
+        style="background: rgb(255, 255, 255); color: rgb(56, 56, 56); font-family: "Fira Code", "Fira Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace; direction: ltr; text-align: left; white-space: pre; word-spacing: normal; word-break: normal; line-height: 1.5; tab-size: 2; hyphens: none;"
+      >
+        <span>
+          <span
+            class="linenumber react-syntax-highlighter-line-number"
+            style="display: inline-block; min-width: 1.25em; padding-right: 1em; text-align: right; user-select: none; font-style: italic; color: rgb(160, 160, 160);"
+          >
+            1
+          </span>
+          <span
+            class="token"
+            style="color: rgb(38, 38, 38);"
+          >
+            const
+          </span>
+          <span>
+             a 
+          </span>
+          <span
+            class="token"
+            style="color: rgb(64, 64, 64);"
+          >
+            =
+          </span>
+          <span>
+             
+          </span>
+          <span
+            class="token"
+            style="color: rgb(1, 1, 1);"
+          >
+            1
+          </span>
+        </span>
+      </code>
+    </pre>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Test Chat CodeBlock Match snapshot: normal 2`] = `
+<DocumentFragment>
+  <div
+    class="dtc__aigc__codeblock dtc__aigc__codeblock--convert"
+  >
+    <div
+      class="dtc__aigc__codeblock__header"
+    >
+      <span
+        class="dtc__aigc__codeblock__language"
+      >
+        javascript
+      </span>
+      <div
+        class="dtc__aigc__codeblock__tool"
+      >
+        <span
+          class="dt-copy"
+        >
+          <span
+            class="dt-copy__default-icon"
+            data-mock-icon="CopyOutlined"
+          />
+        </span>
+      </div>
+    </div>
+    <pre
+      style="background: rgb(249, 249, 250); color: rgb(56, 56, 56); font-family: "Fira Code", "Fira Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace; direction: ltr; text-align: left; white-space: pre; word-spacing: normal; word-break: normal; line-height: 1.5; tab-size: 2; hyphens: none; padding: 1em; margin: 0px; overflow: auto; border-radius: 0 0 4px 4px; max-height: 270px;"
+    >
+      <code
+        class="language-javascript"
+        style="background: rgb(249, 249, 250); color: rgb(56, 56, 56); font-family: "Fira Code", "Fira Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace; direction: ltr; text-align: left; white-space: pre; word-spacing: normal; word-break: normal; line-height: 1.5; tab-size: 2; hyphens: none;"
+      >
+        <span>
+          <span
+            class="linenumber react-syntax-highlighter-line-number"
+            style="display: inline-block; min-width: 1.25em; padding-right: 1em; text-align: right; user-select: none; font-style: italic; color: rgb(160, 160, 160);"
+          >
+            1
+          </span>
+          <span
+            class="token"
+            style="color: rgb(38, 38, 38);"
+          >
+            const
+          </span>
+          <span>
+             a 
+          </span>
+          <span
+            class="token"
+            style="color: rgb(64, 64, 64);"
+          >
+            =
+          </span>
+          <span>
+             
+          </span>
+          <span
+            class="token"
+            style="color: rgb(1, 1, 1);"
+          >
+            1
+          </span>
+        </span>
+      </code>
+    </pre>
+  </div>
+</DocumentFragment>
+`;

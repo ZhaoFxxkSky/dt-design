@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Empty match snapshots 1`] = `
+<DocumentFragment>
+  <div
+    class="ant-empty dt-empty"
+  >
+    <div
+      class="ant-empty-image"
+    >
+      <img
+        src="empty_default.png"
+      />
+    </div>
+    <div
+      class="ant-empty-description"
+    >
+      No Data
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Empty match snapshots 2`] = `
+<DocumentFragment>
+  <div
+    class="ant-empty dt-empty dt-empty__large"
+  >
+    <div
+      class="ant-empty-image"
+    >
+      <img
+        src="empty_default.png"
+      />
+    </div>
+    <div
+      class="ant-empty-description"
+    >
+      No Data
+    </div>
+  </div>
+</DocumentFragment>
+`;

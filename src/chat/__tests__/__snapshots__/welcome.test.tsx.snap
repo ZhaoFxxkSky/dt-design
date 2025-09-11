@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Welcome Component matches the snapshot with default props: default welcome 1`] = `
+<DocumentFragment>
+  <div
+    class="dtc__welcome"
+  >
+    <div
+      class="dtc__welcome__content"
+    >
+      <section
+        class="dt-flex"
+        style="flex-wrap: nowrap; justify-content: normal; align-items: center; gap: 8px;"
+      >
+        <span
+          data-mock-icon="AiAvatarColored"
+          style="font-size: 24px;"
+        />
+        <span
+          class="dtc__welcome__title"
+        >
+          Welcome Title
+        </span>
+      </section>
+      <div
+        class="dtc__welcome__description"
+      >
+        This is a description
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

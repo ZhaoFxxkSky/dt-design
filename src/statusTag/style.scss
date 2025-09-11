@@ -1,0 +1,102 @@
+$card_prefix: "dt-statusTag";
+$colors: (
+    "yellow": (
+        color: #FBB310,
+        bg: #FFF4D9,
+    ),
+    "blue": (
+        color: #1D78FF,
+        bg: #E8F1FF,
+    ),
+    "green": (
+        color: #11D782,
+        bg: #E7FBF7,
+    ),
+    "gray": (
+        color: #B1B4C5,
+        bg: #F5F5F8,
+    ),
+    "red": (
+        color: #F96C5B,
+        bg: #FDE9E7,
+    ),
+    "purple": (
+        color: #AC9DFF,
+        bg: #EAE6FF,
+    ),
+    "cyan": (
+        color: #2CCCDF,
+        bg: #E7F8FA,
+    ),
+    "pink": (
+        color: #FF82AE,
+        bg: #FFE6EF,
+    ),
+);
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.#{$card_prefix} {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    height: 24px;
+    font-size: 12px;
+    color: #3D446E;
+    .ant-spin {
+        font-size: 14px; // 因为 theme 修改了默认字体为 12px，导致居中错乱，因此覆盖一下
+    }
+    &--border {
+        padding: 2px 12px;
+        border: 1px solid #D8DAE2;
+        border-radius: 14px;
+        background-color: #FFF;
+    }
+    &--fill {
+        padding: 2px 12px;
+        border-radius: 14px;
+    }
+    &__icon {
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        margin-right: 8px;
+        &--default {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        &--loading {
+            animation: spin 1s linear infinite;
+        }
+    }
+    &__text {
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 22px;
+        white-space: nowrap;
+    }
+
+    @each $type, $values in $colors {
+        &__#{$type} {
+            &--icon {
+                color: map-get($values, color);
+            }
+            &--fill {
+                color: map-get($values, color);
+                background-color: map-get($values, bg);
+            }
+            &--iconBg {
+                background: map-get($values, color);
+            }
+        }
+    }
+}

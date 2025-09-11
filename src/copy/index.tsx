@@ -1,0 +1,53 @@
+import React, { CSSProperties, ReactNode } from 'react';
+import { CopyUtils } from '@dtinsight/dt-utils';
+import { CopyOutlined } from '@dtinsight/react-icons';
+import { message, Tooltip } from 'antd';
+import classNames from 'classnames';
+
+import useLocale from '../locale/useLocale';
+import { LabelTooltipType, toTooltipProps } from '../utils';
+import './style.scss';
+
+export interface ICopyProps {
+    text: string;
+    button?: ReactNode;
+    style?: CSSProperties;
+    className?: string;
+    tooltip?: LabelTooltipType;
+    disabled?: boolean;
+    onCopy?: (text: string) => void;
+}
+
+const Copy: React.FC<ICopyProps> = (props) => {
+    const locale = useLocale('Copy');
+    const {
+        button = <CopyOutlined className="dt-copy__default-icon" />,
+        text,
+        tooltip = locale.copy,
+        style,
+        className,
+        disabled = false,
+        onCopy = () => message.success(locale.copied),
+    } = props;
+
+    const handleCopy = () => {
+        if (disabled) return;
+        new CopyUtils().copy(text, () => onCopy(text));
+    };
+
+    const renderCopyButton = () => (
+        <span
+            className={classNames(['dt-copy', { 'dt-copy--disabled': disabled }, className])}
+            style={style}
+            onClick={() => handleCopy()}
+        >
+            {button}
+        </span>
+    );
+
+    const tooltipProps = toTooltipProps(tooltip);
+
+    return <Tooltip {...tooltipProps}>{renderCopyButton()}</Tooltip>;
+};
+
+export default Copy;

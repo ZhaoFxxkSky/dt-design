@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Chat Pagination Match Snapshots: default 1`] = `
+<DocumentFragment>
+  <div
+    class="dt-aigc-pagination"
+  >
+    <span
+      class="arrow-disabled"
+      data-mock-icon="LeftOutlined"
+      data-testid="icon-left"
+    />
+    <section>
+      <span>
+        1
+      </span>
+      <span>
+        /
+      </span>
+      <span>
+        5
+      </span>
+    </section>
+    <span
+      class=""
+      data-mock-icon="RightOutlined"
+      data-testid="icon-right"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Test Chat Pagination Match Snapshots: disabled 1`] = `
+<DocumentFragment>
+  <div
+    class="dt-aigc-pagination"
+  >
+    <span
+      class="arrow-disabled"
+      data-mock-icon="LeftOutlined"
+      data-testid="icon-left"
+    />
+    <section>
+      <span>
+        1
+      </span>
+      <span>
+        /
+      </span>
+      <span>
+        5
+      </span>
+    </section>
+    <span
+      class="arrow-disabled"
+      data-mock-icon="RightOutlined"
+      data-testid="icon-right"
+    />
+  </div>
+</DocumentFragment>
+`;

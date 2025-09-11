@@ -1,0 +1,30 @@
+import React from 'react';
+
+import useIntersectionObserver from '..';
+
+const Basic = () => {
+    const handleObserverCb = ([entry]: IntersectionObserverEntry[]) => {
+        const { target, isIntersecting } = entry;
+        if (isIntersecting) {
+            const _target = target as HTMLImageElement;
+            _target.src = _target.dataset['src'] ?? '';
+            _target.onload = () => {
+                _target.style.opacity = '1';
+            };
+        }
+    };
+
+    const imgRef = useIntersectionObserver<HTMLImageElement>(handleObserverCb);
+
+    return (
+        <div style={{ height: 300, overflow: 'scroll' }}>
+            <div style={{ height: 330 }}>占位，往下滑动</div>
+            <img
+                data-src="https://dtstack.github.io/dt-design/static/empty_overview.43b0eedf.png"
+                ref={imgRef}
+            />
+        </div>
+    );
+};
+
+export default Basic;

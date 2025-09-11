@@ -1,0 +1,7 @@
+.dt-descriptions {
+    &__fixed {
+        .ant-descriptions-view > table {
+            table-layout: fixed;
+        }
+    }
+}

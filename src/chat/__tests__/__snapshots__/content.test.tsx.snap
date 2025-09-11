@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Chat Content Match snapshot: normal 1`] = `
+<DocumentFragment>
+  <div
+    class="dtc__aigc__content__container"
+  >
+    <div
+      class="dtc__aigc__content__inner__holder"
+    >
+      <pre
+        data-testid="fakePrompt"
+      >
+        {"data":{"id":"1","createdAt":1736479532239,"title":"What is your name?","messages":[{"id":"1","createdAt":1736479532239,"content":"My Name is dt-design","status":0}]}}
+      </pre>
+      <div
+        data-testid="fakeMessage"
+      >
+        <pre>
+          {"prompt":{"id":"1","createdAt":1736479532239,"title":"What is your name?","messages":[{"id":"1","createdAt":1736479532239,"content":"My Name is dt-design","status":0}]},"data":[{"id":"1","createdAt":1736479532239,"content":"My Name is dt-design","status":0}],"regenerate":true}
+        </pre>
+        <button
+          data-testid="fakeOnRegenerate"
+        >
+          onRegenerate
+        </button>
+        <button
+          data-testid="fakeOnStop"
+        >
+          onStop
+        </button>
+        <button
+          data-testid="fakeOnLazyRendered"
+        >
+          onLazyRendered
+        </button>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Test Chat Content Match snapshot: placeholder 1`] = `
+<DocumentFragment>
+  <div
+    class="dtc__aigc__content__container"
+  >
+    <div>
+      placeholder
+    </div>
+  </div>
+</DocumentFragment>
+`;

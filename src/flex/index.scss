@@ -1,0 +1,7 @@
+.dt-flex {
+    display: flex;
+    flex-direction: row;
+    &__vertical {
+        flex-direction: column;
+    }
+}

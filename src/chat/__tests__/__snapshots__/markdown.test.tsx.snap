@@ -1,0 +1,324 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Chat Markdown Match Snapshots: default 1`] = `
+<DocumentFragment>
+  <div
+    class="dtc__aigc__markdown"
+  >
+    <h1>
+      title
+    </h1>
+    
+
+    <hr
+      class="dtc__aigc__markdown__hr"
+      color="#ebecf0"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Test Chat Markdown Match Snapshots: typing 1`] = `
+<DocumentFragment>
+  <div
+    class="dtc__aigc__markdown dtc__aigc__markdown--blink test"
+  >
+    <div>
+      <code
+        class="dtc__aigc__markdown__inlineCode"
+      >
+        inline code test 
+      </code>
+    </div>
+    
+
+    <div
+      class="dtc__aigc__codeblock"
+    >
+      <div
+        class="dtc__aigc__codeblock__header"
+      >
+        <span
+          class="dtc__aigc__codeblock__language"
+        >
+          sql
+        </span>
+        <div
+          class="dtc__aigc__codeblock__tool"
+        >
+          <span
+            class="dt-copy"
+          >
+            <span
+              class="dt-copy__default-icon"
+              data-mock-icon="CopyOutlined"
+            />
+          </span>
+        </div>
+      </div>
+      <pre
+        style="background: rgb(255, 255, 255); color: rgb(56, 56, 56); font-family: "Fira Code", "Fira Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace; direction: ltr; text-align: left; white-space: pre; word-spacing: normal; word-break: normal; line-height: 1.5; tab-size: 2; hyphens: none; padding: 1em; margin: 0px; overflow: auto; border-radius: 0 0 4px 4px; max-height: 270px;"
+      >
+        <code
+          class="language-sql"
+          style="background: rgb(255, 255, 255); color: rgb(56, 56, 56); font-family: "Fira Code", "Fira Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace; direction: ltr; text-align: left; white-space: pre; word-spacing: normal; word-break: normal; line-height: 1.5; tab-size: 2; hyphens: none;"
+        >
+          <span>
+            <span
+              class="linenumber react-syntax-highlighter-line-number"
+              style="display: inline-block; min-width: 1.25em; padding-right: 1em; text-align: right; user-select: none; font-style: italic; color: rgb(160, 160, 160);"
+            >
+              1
+            </span>
+            <span>
+                              
+            </span>
+            <span
+              class="token identifier"
+              style="color: rgb(56, 56, 56);"
+            >
+              \`
+            </span>
+            <span
+              class="token identifier"
+              style="color: rgb(56, 56, 56);"
+            >
+              \`
+            </span>
+            <span
+              class="token identifier"
+              style="color: rgb(56, 56, 56);"
+            >
+              \`
+            </span>
+            <span
+              class="token identifier"
+            >
+              sql
+
+            </span>
+          </span>
+          <span>
+            <span
+              class="linenumber react-syntax-highlighter-line-number"
+              style="display: inline-block; min-width: 1.25em; padding-right: 1em; text-align: right; user-select: none; font-style: italic; color: rgb(160, 160, 160);"
+            >
+              2
+            </span>
+                            SELECT * FROM table;
+
+          </span>
+          <span>
+            <span
+              class="linenumber react-syntax-highlighter-line-number"
+              style="display: inline-block; min-width: 1.25em; padding-right: 1em; text-align: right; user-select: none; font-style: italic; color: rgb(160, 160, 160);"
+            >
+              3
+            </span>
+            <span
+              class="token identifier"
+            >
+                              \`\`
+            </span>
+            <span
+              class="token identifier"
+              style="color: rgb(56, 56, 56);"
+            >
+              \`
+            </span>
+            <span>
+              
+
+            </span>
+          </span>
+          <span>
+            <span
+              class="linenumber react-syntax-highlighter-line-number"
+              style="display: inline-block; min-width: 1.25em; padding-right: 1em; text-align: right; user-select: none; font-style: italic; color: rgb(160, 160, 160);"
+            >
+              4
+            </span>
+                            
+          </span>
+        </code>
+      </pre>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Test Chat Markdown Should be a memoized component: code block 1`] = `
+<div
+  class="dtc__aigc__markdown dtc__aigc__markdown--blink jest"
+>
+  <div
+    class="dtc__aigc__codeblock"
+  >
+    <div
+      class="dtc__aigc__codeblock__header"
+    >
+      <span
+        class="dtc__aigc__codeblock__language"
+      >
+        sql
+      </span>
+      <div
+        class="dtc__aigc__codeblock__tool"
+      >
+        <span
+          class="dt-copy"
+        >
+          <span
+            class="dt-copy__default-icon"
+            data-mock-icon="CopyOutlined"
+          />
+        </span>
+      </div>
+    </div>
+    <pre
+      style="background: rgb(255, 255, 255); color: rgb(56, 56, 56); font-family: "Fira Code", "Fira Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace; direction: ltr; text-align: left; white-space: pre; word-spacing: normal; word-break: normal; line-height: 1.5; tab-size: 2; hyphens: none; padding: 1em; margin: 0px; overflow: auto; border-radius: 0 0 4px 4px; max-height: 270px;"
+    >
+      <code
+        class="language-sql"
+        style="background: rgb(255, 255, 255); color: rgb(56, 56, 56); font-family: "Fira Code", "Fira Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace; direction: ltr; text-align: left; white-space: pre; word-spacing: normal; word-break: normal; line-height: 1.5; tab-size: 2; hyphens: none;"
+      >
+        <span>
+          <span
+            class="linenumber react-syntax-highlighter-line-number"
+            style="display: inline-block; min-width: 1.25em; padding-right: 1em; text-align: right; user-select: none; font-style: italic; color: rgb(160, 160, 160);"
+          >
+            1
+          </span>
+          <span
+            class="token"
+            style="color: rgb(38, 38, 38);"
+          >
+            SELECT
+          </span>
+          <span>
+             
+          </span>
+          <span
+            class="token"
+            style="color: rgb(64, 64, 64);"
+          >
+            *
+          </span>
+          <span>
+             
+          </span>
+          <span
+            class="token"
+            style="color: rgb(38, 38, 38);"
+          >
+            FROM
+          </span>
+          <span>
+             
+          </span>
+          <span
+            class="token"
+            style="color: rgb(38, 38, 38);"
+          >
+            table
+          </span>
+          <span
+            class="token"
+            style="color: rgb(56, 56, 56);"
+          >
+            ;
+          </span>
+        </span>
+      </code>
+    </pre>
+  </div>
+</div>
+`;
+
+exports[`Test Chat Markdown Should be a memoized component: code block with convert 1`] = `
+<div
+  class="dtc__aigc__markdown dtc__aigc__markdown--blink jest"
+>
+  <div
+    class="dtc__aigc__codeblock dtc__aigc__codeblock--convert"
+  >
+    <div
+      class="dtc__aigc__codeblock__header"
+    >
+      <span
+        class="dtc__aigc__codeblock__language"
+      >
+        sql
+      </span>
+      <div
+        class="dtc__aigc__codeblock__tool"
+      >
+        <span
+          class="dt-copy"
+        >
+          <span
+            class="dt-copy__default-icon"
+            data-mock-icon="CopyOutlined"
+          />
+        </span>
+      </div>
+    </div>
+    <pre
+      style="background: rgb(249, 249, 250); color: rgb(56, 56, 56); font-family: "Fira Code", "Fira Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace; direction: ltr; text-align: left; white-space: pre; word-spacing: normal; word-break: normal; line-height: 1.5; tab-size: 2; hyphens: none; padding: 1em; margin: 0px; overflow: auto; border-radius: 0 0 4px 4px; max-height: 270px;"
+    >
+      <code
+        class="language-sql"
+        style="background: rgb(249, 249, 250); color: rgb(56, 56, 56); font-family: "Fira Code", "Fira Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace; direction: ltr; text-align: left; white-space: pre; word-spacing: normal; word-break: normal; line-height: 1.5; tab-size: 2; hyphens: none;"
+      >
+        <span>
+          <span
+            class="linenumber react-syntax-highlighter-line-number"
+            style="display: inline-block; min-width: 1.25em; padding-right: 1em; text-align: right; user-select: none; font-style: italic; color: rgb(160, 160, 160);"
+          >
+            1
+          </span>
+          <span
+            class="token"
+            style="color: rgb(38, 38, 38);"
+          >
+            SELECT
+          </span>
+          <span>
+             
+          </span>
+          <span
+            class="token"
+            style="color: rgb(64, 64, 64);"
+          >
+            *
+          </span>
+          <span>
+             
+          </span>
+          <span
+            class="token"
+            style="color: rgb(38, 38, 38);"
+          >
+            FROM
+          </span>
+          <span>
+             
+          </span>
+          <span
+            class="token"
+            style="color: rgb(38, 38, 38);"
+          >
+            table
+          </span>
+          <span
+            class="token"
+            style="color: rgb(56, 56, 56);"
+          >
+            ;
+          </span>
+        </span>
+      </code>
+    </pre>
+  </div>
+</div>
+`;

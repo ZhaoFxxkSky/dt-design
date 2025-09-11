@@ -1,0 +1,32 @@
+$prefix: "dt-progress-line";
+
+.#{$prefix} {
+    width: 100%;
+    &-title {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+    }
+    &-content {
+        height: 22px;
+        font-size: 12px;
+        font-family: PingFangSC-Regular, "PingFang SC";
+        color: #666;
+        line-height: 22px;
+        // title 超出省略
+        &:nth-child(3n + 1) {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+    }
+    &-wrap {
+        height: 6px;
+        background: #E8E8E8;
+        border-radius: 3px;
+    }
+    &-line {
+        height: 6px;
+        border-radius: 3px;
+    }
+}

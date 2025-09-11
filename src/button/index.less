@@ -1,0 +1,82 @@
+@prefix-cls: ~'@{ant-prefix}-btn';
+
+.@{prefix-cls} {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 16px;
+
+    &__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: inherit;
+        line-height: 0;
+        // 因为 dtstack-icon 组件的 font-size 是 16px，现在需要继承 Button 组件的 font-size
+        .dtstack-icon {
+            font-size: inherit;
+        }
+        &--small {
+            font-size: 12px;
+        }
+        &--middle {
+            font-size: 16px;
+        }
+        &--large {
+            font-size: 18px;
+        }
+        & + .@{prefix-cls}__text {
+            &--small {
+                margin-left: 2px;
+            }
+            &--middle {
+                margin-left: 8px;
+            }
+            &--large {
+                margin-left: 8px;
+            }
+        }
+    }
+    &__text {
+        display: inline-block;
+        &--small {
+            font-size: 12px;
+        }
+        &--middle {
+            font-size: 14px;
+        }
+        &--large {
+            font-size: 14px;
+        }
+    }
+
+    &-sm {
+        padding: 2px 12px;
+    }
+
+    &-lg {
+        padding: 3px 40px;
+    }
+
+    &-secondary {
+        border-color: @primary-color;
+        color: @primary-color;
+
+        &:hover,
+        &:focus {
+            background-color: @item-hover-bg;
+        }
+    }
+
+    &-tertiary {
+        background-color: @table-title-fill-bg;
+        border-color: @border-color-base;
+
+        &:hover,
+        &:focus {
+            background-color: @item-hover-bg;
+            border-color: @primary-color;
+            color: @primary-color;
+        }
+    }
+}

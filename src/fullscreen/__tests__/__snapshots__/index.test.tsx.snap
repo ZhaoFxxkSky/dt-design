@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test Fullscreen should default render correctly 1`] = `
+<div>
+  <div
+    class="dt-fullscreen"
+  >
+    <span>
+      <button
+        class="ant-btn ant-btn-default dt-button"
+        type="button"
+      >
+        <span
+          class="dt-button__icon dt-button__icon--middle"
+        >
+          <span
+            data-mock-icon="FullscreenOutlined"
+          />
+        </span>
+        <span
+          class="dt-button__text dt-button__text--middle"
+        >
+          全屏
+        </span>
+      </button>
+    </span>
+  </div>
+</div>
+`;

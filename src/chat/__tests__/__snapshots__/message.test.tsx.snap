@@ -1,0 +1,214 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Chat Message Match Snapshots: default 1`] = `
+<DocumentFragment>
+  <section
+    class="dtc__message__container"
+  >
+    <div
+      class="dtc__message__avatar"
+    >
+      <span
+        data-mock-icon="AiAvatarColored"
+      />
+    </div>
+    <div
+      class="dtc__message__wrapper"
+    >
+      <div
+        class="dtc__message__content"
+      >
+        <div
+          class="dtc__message__footer"
+        />
+      </div>
+    </div>
+    <div
+      class="ant-space ant-space-horizontal ant-space-align-center dtc__message__iconGroup"
+    >
+      <div
+        class="ant-space-item"
+      >
+        <span
+          class="dt-copy dtc__message__icon"
+        >
+          <span
+            data-mock-icon="CopyOutlined"
+          />
+        </span>
+      </div>
+    </div>
+  </section>
+</DocumentFragment>
+`;
+
+exports[`Test Chat Message Match Snapshots: empty 1`] = `
+<DocumentFragment>
+  <section
+    class="dtc__message__container"
+  >
+    <div
+      class="dtc__message__avatar"
+    >
+      <span
+        data-mock-icon="AiAvatarColored"
+      />
+    </div>
+    <div
+      class="dtc__message__wrapper"
+    >
+      <div
+        class="dtc__message__content"
+      >
+        <div
+          class="dtc__message__footer"
+        />
+      </div>
+    </div>
+    <div
+      class="ant-space ant-space-horizontal ant-space-align-center dtc__message__iconGroup"
+    />
+  </section>
+</DocumentFragment>
+`;
+
+exports[`Test Chat Message Match Snapshots: generating 1`] = `
+<DocumentFragment>
+  <section
+    class="dtc__message__container"
+  >
+    <div
+      class="dtc__message__avatar"
+    >
+      <span
+        data-mock-icon="AiAvatarColored"
+      />
+    </div>
+    <div
+      class="dtc__message__wrapper"
+    >
+      <div
+        class="dtc__message__content"
+      >
+        <div
+          class="dtc__message__footer"
+        />
+      </div>
+      <div
+        class="dtc__message__extra"
+      >
+        <button
+          class="ant-btn ant-btn-link dtc__message__stopBtn"
+          type="button"
+        >
+          <span
+            data-mock-icon="PauseOutlined"
+            style="vertical-align: sub;"
+          />
+          <span>
+            停止回答
+          </span>
+        </button>
+      </div>
+    </div>
+  </section>
+</DocumentFragment>
+`;
+
+exports[`Test Chat Message Match Snapshots: pending 1`] = `
+<DocumentFragment>
+  <section
+    class="dtc__message__container"
+  >
+    <div
+      class="dtc__message__avatar"
+    >
+      <span
+        data-mock-icon="AiAvatarColored"
+      />
+    </div>
+    <div
+      class="dtc__message__wrapper"
+    >
+      <div
+        class="dtc__message__content dtc__message__content--loading"
+      >
+        <div
+          class="dtc__aigc__loading"
+        >
+          <div />
+          <div />
+          <div />
+        </div>
+        <div
+          class="dtc__message__footer"
+        />
+      </div>
+      <div
+        class="dtc__message__extra"
+      >
+        <button
+          class="ant-btn ant-btn-link dtc__message__stopBtn"
+          type="button"
+        >
+          <span
+            data-mock-icon="PauseOutlined"
+            style="vertical-align: sub;"
+          />
+          <span>
+            停止回答
+          </span>
+        </button>
+      </div>
+    </div>
+  </section>
+</DocumentFragment>
+`;
+
+exports[`Test Chat Message Match Snapshots: stopped 1`] = `
+<DocumentFragment>
+  <section
+    class="dtc__message__container"
+  >
+    <div
+      class="dtc__message__avatar"
+    >
+      <span
+        data-mock-icon="AiAvatarColored"
+      />
+    </div>
+    <div
+      class="dtc__message__wrapper"
+    >
+      <div
+        class="dtc__message__content"
+      >
+        <div
+          class="dtc__message__footer"
+        >
+          <span
+            class="dtc__message__stopText"
+          >
+            回答已停止
+          </span>
+        </div>
+      </div>
+    </div>
+    <div
+      class="ant-space ant-space-horizontal ant-space-align-center dtc__message__iconGroup"
+    >
+      <div
+        class="ant-space-item"
+      >
+        <span
+          class="dt-copy dtc__message__icon"
+        >
+          <span
+            data-mock-icon="CopyOutlined"
+          />
+        </span>
+      </div>
+    </div>
+  </section>
+</DocumentFragment>
+`;

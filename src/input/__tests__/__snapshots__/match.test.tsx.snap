@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Input.Match component Should match snapshot 1`] = `
+<DocumentFragment>
+  <span
+    class="ant-input-affix-wrapper dt-input-match"
+  >
+    <input
+      class="ant-input"
+      type="text"
+      value=""
+    />
+    <span
+      class="ant-input-suffix"
+    >
+      <div
+        class="dt-input-match-items"
+      >
+        <span
+          class="dt-input-match-suffixItem"
+          data-mock-icon="CaseSensitiveMatchOutlined"
+        />
+        <span
+          class="dt-input-match-suffixItem"
+          data-mock-icon="ExactMatchOutlined"
+        />
+        <span
+          class="dt-input-match-suffixItem"
+          data-mock-icon="PrefixMatchOutlined"
+        />
+        <span
+          class="dt-input-match-suffixItem"
+          data-mock-icon="SuffixMatchOutlined"
+        />
+      </div>
+    </span>
+  </span>
+</DocumentFragment>
+`;
