@@ -36,6 +36,9 @@ export default defineConfig({
             'item-active-bg': 'fade(#3B7BFD, 20%)',
 
             'disabled-bg': '#F3F3F3',
+            'disabled-color': '#CCCCCC',
+
+            'primary-color-disabled': '#F9F9F9',
 
             'table-title-fill-bg': '#F3F3F3',
         },
