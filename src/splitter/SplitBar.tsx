@@ -27,8 +27,10 @@ export interface SplitBarProps {
     containerSize: number;
 }
 
-function getValidNumber(num: number | undefined): number {
-    return typeof num === 'number' && !Number.isNaN(num) ? Math.round(num) : 0;
+function getValidNumber(num?: number): number {
+    return typeof num === 'number' && !Number.isNaN(num) && Number.isFinite(num)
+        ? Math.round(num)
+        : 0;
 }
 
 const SplitBar: React.FC<SplitBarProps> = (props) => {
@@ -55,7 +57,6 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
 
     const splitBarPrefixCls = `${prefixCls}-bar`;
 
-    // ======================== Resize ========================
     const [startPos, setStartPos] = useState<[x: number, y: number] | null>(null);
     const [constrainedOffset, setConstrainedOffset] = useState<number>(0);
 
@@ -77,16 +78,13 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
         }
     };
 
-    // Updated constraint calculation
     const getConstrainedOffset = (rawOffset: number) => {
         const currentPos = (containerSize * ariaNow) / 100;
         const newPos = currentPos + rawOffset;
 
-        // Calculate available space
         const minAllowed = Math.max(0, (containerSize * ariaMin) / 100);
         const maxAllowed = Math.min(containerSize, (containerSize * ariaMax) / 100);
 
-        // Constrain new position within bounds
         const clampedPos = Math.max(minAllowed, Math.min(maxAllowed, newPos));
         return clampedPos - currentPos;
     };
@@ -182,7 +180,6 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
         [`--${splitBarPrefixCls}-preview-offset`]: `${constrainedOffset}px`,
     };
 
-    // ======================== Render ========================
     const StartIcon = vertical ? UpOutlined : LeftOutlined;
     const EndIcon = vertical ? DownOutlined : RightOutlined;
 
@@ -231,7 +228,6 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
                 </div>
             )}
 
-            {/* End Collapsible */}
             {endCollapsible && (
                 <div
                     className={classNames(
