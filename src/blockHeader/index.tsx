@@ -82,7 +82,6 @@ const BlockHeader: React.FC<IBlockHeaderProps> = function (props) {
     } = props;
 
     const [internalExpand, setInternalExpand] = useState(defaultExpand);
-    // const locale = useLocale('BlockHeader');
 
     const currentExpand = isControlled(props) ? expand : internalExpand;
 
@@ -122,7 +121,10 @@ const BlockHeader: React.FC<IBlockHeaderProps> = function (props) {
                     <div className="title__text">{title}</div>
                     {tooltipProps?.title ? (
                         <div className={`title__tooltip`}>
-                            <Tooltip {...tooltipProps}>
+                            <Tooltip
+                                {...tooltipProps}
+                                className={classNames(tooltipProps?.className, 'anticon')}
+                            >
                                 <QuestionOutlined />
                             </Tooltip>
                         </div>
@@ -132,11 +134,9 @@ const BlockHeader: React.FC<IBlockHeaderProps> = function (props) {
                 {addonAfter && <div className={`title__addon-after`}>{addonAfter}</div>}
                 {showCollapse && (
                     <div className={`title__collapse`}>
-                        <div className="collapse__text">
-                            {/* {currentExpand ? locale.collapse : locale.expand} */}
-                        </div>
+                        <div className="collapse__text">{currentExpand ? '收起' : '展开'}</div>
                         <UpOutlined
-                            className={classNames('collapse__icon', {
+                            className={classNames('collapse__icon', 'anticon', {
                                 'collapse__icon--up': currentExpand,
                                 'collapse__icon--down': !currentExpand,
                             })}
