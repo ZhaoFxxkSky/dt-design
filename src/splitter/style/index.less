@@ -1,0 +1,312 @@
+@import '../../style/themes/index.less';
+        
+@splitter-prefix-cls: ~'@{ant-prefix}-splitter';
+
+@splitter-resize-spinner-size: 20px;
+@splitter-split-bar-draggable-size: @splitter-resize-spinner-size;
+@splitter-split-bar-size: 2px;
+@splitter-split-trigger-size: 6px;
+
+@splitterBarPreviewOffsetVar: ~'@{splitter-prefix-cls}-bar-preview-offset';
+@splitter-transform-x: ~'translateX(var(--@{splitterBarPreviewOffsetVar}))';
+@splitter-transform-y: ~'translateY(var(--@{splitterBarPreviewOffsetVar}))';
+
+.center-position() {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.@{splitter-prefix-cls} {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: stretch;
+
+    & > .@{splitter-prefix-cls}-bar {
+        flex: none;
+        position: relative;
+        user-select: none;
+
+        .@{splitter-prefix-cls}-bar-dragger {
+            .center-position();
+            z-index: 1;
+            pointer-events: auto;
+
+            &::before {
+                content: '';
+                background: @item-hover-bg;
+                .center-position();
+            }
+
+            &::after {
+                content: '';
+                background: rgba(0, 0, 0, 0.15);
+                .center-position();
+            }
+
+            &:hover:not(.@{splitter-prefix-cls}-bar-dragger-active) {
+                &::before {
+                    background: @item-active-bg;
+                }
+            }
+
+            &.@{splitter-prefix-cls}-bar-dragger-active {
+                z-index: 2;
+
+                &::before {
+                    background: @item-active-bg;
+                }
+            }
+
+            &.@{splitter-prefix-cls}-bar-dragger-disabled {
+                z-index: 0;
+                cursor: default;
+
+                &,
+                &:hover,
+                &.@{splitter-prefix-cls}-bar-dragger-active {
+                    &::before {
+                        background: @disabled-bg;
+                    }
+                }
+
+                &::after {
+                    display: none;
+                }
+            }
+        }
+
+        .@{splitter-prefix-cls}-bar-collapse-bar {
+            .center-position();
+            z-index: @zindex-popover;
+            background: @item-hover-bg;
+            font-size: @font-size-base;
+            border-radius: @border-radius-base;
+            color: @text-color;
+            cursor: pointer;
+            opacity: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &:hover {
+                background: @item-active-bg;
+            }
+
+            &:active {
+                background: @item-active-bg;
+            }
+        }
+
+        &:hover,
+        &:active {
+            .@{splitter-prefix-cls}-bar-collapse-bar-hover-only {
+                opacity: 1;
+            }
+        }
+
+        .@{splitter-prefix-cls}-bar-collapse-bar-hover-only {
+            @media (hover: none) {
+                opacity: 1;
+            }
+        }
+
+        .@{splitter-prefix-cls}-bar-collapse-bar-always-hidden {
+            display: none;
+        }
+
+        .@{splitter-prefix-cls}-bar-collapse-bar-always-visible {
+            opacity: 1;
+        }
+    }
+
+    .@{splitter-prefix-cls}-mask {
+        position: fixed;
+        z-index: 9999;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: transparent;
+
+        &.@{splitter-prefix-cls}-mask-horizontal {
+            cursor: col-resize;
+        }
+
+        &.@{splitter-prefix-cls}-mask-vertical {
+            cursor: row-resize;
+        }
+    }
+
+    &.@{splitter-prefix-cls}-horizontal {
+        flex-direction: row;
+
+        & > .@{splitter-prefix-cls}-bar {
+            width: 0;
+
+            .@{splitter-prefix-cls}-bar-preview {
+                height: 100%;
+                width: @splitter-split-bar-size;
+                position: absolute;
+                background: @primary-color;
+                opacity: 0.2;
+                pointer-events: none;
+                transition: none;
+                z-index: 1;
+                display: none;
+
+                &.@{splitter-prefix-cls}-bar-preview-active {
+                    display: block;
+
+                    transform: @splitter-transform-x;
+                }
+            }
+
+            .@{splitter-prefix-cls}-bar-dragger {
+                cursor: col-resize;
+                height: 100%;
+                width: @splitter-split-trigger-size;
+
+                &::before {
+                    height: 100%;
+                    width: @splitter-split-bar-size;
+                }
+
+                &::after {
+                    height: @splitter-split-bar-draggable-size;
+                    width: @splitter-split-bar-size;
+                }
+            }
+
+            .@{splitter-prefix-cls}-bar-collapse-bar {
+                width: @font-size-sm;
+                height: @btn-height-sm;
+
+                &.@{splitter-prefix-cls}-bar-collapse-bar-start {
+                    left: auto;
+                    right: (@splitter-split-trigger-size / 2);
+                    transform: translateY(-50%);
+                }
+
+                &.@{splitter-prefix-cls}-bar-collapse-bar-end {
+                    left: (@splitter-split-trigger-size / 2);
+                    right: auto;
+                    transform: translateY(-50%);
+                }
+            }
+        }
+    }
+
+    &.@{splitter-prefix-cls}-vertical {
+        flex-direction: column;
+
+        & > .@{splitter-prefix-cls}-bar {
+            height: 0;
+
+            .@{splitter-prefix-cls}-bar-preview {
+                height: @splitter-split-bar-size;
+                width: 100%;
+                position: absolute;
+                background: @primary-color;
+                opacity: 0.2;
+                pointer-events: none;
+                transition: none;
+                z-index: 1;
+                display: none;
+
+                &.@{splitter-prefix-cls}-bar-preview-active {
+                    display: block;
+                    transform: @splitter-transform-y;
+                }
+            }
+
+            .@{splitter-prefix-cls}-bar-dragger {
+                cursor: row-resize;
+                width: 100%;
+                height: @splitter-split-trigger-size;
+
+                &::before {
+                    width: 100%;
+                    height: @splitter-split-bar-size;
+                }
+
+                &::after {
+                    width: @splitter-split-bar-draggable-size;
+                    height: @splitter-split-bar-size;
+                }
+            }
+
+            .@{splitter-prefix-cls}-bar-collapse-bar {
+                height: @font-size-sm;
+                width: @btn-height-sm;
+
+                &.@{splitter-prefix-cls}-bar-collapse-bar-start {
+                    top: auto;
+                    bottom: (@splitter-split-trigger-size / 2);
+                    transform: translateX(-50%);
+                }
+
+                &.@{splitter-prefix-cls}-bar-collapse-bar-end {
+                    top: (@splitter-split-trigger-size / 2);
+                    bottom: auto;
+                    transform: translateX(-50%);
+                }
+            }
+        }
+    }
+
+    .@{splitter-prefix-cls}-panel {
+        overflow: auto;
+        padding: 0 1px;
+        box-sizing: border-box;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: @table-sticky-scroll-bar-bg;
+            border-radius: @table-sticky-scroll-bar-radius;
+        }
+
+        &.@{splitter-prefix-cls}-panel-hidden {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        &:has(.@{splitter-prefix-cls}:only-child) {
+            overflow: hidden;
+        }
+    }
+
+    &.@{ant-prefix}-rtl.@{splitter-prefix-cls}-horizontal {
+        & > .@{splitter-prefix-cls}-bar {
+            .@{splitter-prefix-cls}-bar-collapse-previous {
+                right: 0;
+                left: unset;
+            }
+
+            .@{splitter-prefix-cls}-bar-collapse-next {
+                right: unset;
+                left: 0;
+            }
+        }
+    }
+
+    &.@{ant-prefix}-rtl.@{splitter-prefix-cls}-vertical {
+        & > .@{splitter-prefix-cls}-bar {
+            .@{splitter-prefix-cls}-bar-collapse-previous {
+                right: 50%;
+                left: unset;
+            }
+
+            .@{splitter-prefix-cls}-bar-collapse-next {
+                right: 50%;
+                left: unset;
+            }
+        }
+    }
+}

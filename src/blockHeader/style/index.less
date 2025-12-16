@@ -1,0 +1,143 @@
+@import '../../style/themes/index.less';
+
+@card_prefix: ~'@{ant-prefix}-block-header';
+
+.@{card_prefix} {
+    &__title {
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        &--large {
+            .title__box {
+                line-height: 24px;
+                .title__text {
+                    font-size: 16px;
+                }
+            }
+        }
+        &--middle {
+            .title__box {
+                line-height: 22px;
+                .title__text {
+                    font-size: 14px;
+                }
+            }
+        }
+        &--small {
+            .title__box {
+                line-height: 20px;
+                .title__text {
+                    font-size: 12px;
+                }
+            }
+        }
+        &--background {
+            padding: 0 12px;
+            background-color: #f9f9fa;
+            &.@{card_prefix}__title {
+                &--middle,
+                &--large {
+                    height: 40px;
+                }
+                &--small {
+                    height: 32px;
+                }
+            }
+        }
+        &--pointer {
+            cursor: pointer;
+        }
+        .title {
+            &__box {
+                flex: 1;
+                display: flex;
+                align-items: center;
+            }
+            &__addon-before {
+                margin-right: 8px;
+                color: @primary-color;
+                &--middle {
+                    .addon-before--default {
+                        width: 4px;
+                        height: 16px;
+                        background-color: @primary-color;
+                    }
+                    font-size: 20px;
+                }
+                &--small {
+                    .addon-before--default {
+                        width: 4px;
+                        height: 16px;
+                        background-color: @primary-color;
+                    }
+                    font-size: 16px;
+                }
+                &--large {
+                    .addon-before--default {
+                        width: 4px;
+                        height: 20px;
+                        background-color: @primary-color;
+                    }
+                    font-size: 24px;
+                }
+            }
+            &__tooltip {
+                display: flex;
+                margin-right: 4px;
+                font-size: 16px;
+                color: #b1b4c5;
+                cursor: pointer;
+            }
+            &__text {
+                color: @text-color;
+                font-weight: 500;
+                margin-right: 4px;
+            }
+            &__description {
+                display: flex;
+                align-items: center;
+                color: @label-color;
+                font-size: 12px;
+            }
+            &__addon-after {
+                color: @label-color;
+            }
+            &__collapse {
+                color: @label-color;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                user-select: none;
+                .collapse {
+                    &__text {
+                        font-size: 12px;
+                        margin: 0 4px;
+                    }
+                    &__icon {
+                        font-size: 16px;
+                        transition: transform 0.4s;
+                        &--down {
+                            transform: rotate(-180deg);
+                        }
+                        &--up {
+                            transform: rotate(0deg);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    &__content {
+        padding: 16px 24px;
+
+        // opacity: 0;
+        // height: 0;
+        // overflow: hidden;
+        // transition: opacity 0.5s ease, height 0.5s ease;
+        &--active {
+            // opacity: 1;
+            // height: auto;
+        }
+    }
+}

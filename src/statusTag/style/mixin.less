@@ -1,0 +1,39 @@
+.status-color(@color, @bg) {
+    &--icon {
+        color: @color;
+    }
+    &--fill {
+        color: @color;
+        background-color: @bg;
+    }
+    &--iconBg {
+        background: @color;
+    }
+}
+
+.color-map() {
+    &__yellow {
+        .status-color(#FBB310, #FFF4D9);
+    }
+    &__blue {
+        .status-color(#1d78ff, #E8F1FF);
+    }
+    &__green {
+        .status-color(#11d782, #E7FBF7);
+    }
+    &__gray {
+        .status-color(#B1B4C5, #F5F5F8);
+    }
+    &__red {
+        .status-color(#F96C5B, #FDE9E7);
+    }
+    &__purple {
+        .status-color(#AC9DFF, #EAE6FF);
+    }
+    &__cyan {
+        .status-color(#2cccdf, #E7F8FA);
+    }
+    &__pink {
+        .status-color(#FF82AE, #FFE6EF);
+    }
+}

@@ -1,0 +1,57 @@
+@import "../../theme/style/const.scss";
+
+.dt-homepage {
+    background-color: #EBF5FD;
+    height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    .dt-homepage-title {
+        font-size: 70px;
+        color: $basic-black-color;
+        user-select: none;
+        margin-bottom: 12px;
+        line-height: 1.15;
+    }
+    .dt-homepage-badges {
+        margin-bottom: 12px;
+        img:not(:last-child) {
+            margin-inline-end: 20px;
+        }
+    }
+    .dt-homepage-description {
+        color: $basic-black-color;
+        font-size: 30px;
+    }
+    .dt-homepage-btnGroups {
+        margin: 12px auto 0;
+        display: grid;
+        grid-gap: 18px;
+        grid-template-columns: 1fr 1fr;
+        > .ant-btn {
+            font-size: 20px;
+            height: 40px;
+            line-height: 40px;
+        }
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .dt-homepage {
+        height: calc(100vh - 52px);
+        .dt-homepage-title {
+            font-size: 60px;
+        }
+        .dt-homepage-description {
+            font-size: 26px;
+        }
+        .dt-homepage-btnGroups {
+            > .ant-btn {
+                font-size: 16px;
+                height: 32px;
+                line-height: 32px;
+            }
+        }
+    }
+}

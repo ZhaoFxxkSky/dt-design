@@ -1,0 +1,70 @@
+@import '../../style/themes/index.less';
+@import './mixin.less';
+@import './mixin.less';
+
+@status-tag-prefix-cls: ~'@{ant-prefix}-status-tag';
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// 主选择器
+.@{status-tag-prefix-cls} {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    height: 24px;
+    font-size: 12px;
+    color: #3d446e;
+
+    .ant-spin {
+        font-size: 14px; // 修复 antd 字体居中问题
+    }
+
+    &--border {
+        padding: 2px 12px;
+        border: 1px solid #d8dae2;
+        background-color: #fff;
+    }
+
+    &--fill {
+        padding: 2px 12px;
+    }
+
+    &--rounded {
+        border-radius: 14px;
+    }
+
+    &__icon {
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        margin-right: 8px;
+
+        &--default {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        &--loading {
+            animation: spin 1s linear infinite;
+        }
+    }
+
+    &__text {
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 22px;
+        white-space: nowrap;
+    }
+
+    // 调用颜色映射 Mixin，生成所有颜色的样式
+    .color-map();
+}

@@ -1,0 +1,24 @@
+@import '../../style/themes/index.less';
+
+@collapsible-prefix-cls: ~'@{ant-prefix}-collapsible';
+
+@transition-duration-collapsible-height: 250ms;
+@transition-function-collapsible-height: cubic-bezier(0.25, 0.1, 0.25, 1);
+@transition-delay-collapsible-height: 0ms;
+
+@transition-duration-collapsible-opacity: 250ms;
+@transition-function-collapsible-opacity: @ease-in;
+@transition-delay-collapsible-opacity: 0ms;
+
+// 容器基础样式
+.@{collapsible-prefix-cls}-wrapper {
+    box-sizing: border-box;
+}
+
+// 过渡动画样式
+.@{collapsible-prefix-cls}-transition {
+    transition: height @transition-duration-collapsible-height
+            @transition-function-collapsible-height @transition-delay-collapsible-height,
+        opacity @transition-duration-collapsible-opacity @transition-function-collapsible-opacity
+            @transition-delay-collapsible-opacity;
+}

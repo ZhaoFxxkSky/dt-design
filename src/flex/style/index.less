@@ -1,0 +1,77 @@
+@import '../../style/themes/index.less';
+
+@flex-prefix-cls: ~'@{ant-prefix}-flex';
+
+// 属性与值的映射
+@align-items-values: {
+    stretch: stretch;
+    flex-start: flex-start;
+    center: center;
+    flex-end: flex-end;
+    baseline: baseline;
+};
+
+@justify-content-values: {
+    flex-start: flex-start;
+    center: center;
+    flex-end: flex-end;
+    space-between: space-between;
+    space-around: space-around;
+    space-evenly: space-evenly;
+};
+
+@flex-wrap-values: {
+    nowrap: nowrap;
+    wrap: wrap;
+    wrap-reverse: wrap-reverse;
+};
+
+.@{flex-prefix-cls} {
+    display: flex;
+    margin: 0;
+    padding: 0;
+
+    // 方向
+    &-vertical {
+        flex-direction: column;
+    }
+    &-rtl {
+        direction: rtl;
+    }
+    &:empty {
+        display: none;
+    }
+
+    // 间距 (Gap)
+    &-gap-small {
+        gap: @padding-xs;
+    }
+    &-gap-middle {
+        gap: @padding-md;
+    }
+    &-gap-large {
+        gap: @padding-lg;
+    }
+
+    // 使用 Loops/Each 抽象重复代码
+    // flex-wrap
+    each(@flex-wrap-values, .(@value, @key) {
+        &-wrap-@{key} {
+            flex-wrap: @value;
+        }
+    });
+
+    // align-items
+    each(@align-items-values, .(@value, @key) {
+        &-align-@{key} {
+            align-items: @value;
+        }
+    });
+
+    // justify-content
+    each(@justify-content-values, .(@value, @key) {
+        &-justify-@{key} {
+            justify-content: @value;
+        }
+    });
+}

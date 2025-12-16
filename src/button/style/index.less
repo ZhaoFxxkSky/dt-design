@@ -1,0 +1,134 @@
+@import '../../style/themes/index.less';
+@import './mixin.less';
+
+@btn-prefix-cls: ~'@{ant-prefix}-btn';
+
+.@{btn-prefix-cls} {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    // 引用中尺寸配置（核心：先调用混入，再取值）
+    .btn-size-middle();
+    padding: @padding;
+
+    // 图标样式
+    &__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: inherit;
+        line-height: 0;
+
+        .dtstack-icon {
+            font-size: inherit;
+        }
+
+        // 小尺寸图标
+        &--small {
+            .btn-size-small();
+            font-size: @icon-font-size;
+        }
+        // 中尺寸图标
+        &--middle {
+            .btn-size-middle();
+            font-size: @icon-font-size;
+        }
+        // 大尺寸图标
+        &--large {
+            .btn-size-large();
+            font-size: @icon-font-size;
+        }
+
+        // 图标与文字间距
+        & + .@{btn-prefix-cls}__text {
+            &--small {
+                .btn-size-small();
+                margin-left: @icon-text-margin;
+            }
+            &--middle {
+                .btn-size-middle();
+                margin-left: @icon-text-margin;
+            }
+            &--large {
+                .btn-size-large();
+                margin-left: @icon-text-margin;
+            }
+        }
+    }
+
+    // 文字样式
+    &__text {
+        display: inline-block;
+
+        &--small {
+            .btn-size-small();
+            font-size: @text-font-size;
+        }
+        &--middle {
+            .btn-size-middle();
+            font-size: @text-font-size;
+        }
+        &--large {
+            .btn-size-large();
+            font-size: @text-font-size;
+        }
+    }
+
+    // 尺寸变体
+    &-sm {
+        .btn-size-small();
+        padding: @padding;
+    }
+    &-lg {
+        .btn-size-large();
+        padding: @padding;
+    }
+
+    // 主要按钮
+    &-primary {
+        .btn-disabled-primary();
+        .generate-btn-disabled(@bg, @color, @border);
+
+        &:hover,
+        &:focus {
+            background-color: #225fdb;
+        }
+    }
+
+    // 次要按钮
+    &-secondary {
+        border-color: @primary-color;
+        color: @primary-color;
+
+        &:hover,
+        &:focus {
+            background-color: fade(@primary-color, 10%);
+        }
+
+        .btn-disabled-secondary-tertiary();
+        .generate-btn-disabled(@bg, @color, @border);
+    }
+
+    // 三级按钮
+    &-tertiary {
+        background-color: #f3f3f3;
+        border-color: @border-color-base;
+
+        &:hover,
+        &:focus {
+            background-color: fade(@primary-color, 10%);
+            border-color: @primary-color;
+            color: @primary-color;
+        }
+
+        .btn-disabled-secondary-tertiary();
+        .generate-btn-disabled(@bg, @color, @border);
+    }
+
+    // 默认按钮
+    &-default {
+        .btn-disabled-default();
+        .generate-btn-disabled(@bg, @color, @border);
+    }
+}

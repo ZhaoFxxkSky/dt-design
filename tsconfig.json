@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "module": "esnext",
+        "target": "es6",
+        "moduleResolution": "Node",
+        "resolveJsonModule": true,
+        "keyofStringsOnly": true,
+        "allowSyntheticDefaultImports": true,
+        "experimentalDecorators": true,
+        "strict": true,
+        "declaration": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "lib": ["es6", "es2016", "dom"],
+        "jsx": "react",
+        "baseUrl": "./",
+        "outDir": "./dist",
+        "typeRoots": ["node", "node_modules/@types"],
+        "paths": {
+            "@@/*": [".dumi/tmp/*"],
+            "@dtjoy/dt-design": ["src"],
+            "@dtjoy/dt-design/*": ["src/*", "*"]
+        }
+    },
+    "include": ["src/**/*", ".dumirc.ts","global.d.ts"]
+}

@@ -1,0 +1,47 @@
+.btn-size-small() {
+    @padding: 2px 12px;
+    @icon-font-size: 12px;
+    @text-font-size: 12px;
+    @icon-text-margin: 2px;
+}
+.btn-size-middle() {
+    @padding: 4px 16px;
+    @icon-font-size: 16px;
+    @text-font-size: 14px;
+    @icon-text-margin: 8px;
+}
+.btn-size-large() {
+    @padding: 3px 40px;
+    @icon-font-size: 18px;
+    @text-font-size: 14px;
+    @icon-text-margin: 8px;
+}
+
+// 禁用状态配置（同样用混入）
+.btn-disabled-primary() {
+    @bg: @disabled-color;
+    @color: #F9F9F9;
+    @border: @disabled-color;
+}
+.btn-disabled-secondary-tertiary() {
+    @bg: @primary-color-disabled;
+    @color: @disabled-color;
+    @border: @border-color-base;
+}
+.btn-disabled-default() {
+    @bg: transparent;
+    @color: @disabled-color;
+    @border: @border-color-base;
+}
+
+// ===================== 工具混入 =====================
+.generate-btn-disabled(@bg, @color, @border) {
+    &[disabled],
+    &[disabled]:hover {
+        background: @bg;
+        color: @color;
+        border-color: @border;
+        cursor: not-allowed;
+        opacity: 1;
+    }
+}

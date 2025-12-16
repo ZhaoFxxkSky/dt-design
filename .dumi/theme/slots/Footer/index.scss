@@ -1,0 +1,47 @@
+@import "../../style/const.scss";
+
+.dt-footer {
+    margin-top: 16px;
+    background: rgb(250, 250, 252);
+    .dt-footer-links {
+        padding-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        .dt-footer-rows {
+            width: 200px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            .dt-footer-rows-title {
+                line-height: 28px;
+                font-size: 14px;
+                color: #8B8FA8;
+            }
+            .dt-footer-col {
+                line-height: 28px;
+                > a {
+                    color: $basic-black-color;
+                }
+            }
+        }
+    }
+    .dt-footer-divider {
+        margin: 0 48px;
+    }
+    .dt-footer-copyright {
+        text-align: center;
+        font-size: 14px;
+        padding-bottom: 20px;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .dt-footer {
+        .dt-footer-links {
+            .dt-footer-rows {
+                width: 100px;
+            }
+        }
+    }
+}
