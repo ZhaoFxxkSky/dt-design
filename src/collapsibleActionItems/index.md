@@ -101,7 +101,7 @@ export default () => {
 import React, { useState } from 'react';
 import { CollapsibleActionItems } from '@dtjoy/dt-design';
 import { Table, message, Popconfirm } from 'antd';
-import { DownOutlined } from '@dtinsight/react-icons';
+import { DownOutlined } from '@ant-design/icons';
 
 export default () => {
     const [dataSource, setDataSource] = useState([

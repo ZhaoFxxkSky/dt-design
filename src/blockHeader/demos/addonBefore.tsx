@@ -1,5 +1,5 @@
 import React from 'react';
-import { PauseOutlined, PieChartFilled } from '@dtinsight/react-icons';
+import { PauseOutlined, PieChartFilled } from '@ant-design/icons';
 import { BlockHeader } from '@dtjoy/dt-design';
 
 export default () => {

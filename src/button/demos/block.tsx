@@ -1,7 +1,7 @@
 import React from 'react';
-import { UploadOutlined } from '@dtinsight/react-icons';
-import { Space } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import { Button } from '@dtjoy/dt-design';
+import { Space } from 'antd';
 
 export default function BlockDemo() {
     return (

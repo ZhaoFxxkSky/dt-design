@@ -1,5 +1,3 @@
-import '@dtinsight/react-icons/dist/index.css';
-
 export { default as BlockHeader } from './blockHeader';
 export type { ButtonProps } from './button';
 export { default as Button } from './button';

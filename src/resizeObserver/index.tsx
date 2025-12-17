@@ -1,6 +1,5 @@
 import React from 'react';
 import { findDOMNode } from 'react-dom';
-import PropTypes from 'prop-types';
 
 interface BaseProps {
     className?: string;
@@ -27,21 +26,7 @@ export enum ObserverProperty {
     All = 'all',
 }
 
-export default class Index extends React.Component<ReactResizeObserverProps> {
-    static propTypes = {
-        onResize: PropTypes.func,
-        observeParent: PropTypes.bool,
-        observerProperty: PropTypes.oneOf([
-            ObserverProperty.Width,
-            ObserverProperty.Height,
-            ObserverProperty.All,
-        ]),
-        delayTick: PropTypes.number,
-        children: PropTypes.element.isRequired,
-        className: PropTypes.string,
-        style: PropTypes.object,
-    };
-
+export default class ReactResizeObserver extends React.Component<ReactResizeObserverProps> {
     static defaultProps = {
         onResize: () => {},
         observeParent: false,

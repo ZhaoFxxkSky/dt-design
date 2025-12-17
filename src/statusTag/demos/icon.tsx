@@ -1,21 +1,21 @@
 import React from 'react';
-import { TargetFilled } from '@dtinsight/react-icons';
+import { BookOutlined } from '@ant-design/icons';
 import { StatusTag } from '@dtjoy/dt-design';
 import { Space } from 'antd';
 
 export default () => {
     return (
         <Space direction="vertical">
-            <StatusTag color="green" type="outline" icon={<TargetFilled />}>
+            <StatusTag color="green" type="outline" icon={<BookOutlined />}>
                 成功
             </StatusTag>
-            <StatusTag color="blue" icon={<TargetFilled />}>
+            <StatusTag color="blue" icon={<BookOutlined />}>
                 运行中
             </StatusTag>
-            <StatusTag color="yellow" type="fill" icon={<TargetFilled />}>
+            <StatusTag color="yellow" type="fill" icon={<BookOutlined />}>
                 运行中
             </StatusTag>
-            <StatusTag color="#2f10fb" type="fill" icon={<TargetFilled />}>
+            <StatusTag color="#2f10fb" type="fill" icon={<BookOutlined />}>
                 运行中
             </StatusTag>
         </Space>

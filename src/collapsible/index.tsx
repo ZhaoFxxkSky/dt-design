@@ -1,7 +1,7 @@
 import React from 'react';
 import { globalConfig } from 'antd/es/config-provider';
 import classNames from 'classnames';
-import { isEqual, pick } from 'lodash';
+import { isEqual, pick } from 'lodash-es';
 import './style';
 
 interface BaseComponentProps {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UploadOutlined } from '@dtinsight/react-icons';
+import { UploadOutlined } from '@ant-design/icons';
 import { Button } from '@dtjoy/dt-design';
 import { Radio, Space } from 'antd';
 

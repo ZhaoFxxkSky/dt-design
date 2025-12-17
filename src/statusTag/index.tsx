@@ -1,5 +1,5 @@
 import React, { CSSProperties, HTMLAttributes, ReactNode, useMemo } from 'react';
-import { SpinOutlined } from '@dtinsight/react-icons';
+import { LoadingOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
 import { globalConfig } from 'antd/es/config-provider';
 import classNames from 'classnames';
@@ -144,7 +144,7 @@ const StatusTag: React.FC<IStatusTagProps> = React.memo((props) => {
     }, [color, icon, prefixCls]);
 
     const loadingIndicator = useMemo(
-        () => <SpinOutlined className={`${prefixCls}__icon ${prefixCls}__icon--loading`} />,
+        () => <LoadingOutlined className={`${prefixCls}__icon ${prefixCls}__icon--loading`} />,
         [prefixCls]
     );
 

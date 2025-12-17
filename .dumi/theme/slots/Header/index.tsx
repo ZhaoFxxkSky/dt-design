@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HamburgerOutlined, MenuCloseOutlined } from '@dtinsight/react-icons';
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
 import { useRouteMeta } from 'dumi';
 import LangSwitch from 'dumi/theme-default/slots/LangSwitch';
@@ -65,7 +65,7 @@ export default function Header() {
                         setShowMenu((v) => !v);
                     }}
                 >
-                    {showMenu ? <MenuCloseOutlined /> : <HamburgerOutlined />}
+                    {showMenu ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                 </button>
             </div>
         </div>

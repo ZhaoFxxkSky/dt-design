@@ -1,9 +1,8 @@
 import React, { ReactNode, useState } from 'react';
-import { QuestionOutlined, UpOutlined } from '@dtinsight/react-icons';
+import { QuestionCircleOutlined, UpOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import { globalConfig } from 'antd/es/config-provider';
 import classNames from 'classnames';
-// import useLocale from '../locale/useLocale';
 import './style';
 
 import { LabelTooltipType, toTooltipProps } from '../_util';
@@ -123,9 +122,9 @@ const BlockHeader: React.FC<IBlockHeaderProps> = function (props) {
                         <div className={`title__tooltip`}>
                             <Tooltip
                                 {...tooltipProps}
-                                className={classNames(tooltipProps?.className, 'anticon')}
+                                className={classNames(tooltipProps?.className)}
                             >
-                                <QuestionOutlined />
+                                <QuestionCircleOutlined />
                             </Tooltip>
                         </div>
                     ) : null}
@@ -136,7 +135,7 @@ const BlockHeader: React.FC<IBlockHeaderProps> = function (props) {
                     <div className={`title__collapse`}>
                         <div className="collapse__text">{currentExpand ? '收起' : '展开'}</div>
                         <UpOutlined
-                            className={classNames('collapse__icon', 'anticon', {
+                            className={classNames('collapse__icon', {
                                 'collapse__icon--up': currentExpand,
                                 'collapse__icon--down': !currentExpand,
                             })}

@@ -1,11 +1,9 @@
-/* eslint-disable react/no-array-index-key */
-import React, { useContext,useState } from 'react';
-// 替换 v5 配置为 v4 ConfigContext
+import React, { useContext, useState } from 'react';
 import { ConfigContext } from 'antd/es/config-provider';
 import classNames from 'classnames';
 import ResizeObserver from 'rc-resize-observer';
-import useEvent from 'rc-util/lib/hooks/useEvent';
-import warning from 'rc-util/lib/warning'; // 替换 devUseWarning 为 v4 原生 warning
+import useEvent from 'rc-util/es/hooks/useEvent';
+import warning from 'rc-util/es/warning';
 
 import useItems from './hooks/useItems';
 import useResizable from './hooks/useResizable';
@@ -120,8 +118,6 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
         onResizeEnd?.(nextSizes);
     });
 
-    // ======================== Styles ========================
-    // 构建 v4 风格类名（移除 cssinjs 相关 hash 和变量类）
     const containerClassName = classNames(
         prefixCls,
         className,
@@ -130,11 +126,6 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
             [`${prefixCls}-rtl`]: isRTL,
         },
         rootClassName
-        // 移除 v5 cssinjs 类名
-        // contextClassName,
-        // cssVarCls,
-        // rootCls,
-        // hashId
     );
 
     // ======================== Render ========================
@@ -152,10 +143,8 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
         return mergedSizes;
     }, [itemPtgSizes]);
 
-    // 合并样式（移除 v5 上下文样式）
     const mergedStyle: React.CSSProperties = { ...style };
 
-    // 移除 wrapCSSVar 包装（v4 无需 cssinjs 变量注入）
     return (
         <ResizeObserver onResize={onContainerResize}>
             <div style={mergedStyle} className={containerClassName}>
@@ -165,7 +154,6 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
                         <InternalPanel {...item} prefixCls={prefixCls} size={panelSizes[idx]} />
                     );
 
-                    // Split Bar
                     let splitBar: React.ReactElement | null = null;
 
                     const resizableInfo = resizableInfos[idx];
@@ -214,7 +202,6 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
                     );
                 })}
 
-                {/* Fake mask for cursor */}
                 {typeof movingIndex === 'number' && (
                     <div aria-hidden className={classNames(maskCls, `${maskCls}-${layout}`)} />
                 )}

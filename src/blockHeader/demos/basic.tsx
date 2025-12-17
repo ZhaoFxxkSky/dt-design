@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PieChartOutlined } from '@dtinsight/react-icons';
+import { PieChartOutlined } from '@ant-design/icons';
 import { BlockHeader } from '@dtjoy/dt-design';
 import { SizeType } from '@dtjoy/dt-design/blockHeader';
 import { Radio, Space, Switch } from 'antd';

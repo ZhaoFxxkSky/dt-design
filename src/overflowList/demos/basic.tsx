@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import {
-    AigcOutlined,
-    AlarmColored,
+    AlibabaOutlined,
+    AliyunOutlined,
     BookOutlined,
     QuestionOutlined,
-    StreamTaskColored,
-    WorkflowOutlined,
-} from '@dtinsight/react-icons';
+    WechatOutlined,
+    YoutubeOutlined,
+} from '@ant-design/icons';
 import { OverflowList } from '@dtjoy/dt-design';
 import { Slider, Tag } from 'antd';
 
@@ -29,12 +29,12 @@ export default function () {
     };
 
     const items = [
-        { icon: <AlarmColored style={{ marginRight: 4 }} />, key: 'alarm' },
+        { icon: <WechatOutlined style={{ marginRight: 4 }} />, key: 'alarm' },
         { icon: <BookOutlined style={{ marginRight: 4 }} />, key: 'bookmark' },
         { icon: <QuestionOutlined style={{ marginRight: 4 }} />, key: 'camera' },
-        { icon: <AigcOutlined style={{ marginRight: 4 }} />, key: 'duration' },
-        { icon: <WorkflowOutlined style={{ marginRight: 4 }} />, key: 'edit' },
-        { icon: <StreamTaskColored style={{ marginRight: 4 }} />, key: 'folder' },
+        { icon: <AliyunOutlined style={{ marginRight: 4 }} />, key: 'duration' },
+        { icon: <AlibabaOutlined style={{ marginRight: 4 }} />, key: 'edit' },
+        { icon: <YoutubeOutlined style={{ marginRight: 4 }} />, key: 'folder' },
     ];
 
     return (

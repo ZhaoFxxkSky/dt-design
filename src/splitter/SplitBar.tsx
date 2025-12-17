@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DownOutlined, LeftOutlined, RightOutlined, UpOutlined } from '@dtinsight/react-icons';
+import { DownOutlined, LeftOutlined, RightOutlined, UpOutlined } from '@ant-design/icons';
 import classNames from 'classnames';
 import useEvent from 'rc-util/lib/hooks/useEvent';
 import useLayoutEffect from 'rc-util/lib/hooks/useLayoutEffect';

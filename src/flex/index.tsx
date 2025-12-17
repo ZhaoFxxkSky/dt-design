@@ -1,6 +1,6 @@
 import React from 'react';
 import { ConfigConsumerProps, ConfigContext, globalConfig } from 'antd/es/config-provider';
-import { clsx } from 'clsx';
+import clsx from 'classnames';
 import { omit } from 'lodash-es';
 import './style';
 

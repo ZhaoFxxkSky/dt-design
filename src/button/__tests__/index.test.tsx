@@ -1,5 +1,5 @@
 import React from 'react';
-import { UploadOutlined } from '@dtinsight/react-icons';
+import { UploadOutlined } from '@ant-design/icons';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
