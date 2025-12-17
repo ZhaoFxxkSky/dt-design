@@ -6,7 +6,6 @@ group:
 toc: content
 demo:
     cols: 2
-order: 1
 ---
 
 # Collapsible 折叠

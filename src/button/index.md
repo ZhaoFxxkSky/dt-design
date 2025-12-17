@@ -1,4 +1,5 @@
 ---
+nav: 组件
 title: Button 按钮
 group:
     title: 通用

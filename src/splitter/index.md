@@ -4,7 +4,6 @@ group: 布局
 toc: content
 demo:
     cols: 1
-order: 2
 ---
 
 # Splitter 分隔面板

@@ -4,7 +4,6 @@ group: 数据展示
 toc: content
 demo:
     cols: 2
-order: 2
 ---
 
 # BlockHeader 标题
