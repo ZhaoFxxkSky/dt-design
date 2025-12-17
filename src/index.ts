@@ -8,6 +8,7 @@ export type { FlexProps } from './flex/interface';
 // export { default as Catalogue } from './catalogue';
 // export { default as Chat } from './chat';
 export { default as CollapsibleActionItems } from './collapsibleActionItems';
+export { default as OverflowList } from './overflowList';
 // export { default as ConfigProvider } from './configProvider';
 // export { default as ContentLayout } from './contentLayout';
 // export { default as ContextMenu } from './contextMenu';
