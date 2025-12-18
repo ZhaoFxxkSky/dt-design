@@ -1,7 +1,5 @@
 import { ShowCollapsibleIconMode } from './SplitBar';
 
-// ================ outside ================
-
 export interface SplitterProps {
     prefixCls?: string;
     className?: string;
@@ -11,6 +9,7 @@ export interface SplitterProps {
     onResizeStart?: (sizes: number[]) => void;
     onResize?: (sizes: number[]) => void;
     onResizeEnd?: (sizes: number[]) => void;
+    onCollapse?: (collapsed: boolean[], sizes: number[]) => void;
     lazy?: boolean;
 }
 
@@ -26,8 +25,6 @@ export interface PanelProps {
     resizable?: boolean;
     defaultSize?: number | string;
 }
-
-// ================ inside ================
 
 export interface InternalPanelProps extends PanelProps {
     className?: string;

@@ -31,15 +31,12 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
     const { getPrefixCls, direction } = useContext(ConfigContext);
     const prefixCls = getPrefixCls('splitter', customizePrefixCls);
 
-    // ======================== Direct ========================
     const isVertical = layout === 'vertical';
     const isRTL = direction === 'rtl';
     const reverse = !isVertical && isRTL;
 
-    // ====================== Items Data ======================
     const items = useItems(children);
 
-    // >>> Warning 适配 v4
     if (process.env.NODE_ENV !== 'production') {
         let existSize = false;
         let existUndefinedSize = false;
@@ -60,7 +57,6 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
         }
     }
 
-    // ====================== Container =======================
     const [containerSize, setContainerSize] = useState<number | undefined>();
 
     const onContainerResize = (size: { offsetWidth: number; offsetHeight: number }) => {
@@ -72,11 +68,9 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
         setContainerSize(containerSize);
     };
 
-    // ========================= Size =========================
     const [panelSizes, itemPxSizes, itemPtgSizes, itemPtgMinSizes, itemPtgMaxSizes, updateSizes] =
         useSizes(items, containerSize);
 
-    // ====================== Resizable =======================
     const resizableInfos = useResizable(items, itemPxSizes, isRTL);
 
     const [onOffsetStart, onOffsetUpdate, onOffsetEnd, onCollapse, movingIndex] = useResize(
@@ -88,7 +82,6 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
         isRTL
     );
 
-    // ======================== Events ========================
     const onInternalResizeStart = useEvent((index: number) => {
         onOffsetStart(index);
         onResizeStart?.(itemPxSizes);
@@ -116,6 +109,8 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
         const nextSizes = onCollapse(index, type);
         onResize?.(nextSizes);
         onResizeEnd?.(nextSizes);
+        const collapsed = nextSizes.map((size) => Math.abs(size) < Number.EPSILON);
+        props.onCollapse?.(collapsed, nextSizes);
     });
 
     const containerClassName = classNames(
@@ -128,20 +123,20 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
         rootClassName
     );
 
-    // ======================== Render ========================
     const maskCls = `${prefixCls}-mask`;
 
     const stackSizes = React.useMemo(() => {
         const mergedSizes: number[] = [];
 
         let stack = 0;
-        for (let i = 0; i < items.length; i += 1) {
+        const len = items.length;
+        for (let i = 0; i < len; i += 1) {
             stack += itemPtgSizes[i];
             mergedSizes.push(stack);
         }
 
         return mergedSizes;
-    }, [itemPtgSizes]);
+    }, [itemPtgSizes, items.length]);
 
     const mergedStyle: React.CSSProperties = { ...style };
 
@@ -149,7 +144,6 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
         <ResizeObserver onResize={onContainerResize}>
             <div style={mergedStyle} className={containerClassName}>
                 {items.map((item, idx) => {
-                    // Panel
                     const panel = (
                         <InternalPanel {...item} prefixCls={prefixCls} size={panelSizes[idx]} />
                     );
