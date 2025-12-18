@@ -142,6 +142,7 @@ export default function InternalTable({
                 validateFirst,
                 validateTrigger,
                 valuePropName,
+                wrapperCol,
                 render,
                 ...cols
             }) => {
@@ -158,6 +159,7 @@ export default function InternalTable({
                     messageVariables,
                     validateFirst,
                     validateTrigger,
+                    wrapperCol,
                     tooltip,
                     valuePropName,
                 };
