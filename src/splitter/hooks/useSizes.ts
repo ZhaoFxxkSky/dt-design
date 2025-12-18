@@ -73,7 +73,7 @@ export default function useSizes(items: PanelProps[], containerSize?: number) {
         }
 
         return autoPtgSizes(ptgList, postPercentMinSizes, postPercentMaxSizes);
-    }, [sizes, mergedContainerSize, postPercentMinSizes, postPercentMaxSizes]);
+    }, [itemsCount, sizes, mergedContainerSize, postPercentMinSizes, postPercentMaxSizes]);
 
     const postPxSizes = React.useMemo(
         () => postPercentSizes.map(ptg2px),
@@ -82,7 +82,7 @@ export default function useSizes(items: PanelProps[], containerSize?: number) {
 
     const panelSizes = React.useMemo(
         () => (containerSize ? postPxSizes : sizes),
-        [postPxSizes, containerSize]
+        [postPxSizes, sizes, containerSize]
     );
 
     return [
