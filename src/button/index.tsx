@@ -11,30 +11,17 @@ export interface ButtonProps extends Omit<AntdButtonProps, 'type'> {
     type?: ButtonType;
 }
 
-export default function Button({
-    className,
-    icon,
-    children,
-    size = 'middle',
-    type,
-    ...rest
-}: ButtonProps) {
-    const prefixCls = globalConfig().getPrefixCls('btn');
-    const typeClassName = type ? `${prefixCls}--${type}` : '';
-
+function Button({ className, size = 'middle', type, ...rest }: ButtonProps) {
     return (
         <AntdButton
-            className={classNames(prefixCls, className, typeClassName)}
+            className={classNames(className)}
             size={size}
             type={type as AntdButtonType}
             {...rest}
-        >
-            {icon && (
-                <span className={`${prefixCls}__icon ${prefixCls}__icon--${size}`}>{icon}</span>
-            )}
-            {children && (
-                <span className={`${prefixCls}__text ${prefixCls}__text--${size}`}>{children}</span>
-            )}
-        </AntdButton>
+        />
     );
 }
+
+export default Button as React.ForwardRefExoticComponent<
+    ButtonProps & React.RefAttributes<HTMLElement>
+>;
