@@ -12,3 +12,5 @@ export { default as Resize } from './resize';
 export { default as Splitter } from './splitter';
 export * from './splitter';
 export { default as StatusTag } from './statusTag';
+export { default as Table } from './table';
+export * from './table';

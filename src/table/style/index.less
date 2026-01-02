@@ -1,0 +1,149 @@
+@import '../../style/themes/index.less';
+@import '~antd/es/style/mixins/index.less';
+
+@table-prefix-cls: ~'@{ant-prefix}-table';
+
+@table-expand-column-width: 48px;
+
+@import './bordered.less';
+@import './virtual.less';
+@import './sticky.less';
+@import './fixed.less';
+
+.@{table-prefix-cls}-wrapper {
+    clear: both;
+    max-width: 100%;
+    --rc-virtual-list-scrollbar-bg: @border-color-split;
+    .clearfix();
+
+    .@{table-prefix-cls} {
+        .reset-component();
+        font-size: @font-size-base;
+        border-radius: @border-radius-base @border-radius-base 0 0;
+        scrollbar-color: @table-sticky-scroll-bar-bg @border-color-split;
+    }
+
+    table {
+        width: 100%;
+        text-align: left;
+        border-radius: @border-radius-base @border-radius-base 0 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    // ============================= Cell ==============================
+    .@{table-prefix-cls}-cell,
+    .@{table-prefix-cls}-thead > tr > th,
+    .@{table-prefix-cls}-tbody > tr > th,
+    .@{table-prefix-cls}-tbody > tr > td,
+    tfoot > tr > th,
+    tfoot > tr > td {
+        position: relative;
+        padding: @table-padding-vertical @table-padding-horizontal;
+        overflow-wrap: break-word;
+    }
+
+    // ============================ Title 表格标题 =============================
+    .@{table-prefix-cls}-title {
+        padding: @table-padding-vertical @table-padding-horizontal;
+    }
+
+    // ============================ Header 表头 ============================
+    .@{table-prefix-cls}-thead {
+        > tr > th,
+        > tr > td {
+            position: relative;
+            color: @table-header-color;
+            font-weight: 500;
+            text-align: start;
+            background: @table-header-bg;
+            border-bottom: @border-width-base @border-style-base @border-color-base;
+            transition: background @motion-duration-mid ease;
+
+            // 跨列单元格居中对齐
+            &[colspan]:not([colspan='1']) {
+                text-align: center;
+            }
+
+            &:not(:last-child):not(.@{table-prefix-cls}-selection-column):not(
+                    .@{table-prefix-cls}-row-expand-icon-cell
+                ):not([colspan])::before {
+                position: absolute;
+                top: 50%;
+                right: 0;
+                width: 1px;
+                height: 1.6em;
+                background-color: @border-color-base;
+                transform: translateY(-50%);
+                transition: background-color @motion-duration-mid;
+                content: '';
+            }
+        }
+
+        // 跨列表头去除底部边框（非最后一行）
+        > tr:not(:last-child) > th[colspan] {
+            border-bottom: 0;
+        }
+    }
+
+    // ============================ Body 表体 ============================
+    .@{table-prefix-cls}-tbody {
+        > tr {
+            > th,
+            > td {
+                transition: background @motion-duration-mid, border-color @motion-duration-mid;
+                border-bottom: @border-width-base @border-style-base @border-color-base;
+
+                // ========================= Nest Table 嵌套表格 ===========================
+                > .@{table-prefix-cls}-wrapper:only-child,
+                > .@{table-prefix-cls}-expanded-row-fixed
+                    > .@{table-prefix-cls}-wrapper:only-child {
+                    .@{table-prefix-cls} {
+                        margin: -@table-padding-vertical -@table-padding-horizontal -@table-padding-vertical
+                            (@table-expand-column-width - @table-padding-horizontal);
+
+                        .@{table-prefix-cls}-tbody > tr:last-child > td {
+                            border-bottom-width: 0;
+                            &:first-child,
+                            &:last-child {
+                                border-radius: 0;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 表体中的表头单元格样式（特殊场景）
+            > th {
+                position: relative;
+                color: @table-header-color;
+                font-weight: 500;
+                text-align: left;
+                background: @table-header-bg;
+                border-bottom: @border-width-base @border-style-base @table-border-color;
+                transition: background 0.3s ease;
+            }
+
+            // 测量单元格样式
+            & > .@{table-prefix-cls}-measure-cell {
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+                border-top: 0 !important;
+                border-bottom: 0 !important;
+
+                .@{table-prefix-cls}-measure-cell-content {
+                    height: 0;
+                    overflow: hidden;
+                    pointer-events: none;
+                }
+            }
+        }
+    }
+
+    // ============================ Footer 表脚 ============================
+    .@{table-prefix-cls}-footer {
+        padding: @table-padding-vertical @table-padding-horizontal;
+        color: @table-footer-color;
+        background: @table-footer-bg;
+    }
+}

@@ -5,7 +5,7 @@ export type Primitive = null | undefined | string | number | boolean | symbol | 
 /** https://github.com/Microsoft/TypeScript/issues/29729 */
 export type LiteralUnion<T, U extends Primitive = string> = T | (U & Record<never, never>);
 
-export type AnyObject = Record<string, any>;
+export type AnyObject = Record<PropertyKey, any>;
 
 export type CustomComponent<P = AnyObject> = React.ComponentType<P> | string;
 
@@ -66,10 +66,10 @@ type ExtractRefAttributesRef<T> = T extends React.RefAttributes<infer P> ? P : n
  */
 export type GetRef<T extends ReactRefComponent<any> | React.Component<any>> =
     T extends React.Component<any>
-        ? T
-        : T extends React.ComponentType<infer P>
-        ? ExtractRefAttributesRef<P>
-        : never;
+    ? T
+    : T extends React.ComponentType<infer P>
+    ? ExtractRefAttributesRef<P>
+    : never;
 
 export type GetContextProps<T> = T extends React.Context<infer P> ? P : never;
 

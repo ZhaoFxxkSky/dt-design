@@ -54,7 +54,9 @@ export interface IFormTableProps
     /**
      * 表格列的配置描述
      */
-    columns?: ColumnType[] | ((...args: Parameters<FormListProps['children']>) => ColumnType[]);
+    columns?:
+        | FormListColumnType[]
+        | ((...args: Parameters<FormListProps['children']>) => FormListColumnType[]);
     /**
      * Table 的 className
      */
@@ -72,7 +74,7 @@ export interface IFormTableProps
     summary?: PanelRenderFunc;
 }
 
-export interface ColumnType
+export interface FormListColumnType
     /**
      * Support all FormItemProps, and re-defined `rules` and `dependencies`
      */
@@ -122,7 +124,7 @@ export default function InternalTable({
 
     const formInstance = Form.useFormInstance();
 
-    const convertRawToTableCol = (raw?: ColumnType[]): ColumnsType<FormListFieldData> => {
+    const convertRawToTableCol = (raw?: FormListColumnType[]): ColumnsType<FormListFieldData> => {
         if (!raw?.length) return [];
         return raw.map(
             ({

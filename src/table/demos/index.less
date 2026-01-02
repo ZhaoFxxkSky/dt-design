@@ -1,0 +1,46 @@
+.ant-table-wrapper .ant-table-tbody-virtual .ant-table-tbody-virtual-holder-inner > .ant-table-row,
+.ant-table-wrapper
+    .ant-table-tbody-virtual
+    .ant-table-tbody-virtual-holder-inner
+    > div:not(.ant-table-row)
+    > .ant-table-row {
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.ant-table-wrapper .ant-table-cell.ant-table-cell-fix {
+    position: sticky;
+}
+
+.ant-table-wrapper .ant-table-cell-fix {
+    z-index: 13;
+    background-color: white;
+}
+
+.ant-table-wrapper .ant-table-cell,
+.ant-table-wrapper .ant-table-thead > tr > th,
+.ant-table-wrapper .ant-table-tbody > tr > th,
+.ant-table-wrapper .ant-table-tbody > tr > td,
+.ant-table-wrapper tfoot > tr > th,
+.ant-table-wrapper tfoot > tr > td {
+    position: relative;
+    padding: 16px 16px;
+    overflow-wrap: break-word;
+}
+
+.ant-table-wrapper .ant-table-thead > tr > th,
+.ant-table-wrapper .ant-table-thead > tr > td {
+    position: relative;
+    // color: rgba(255, 255, 255, 0.85);
+    font-weight: 600;
+    text-align: start;
+    // background: #1d1d1d;
+    border-bottom: 1px solid #dcdcdc;
+    transition: background 0.2s ease;
+}
+
+.ant-table-wrapper .ant-table-tbody-virtual .ant-table-cell {
+    border-bottom: 1px solid #dcdcdc;
+    transition: background 0.2s;
+}
