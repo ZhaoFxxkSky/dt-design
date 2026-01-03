@@ -110,6 +110,8 @@ const App: React.FC = () => {
     const [empty, setEmpty] = React.useState(false);
     const [count, setCount] = React.useState(10000);
 
+    const [selectedRows, setSelectedRows] = React.useState<RecordType[]>([]);
+
     const tblRef: Parameters<typeof Table>[0]['ref'] = React.useRef(null);
 
     const data = React.useMemo<RecordType[]>(() => getData(count), [count]);
@@ -196,7 +198,13 @@ const App: React.FC = () => {
                         defaultPageSize: 200,
                     }}
                     ref={tblRef}
-                    rowSelection={expanded ? undefined : { type: 'radio', columnWidth: 48 }}
+                    rowSelection={{
+                        columnWidth: 48,
+                        selectedRowKeys: selectedRows.map((item) => item.id),
+                        onChange: (selectedRowKeys, _selectedRows) => {
+                            setSelectedRows(_selectedRows);
+                        },
+                    }}
                     expandable={expandableProps}
                 />
             </Space>
