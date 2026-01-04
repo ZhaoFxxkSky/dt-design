@@ -48,7 +48,10 @@
     "lint:es": "eslint \"components/**/*.{js,jsx,ts,tsx}\" \".dumi/**/*.{js,jsx,ts,tsx}\"",
     "prepublishOnly": "npm run build",
     "deploy": "npm run docs:build && gh-pages -d docs-dist",
-    "release": "./scripts/release.sh"
+    "release": "./scripts/release.sh",
+    "tsc": "tsc --noEmit",
+    "tsc:old": "tsc --noEmit -p tsconfig-old-react.json",
+    "version": "tsx scripts/generate-version.ts"
   },
   "commitlint": {
     "extends": [
@@ -83,6 +86,7 @@
     "@eslint-react/eslint-plugin": "^2.5.0",
     "@faker-js/faker": "^7.6.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+    "@npmcli/run-script": "^10.0.3",
     "@prettier/sync": "^0.6.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
