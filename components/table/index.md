@@ -51,11 +51,11 @@ const columns = [
   },
 ];
 
-<Table dataSource={dataSource} columns={columns}/>;
+<Table dataSource={dataSource} columns={columns} />;
 ```
 
 ## 代码演示
 
-<code src="./demos/virtual.tsx" description="通过 `virtual` 开启虚拟滚动，此时 `scroll.x` 与 `scroll.y` 必须设置且为 `number` 类型。">
-虚拟列表</code>
+<!-- prettier-ignore -->
+<code src="./demos/virtual.tsx" description="通过 `virtual` 开启虚拟滚动，此时 `scroll.x` 与 `scroll.y` 必须设置且为 `number` 类型。">虚拟列表</code>
 <code src="./demos/responsive.tsx" description="响应式配置列的展示。">响应式</code>
