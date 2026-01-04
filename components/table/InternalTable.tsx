@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Reference as RcReference, TableProps as RcTableProps } from '@rc-component/table';
+import { INTERNAL_HOOKS } from '@rc-component/table';
 import { convertChildrenToColumns } from '@rc-component/table/lib/hooks/useColumns';
 import type { SpinProps, TooltipProps } from 'antd';
 import { Pagination, Spin } from 'antd';
@@ -23,9 +24,8 @@ import type { SortState } from 'antd/lib/table/hooks/useSorter';
 import useSorter, { getSortData } from 'antd/lib/table/hooks/useSorter';
 import useTitleColumns from 'antd/lib/table/hooks/useTitleColumns';
 import type { ColumnTitleProps, FilterValue } from 'antd/lib/table/interface';
-import classNames from 'classnames';
+import clsx from 'clsx';
 import { omit } from 'lodash-es';
-import { INTERNAL_HOOKS } from 'rc-table/lib/Table';
 
 import './style';
 
@@ -443,12 +443,12 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   const internalRowClassName = (record: RecordType, index: number, indent: number) => {
     let mergedRowClassName: string;
     if (typeof rowClassName === 'function') {
-      mergedRowClassName = classNames(rowClassName(record, index, indent));
+      mergedRowClassName = clsx(rowClassName(record, index, indent));
     } else {
-      mergedRowClassName = classNames(rowClassName);
+      mergedRowClassName = clsx(rowClassName);
     }
 
-    return classNames(
+    return clsx(
       {
         [`${prefixCls}-row-selected`]: selectedKeySet.has(getRowKey(record, index)),
       },
@@ -501,7 +501,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     const renderPagination = (position: string) => (
       <Pagination
         {...mergedPagination}
-        className={classNames(
+        className={clsx(
           `${prefixCls}-pagination ${prefixCls}-pagination-${position}`,
           mergedPagination.className,
         )}
@@ -541,7 +541,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     };
   }
 
-  const wrapperClassNames = classNames(
+  const wrapperClassNames = clsx(
     `${prefixCls}-wrapper`,
     {
       [`${prefixCls}-wrapper-rtl`]: direction === 'rtl',
@@ -559,7 +559,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
           direction={direction}
           expandable={mergedExpandable}
           prefixCls={prefixCls}
-          className={classNames({
+          className={clsx({
             [`${prefixCls}-middle`]: mergedSize === 'middle',
             [`${prefixCls}-small`]: mergedSize === 'small',
             [`${prefixCls}-bordered`]: bordered,

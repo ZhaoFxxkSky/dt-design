@@ -20,7 +20,7 @@ export default () => {
         {['outline', 'fill'].includes(type) && (
           <Switch
             onChange={setRounded}
-            value={rounded}
+            checked={rounded}
             checkedChildren="开启圆角"
             unCheckedChildren="关闭圆角"
           />

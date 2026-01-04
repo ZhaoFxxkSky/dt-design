@@ -171,7 +171,7 @@ const App: React.FC = () => {
           />
           <Segmented
             value={count}
-            onChange={setCount}
+            onChange={(value) => setCount(value as number)}
             options={[
               { label: 'None', value: 0 },
               { label: 'Less', value: 4 },

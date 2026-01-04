@@ -8,7 +8,7 @@
     "experimentalDecorators": true,
     "baseUrl": "./",
     "module": "esnext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "paths": {
       "@@/*": [".dumi/tmp/*"],
       "@dtjoy/dt-design": ["components/index.ts"],
