@@ -1,11 +1,11 @@
 import type * as React from 'react';
 import type { Reference } from '@rc-component/table';
 import type {
-  ColumnType as RcColumnType,
   ExpandableConfig,
   FixedType,
   GetComponentProps,
   GetRowKey,
+  ColumnType as RcColumnType,
   RenderedCell as RcRenderedCell,
 } from '@rc-component/table/lib/interface';
 import type { CheckboxProps, DropdownProps, PaginationProps, TooltipProps } from 'antd';

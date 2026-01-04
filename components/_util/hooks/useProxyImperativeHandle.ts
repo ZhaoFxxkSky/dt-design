@@ -8,10 +8,8 @@ const fillProxy = (
   element._dtProxy = element._dtProxy || {};
 
   Object.keys(handler).forEach((key) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (!(key in element._dtProxy!)) {
       const ori = (element as any)[key];
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       element._dtProxy![key] = ori;
 
       (element as any)[key] = handler[key];
