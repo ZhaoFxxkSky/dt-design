@@ -4,104 +4,87 @@
 @table-prefix-cls: ~'@{ant-prefix}-table';
 @table-expand-icon-size: 17px;
 
-// ====================== 表格选择列样式（对应genSelectionStyle） ======================
 @{table-prefix-cls}-wrapper {
-    // ========================== Selections 选择列基础样式 ==========================
-    @{table-prefix-cls}-selection-col {
-        width: @table-selection-column-width;
+  @{table-prefix-cls}-selection-col {
+    width: @table-selection-column-width;
 
-        &.@{table-prefix-cls}-selection-col-with-dropdown {
-            width: calc(
-                @table-selection-column-width + @table-expand-icon-size + (@padding-md / 4)
-            );
+    &.@{table-prefix-cls}-selection-col-with-dropdown {
+      width: calc(@table-selection-column-width + @table-expand-icon-size + (@padding-md / 4));
+    }
+  }
+
+  @{table-prefix-cls}-bordered @{table-prefix-cls}-selection-col {
+    width: calc(@table-selection-column-width + (@padding-xs * 2));
+
+    &.@{table-prefix-cls}-selection-col-with-dropdown {
+      width: calc(
+        @table-selection-column-width + @table-expand-icon-size + (@padding-md / 4) +
+          (@padding-xs * 2)
+      );
+    }
+  }
+
+  table tr th.@{table-prefix-cls}-selection-column,
+  table tr td.@{table-prefix-cls}-selection-column,
+  @{table-prefix-cls}-selection-column {
+    padding-right: @padding-xs;
+    padding-left: @padding-xs;
+    text-align: center;
+
+    .@{ant-prefix}-radio-wrapper {
+      margin-right: 0;
+    }
+  }
+
+  table tr th.@{table-prefix-cls}-selection-column.@{table-prefix-cls}-cell-fix-left {
+    z-index: calc(@zindex-table-fixed + 1);
+  }
+
+  table tr th.@{table-prefix-cls}-selection-column::after {
+    background-color: transparent !important;
+  }
+
+  @{table-prefix-cls}-selection {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+  }
+
+  @{table-prefix-cls}-selection-extra {
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    cursor: pointer;
+    transition: all @motion-duration-slow;
+    margin-left: 100%;
+    padding-left: calc(@table-padding-horizontal / 4);
+
+    .@{iconfont-css-prefix} {
+      color: @table-header-bg;
+      font-size: @table-expand-icon-size;
+      vertical-align: baseline;
+
+      &:hover {
+        color: @primary-color;
+      }
+    }
+  }
+
+  @{table-prefix-cls}-tbody {
+    @{table-prefix-cls}-row {
+      &.@{table-prefix-cls}-row-selected {
+        > @{table-prefix-cls}-cell {
+          background: @table-selected-row-bg;
+
+          &.@{table-prefix-cls}-cell-row-hover {
+            background: @table-selected-row-hover-bg;
+          }
         }
+      }
+
+      > @{table-prefix-cls}-cell-row-hover {
+        background: @table-row-hover-bg;
+      }
     }
-
-    // 边框表格中的选择列宽度计算
-    @{table-prefix-cls}-bordered @{table-prefix-cls}-selection-col {
-        width: calc(@table-selection-column-width + (@padding-xs * 2));
-
-        &.@{table-prefix-cls}-selection-col-with-dropdown {
-            width: calc(
-                @table-selection-column-width + @table-expand-icon-size + (@padding-md / 4) +
-                    (@padding-xs * 2)
-            );
-        }
-    }
-
-    // 选择列单元格样式（多选择器整合）
-    table tr th.@{table-prefix-cls}-selection-column,
-    table tr td.@{table-prefix-cls}-selection-column,
-    @{table-prefix-cls}-selection-column {
-        padding-right: @padding-xs; // 对应v5 paddingInlineEnd
-        padding-left: @padding-xs; // 对应v5 paddingInlineStart
-        text-align: center;
-
-        // 单选框包裹器样式
-        .@{ant-prefix}-radio-wrapper {
-            margin-right: 0; // 对应v5 marginInlineEnd
-        }
-    }
-
-    // 左侧固定选择列表头z-index提升
-    table tr th.@{table-prefix-cls}-selection-column.@{table-prefix-cls}-cell-fix-left {
-        z-index: calc(@zindex-table-fixed + 1);
-    }
-
-    // 选择列表头伪元素透明化
-    table tr th.@{table-prefix-cls}-selection-column::after {
-        background-color: transparent !important;
-    }
-
-    // 选择器容器样式
-    @{table-prefix-cls}-selection {
-        position: relative;
-        display: inline-flex;
-        flex-direction: column;
-    }
-
-    // 选择器额外图标样式
-    @{table-prefix-cls}-selection-extra {
-        position: absolute;
-        top: 0;
-        z-index: 1;
-        cursor: pointer;
-        transition: all @motion-duration-slow;
-        margin-left: 100%; // 对应v5 marginInlineStart
-        padding-left: calc(@table-padding-horizontal / 4); // 对应v5 unit(calc(...))
-
-        // 图标样式
-        .@{iconfont-css-prefix} {
-            color: @table-header-bg;
-            font-size: @table-expand-icon-size;
-            vertical-align: baseline;
-
-            // 图标悬浮样式
-            &:hover {
-                color: red;
-            }
-        }
-    }
-
-    // ============================= Rows 行选中/悬浮样式 =============================
-    @{table-prefix-cls}-tbody {
-        @{table-prefix-cls}-row {
-            // 行选中样式
-            &.@{table-prefix-cls}-row-selected {
-                > @{table-prefix-cls}-cell {
-                    background: @table-selected-row-bg;
-
-                    // 选中行悬浮样式
-                    &.@{table-prefix-cls}-cell-row-hover {
-                        background: @table-selected-row-hover-bg;
-                    }
-                }
-            }
-
-            // 普通行悬浮样式
-            > @{table-prefix-cls}-cell-row-hover {
-                background: @table-row-hover-bg;
-            }
-        }
-    }
+  }
 }
