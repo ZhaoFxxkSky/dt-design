@@ -5,5 +5,5 @@ import 'dumi/theme-default/slots/Toc/index.less';
 import './index.scss';
 
 export default function Toc() {
-  return <DumiToc />;
+    return <DumiToc />;
 }

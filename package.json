@@ -2,13 +2,43 @@
   "name": "@dtjoy/dt-design",
   "version": "1.0.2",
   "description": "react-component",
+  "repository": "https://github.com/ZhaoFxxkSky/dt-design",
+  "main": "lib/index.js",
+  "module": "esm/index.js",
+  "types": "esm/index.d.ts",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "dumi dev",
+    "build": "father build",
+    "build:watch": "father dev",
+    "test": "jest",
+    "docs:build": "dumi build",
+    "prepare": "husky install && dumi setup",
+    "doctor": "father doctor",
+    "lint": "npm run lint:es && npm run lint:css",
+    "lint:es-fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" \".dumi/**/*.{js,jsx,ts,tsx}\" --fix",
+    "lint:css-fix": "stylelint \"src/**/*.{css,less,scss}\" \".dumi/**/*.{css,less,scss}\" --fix",
+    "lint:css": "stylelint \"src/**/*.{css,less,scss}\" \".dumi/**/*.{css,less,scss}\"",
+    "lint:es": "eslint \"src/**/*.{js,jsx,ts,tsx}\" \".dumi/**/*.{js,jsx,ts,tsx}\"",
+    "prepublishOnly": "npm run build",
+    "deploy": "npm run docs:build && gh-pages -d docs-dist",
+    "release": "./scripts/release.sh"
+  },
   "author": {
     "name": "夕颜",
     "email": "wx-zhaog@dtjoy.com",
     "url": "https://github.com/ZhaoFxxkSky/dt-design"
   },
   "license": "MIT",
-  "repository": "https://github.com/ZhaoFxxkSky/dt-design",
+  "files": [
+    "lib",
+    "esm"
+  ],
+  "sideEffects": [
+    "esm/**/style/*",
+    "lib/**/style/*",
+    "**/style/*"
+  ],
   "keywords": [
     "react",
     "react-component",
@@ -16,73 +46,40 @@
     "typescript",
     "ant-design"
   ],
-  "sideEffects": [
-    "esm/**/style/*",
-    "lib/**/style/*",
-    "**/style/*"
-  ],
-  "main": "lib/index.js",
-  "module": "esm/index.js",
-  "types": "esm/index.d.ts",
-  "files": [
-    "esm",
-    "lib"
-  ],
-  "scripts": {
-    "start": "npm run dev",
-    "dev": "dumi dev",
-    "build": "father build",
-    "build:watch": "father dev",
-    "format": "biome format --write .",
-    "lint:script": "eslint . --cache",
-    "lint:biome": "biome lint",
-    "biome": "biome check --write",
-    "test": "jest",
-    "docs:build": "dumi build",
-    "prepare": "husky install && dumi setup",
-    "doctor": "father doctor",
-    "lint": "npm run version && npm run tsc && npm run lint:script && npm run lint:biome",
-    "lint:es-fix": "eslint \"components/**/*.{js,jsx,ts,tsx}\" \".dumi/**/*.{js,jsx,ts,tsx}\" --fix",
-    "lint:css-fix": "stylelint \"components/**/*.{css,less,scss}\" \".dumi/**/*.{css,less,scss}\" --fix",
-    "lint:css": "stylelint \"components/**/*.{css,less,scss}\" \".dumi/**/*.{css,less,scss}\"",
-    "lint:es": "eslint \"components/**/*.{js,jsx,ts,tsx}\" \".dumi/**/*.{js,jsx,ts,tsx}\"",
-    "prepublishOnly": "npm run build",
-    "deploy": "npm run docs:build && gh-pages -d docs-dist",
-    "release": "./scripts/release.sh"
-  },
   "commitlint": {
     "extends": [
       "@commitlint/config-conventional"
+    ]
+  },
+  "lint-staged": {
+    "*.{md,json}": [
+      "prettier --write --no-error-on-unmatched-pattern"
+    ],
+    "*.{css,scss}": [
+      "stylelint --fix"
+    ],
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --parser=typescript --write"
+
     ]
   },
   "publishConfig": {
     "access": "public"
   },
   "peerDependencies": {
-    "antd": "^4.x",
     "react": ">=16.9.0",
-    "react-dom": ">=16.9.0"
-  },
-  "dependencies": {
-    "@ant-design/icons": "^4.8.3",
-    "@dtinsight/dt-utils": "^1.3.1",
-    "clsx": "^2.1.1",
-    "immer": "~10.1.1",
-    "lodash-es": "^4.17.21",
-    "rc-drawer": "~5.1.0",
-    "rc-resize-observer": "^1.4.3",
-    "rc-util": "^5.44.4",
-    "rc-virtual-list": "^3.4.13"
+    "react-dom": ">=16.9.0",
+    "antd": "^4.x"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^6.6.1",
-    "@biomejs/biome": "^2.3.10",
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
-    "@eslint-react/eslint-plugin": "^2.5.0",
     "@faker-js/faker": "^7.6.0",
-    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
-    "@prettier/sync": "^0.6.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/react-hooks": "^8.0.1",
@@ -99,15 +96,10 @@
     "ant-design-testing": "^1.1.0",
     "babel-plugin-import": "^1.13.8",
     "cz-conventional-changelog": "^3.3.0",
-    "dumi": "~2.4.21",
-    "eslint": "^9.39.2",
-    "eslint-plugin-compat": "^6.0.2",
-    "eslint-plugin-jest": "^29.12.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.26",
-    "father": "4.6.13",
-    "gh-pages": "^6.3.0",
+    "dumi": "^2.2.12",
+    "eslint": "^8.23.0",
+    "father": "~4.1.0",
+    "gh-pages": "^4.0.0",
     "husky": "^8.0.1",
     "jest": "^29.3.1",
     "jest-environment-jsdom": "^29.3.1",
@@ -120,15 +112,22 @@
     "react-test-renderer": "^18.2.0",
     "resize-observer-polyfill": "^1.5.1",
     "standard-version": "^9.5.0",
-    "stylelint": "^14.9.0",
-    "stylelint-config-prettier": "^9.0.2",
-    "stylelint-config-rational-order": "^0.1.2",
-    "stylelint-config-standard": "^29.0.0",
-    "stylelint-declaration-block-no-ignored-properties": "^2.1.0",
-    "stylelint-order": "^5.0.0",
+    "stylelint": "^14.9.1",
     "ts-jest": "^29.0.3",
-    "typescript": "~5.9.3"
+    "typescript": "~4.5.2"
   },
+  "dependencies": {
+    "@ant-design/icons": "^4.8.3",
+    "@dtinsight/dt-utils": "^1.3.1",
+    "rc-util": "^5.44.4",
+    "classnames": "^2.2.6",
+    "immer": "~10.1.1",
+    "lodash-es": "^4.17.21",
+    "rc-drawer": "~5.1.0",
+    "rc-resize-observer": "^1.4.3",
+    "rc-virtual-list": "^3.4.13"
+  },
+
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
@@ -136,14 +135,5 @@
   },
   "resolutions": {
     "rc-motion": "2.6.2"
-  },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx,css,mjs,json}": [
-      "biome check --write --no-errors-on-unmatched",
-      "eslint"
-    ],
-    "*.{md,yml}": [
-      "prettier --ignore-unknown --write"
-    ]
   }
 }
