@@ -166,6 +166,7 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
     };
 
     for (const [event, handler] of Object.entries(eventHandlerMap)) {
+      // eslint-disable-next-line react-web-api/no-leaked-event-listener
       window.addEventListener(event, handler);
     }
 

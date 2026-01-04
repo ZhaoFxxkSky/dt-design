@@ -1,0 +1,90 @@
+@import '../../style/themes/index.less';
+@import '~antd/es/style/mixins/index.less';
+
+@table-prefix-cls: ~'@{ant-prefix}-table';
+@table-expand-icon-size: 17px;
+
+@{table-prefix-cls}-wrapper {
+  @{table-prefix-cls}-selection-col {
+    width: @table-selection-column-width;
+
+    &.@{table-prefix-cls}-selection-col-with-dropdown {
+      width: calc(@table-selection-column-width + @table-expand-icon-size + (@padding-md / 4));
+    }
+  }
+
+  @{table-prefix-cls}-bordered @{table-prefix-cls}-selection-col {
+    width: calc(@table-selection-column-width + (@padding-xs * 2));
+
+    &.@{table-prefix-cls}-selection-col-with-dropdown {
+      width: calc(
+        @table-selection-column-width + @table-expand-icon-size + (@padding-md / 4) +
+          (@padding-xs * 2)
+      );
+    }
+  }
+
+  table tr th.@{table-prefix-cls}-selection-column,
+  table tr td.@{table-prefix-cls}-selection-column,
+  @{table-prefix-cls}-selection-column {
+    padding-right: @padding-xs;
+    padding-left: @padding-xs;
+    text-align: center;
+
+    .@{ant-prefix}-radio-wrapper {
+      margin-right: 0;
+    }
+  }
+
+  table tr th.@{table-prefix-cls}-selection-column.@{table-prefix-cls}-cell-fix-left {
+    z-index: calc(@zindex-table-fixed + 1);
+  }
+
+  table tr th.@{table-prefix-cls}-selection-column::after {
+    background-color: transparent !important;
+  }
+
+  @{table-prefix-cls}-selection {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+  }
+
+  @{table-prefix-cls}-selection-extra {
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    cursor: pointer;
+    transition: all @motion-duration-slow;
+    margin-left: 100%;
+    padding-left: calc(@table-padding-horizontal / 4);
+
+    .@{iconfont-css-prefix} {
+      color: @table-header-bg;
+      font-size: @table-expand-icon-size;
+      vertical-align: baseline;
+
+      &:hover {
+        color: @primary-color;
+      }
+    }
+  }
+
+  @{table-prefix-cls}-tbody {
+    @{table-prefix-cls}-row {
+      &.@{table-prefix-cls}-row-selected {
+        > @{table-prefix-cls}-cell {
+          background: @table-selected-row-bg;
+
+          &.@{table-prefix-cls}-cell-row-hover {
+            background: @table-selected-row-hover-bg;
+          }
+        }
+      }
+
+      > @{table-prefix-cls}-cell-row-hover {
+        background: @table-row-hover-bg;
+      }
+    }
+  }
+}

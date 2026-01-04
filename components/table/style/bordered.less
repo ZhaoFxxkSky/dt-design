@@ -1,0 +1,141 @@
+@import '../../style/themes/index.less';
+
+@table-prefix-cls: ~'@{ant-prefix}-table';
+
+.@{table-prefix-cls}-wrapper {
+  .@{table-prefix-cls}.@{table-prefix-cls}-bordered {
+    // ============================ Title 标题 =============================
+    > .@{table-prefix-cls}-title {
+      border: @border-width-base @border-style-base @border-color-base;
+      border-bottom: 0;
+    }
+
+    // ============================ Content 内容容器 ============================
+    > .@{table-prefix-cls}-container {
+      border-left: @border-width-base @border-style-base @border-color-base;
+      border-top: @border-width-base @border-style-base @border-color-base;
+
+      > .@{table-prefix-cls}-content,
+      > .@{table-prefix-cls}-header,
+      > .@{table-prefix-cls}-body,
+      > .@{table-prefix-cls}-summary {
+        > table {
+          // ============================= Cell 单元格 =============================
+          > thead > tr > th,
+          > thead > tr > td,
+          > tbody > tr > th,
+          > tbody > tr > td,
+          > tfoot > tr > th,
+          > tfoot > tr > td {
+            border-right: @border-width-base @border-style-base @border-color-base;
+          }
+
+          // ============================ Header 表头 ============================
+          > thead {
+            > tr:not(:last-child) > th {
+              border-bottom: @border-width-base @border-style-base @border-color-base;
+            }
+
+            > tr > th::before {
+              background-color: transparent !important;
+            }
+          }
+
+          > thead > tr,
+          > tbody > tr,
+          > tfoot > tr {
+            > .@{table-prefix-cls}-cell-fix-right-first::after {
+              border-right: @border-width-base @border-style-base @border-color-base;
+            }
+          }
+
+          // ========================== Expandable 展开行 ==========================
+          > tbody > tr > th,
+          > tbody > tr > td {
+            > .@{table-prefix-cls}-expanded-row-fixed {
+              // margin: calc(-@table-cell-padding-vertical)
+              //     calc(-(@table-cell-padding-horizontal + @border-width-base));
+              &::after {
+                position: absolute;
+                top: 0;
+                right: @border-width-base;
+                bottom: 0;
+                border-right: @border-width-base @border-style-base @border-color-base;
+                content: '';
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // ============================ Scroll 水平滚动 ============================
+    &.@{table-prefix-cls}-scroll-horizontal {
+      > .@{table-prefix-cls}-container > .@{table-prefix-cls}-body {
+        > table > tbody {
+          > tr.@{table-prefix-cls}-expanded-row,
+          > tr.@{table-prefix-cls}-placeholder {
+            > th,
+            > td {
+              border-right: 0;
+            }
+          }
+        }
+      }
+    }
+
+    // ============================ Size 尺寸样式（middle/small） ============================
+    &.@{table-prefix-cls}-middle {
+      > .@{table-prefix-cls}-container {
+        > .@{table-prefix-cls}-content,
+        > .@{table-prefix-cls}-body {
+          > table > tbody > tr > th,
+          > table > tbody > tr > td {
+            > .@{table-prefix-cls}-expanded-row-fixed {
+              // margin: calc(-@table-cell-padding-vertical-middle)
+              //     calc(-(@table-cell-padding-horizontal-middle + @border-width-base));
+            }
+          }
+        }
+      }
+    }
+
+    // small尺寸（对应原getSizeBorderStyle('small')）
+    &.@{table-prefix-cls}-small {
+      > .@{table-prefix-cls}-container {
+        > .@{table-prefix-cls}-content,
+        > .@{table-prefix-cls}-body {
+          > table > tbody > tr > th,
+          > table > tbody > tr > td {
+            > .@{table-prefix-cls}-expanded-row-fixed {
+              // margin: calc(-@table-cell-padding-vertical-small)
+              //     calc(-(@table-cell-padding-horizontal-small + @border-width-base));
+            }
+          }
+        }
+      }
+    }
+
+    // ============================ Footer 页脚 ============================
+    > .@{table-prefix-cls}-footer {
+      border: @border-width-base @border-style-base @border-color-base;
+      border-top: 0;
+    }
+  }
+
+  // ============================ Nested 嵌套表格 ============================
+  .@{table-prefix-cls}-cell {
+    > .@{table-prefix-cls}-container:first-child {
+      border-top: 0;
+    }
+
+    &-scrollbar:not([rowspan]) {
+      // box-shadow: 0 @border-width-base 0 @border-width-base @table-header-background;
+    }
+  }
+
+  // 边框表格滚动条右侧边框
+  .@{table-prefix-cls}-bordered .@{table-prefix-cls}-cell-scrollbar {
+    border-right: @border-width-base @border-style-base @border-color-base;
+  }
+}
