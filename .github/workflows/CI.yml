@@ -47,7 +47,7 @@ jobs:
 
 #     stylelint有问题 暂时本地提交代码自己校验 不放在CI里校验
       - name: Lint code
-        run: pnpm lint:es
+        run: pnpm lint
 
       - name: Run Build
         run: pnpm build
