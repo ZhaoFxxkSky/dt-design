@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
+import type { StatusTagType } from '@dtjoy/dt-design';
 import { StatusTag } from '@dtjoy/dt-design';
-import type { StatusTagType } from '@dtjoy/dt-design/statusTag';
 import { Divider, Radio, Space, Switch } from 'antd';
 
 export default () => {
