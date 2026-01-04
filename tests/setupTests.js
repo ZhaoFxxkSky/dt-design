@@ -30,13 +30,12 @@ Object.defineProperty(window, 'IntersectionObserver', {
 });
 
 window.ResizeObserver = class ResizeObserver {
-    constructor() {}
+    
     observe() {}
     disconnect() {}
 };
 
 window.IntersectionObserver = class IntersectionObserver {
-    constructor() {}
     observe() {}
     disconnect() {}
 };

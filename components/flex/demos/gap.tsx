@@ -1,0 +1,27 @@
+import React from 'react';
+import type { FlexProps } from '@dtjoy/dt-design';
+import { Button, Flex } from '@dtjoy/dt-design';
+import { Radio, Slider } from 'antd';
+
+export default () => {
+  const [gapSize, setGapSize] = React.useState<FlexProps['gap']>('small');
+  const [customGapSize, setCustomGapSize] = React.useState<number>(0);
+  return (
+    <Flex gap="middle" vertical>
+      <Radio.Group value={gapSize} onChange={(e) => setGapSize(e.target.value)}>
+        {['small', 'middle', 'large', 'customize'].map((size) => (
+          <Radio key={size} value={size}>
+            {size}
+          </Radio>
+        ))}
+      </Radio.Group>
+      {gapSize === 'customize' && <Slider value={customGapSize} onChange={setCustomGapSize} />}
+      <Flex gap={gapSize !== 'customize' ? gapSize : customGapSize}>
+        <Button type="primary">Primary</Button>
+        <Button>Default</Button>
+        <Button type="dashed">Dashed</Button>
+        <Button type="link">Link</Button>
+      </Flex>
+    </Flex>
+  );
+};

@@ -1,26 +1,31 @@
 {
-    "compilerOptions": {
-        "module": "esnext",
-        "target": "es6",
-        "moduleResolution": "Node",
-        "resolveJsonModule": true,
-        "keyofStringsOnly": true,
-        "allowSyntheticDefaultImports": true,
-        "experimentalDecorators": true,
-        "strict": true,
-        "declaration": true,
-        "skipLibCheck": true,
-        "esModuleInterop": true,
-        "lib": ["es6", "es2016", "dom"],
-        "jsx": "react",
-        "baseUrl": "./",
-        "outDir": "./dist",
-        "typeRoots": ["node", "node_modules/@types"],
-        "paths": {
-            "@@/*": [".dumi/tmp/*"],
-            "@dtjoy/dt-design": ["src"],
-            "@dtjoy/dt-design/*": ["src/*", "*"]
-        }
+  "compilerOptions": {
+    "target": "es2020",
+    "jsx": "react",
+    "jsxFactory": "React.createElement",
+    "jsxFragmentFactory": "React.Fragment",
+    "lib": ["dom", "es2017"],
+    "experimentalDecorators": true,
+    "baseUrl": "./",
+    "module": "esnext",
+    "moduleResolution": "Node",
+    "paths": {
+      "@@/*": [".dumi/tmp/*"],
+      "@dtjoy/dt-design": ["components/index.ts"],
+      "@dtjoy/dt-design/es/*": ["components/*"],
+      "@dtjoy/dt-design/lib/*": ["components/*"],
+      "@dtjoy/dt-design/locale/*": ["components/locale/*"]
     },
-    "include": ["src/**/*", ".dumirc.ts","global.d.ts"]
+    "resolvePackageJsonExports": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "stripInternal": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": [".dumirc.ts", "**/*"],
+  "exclude": ["node_modules", "lib", "es"]
 }
