@@ -17,8 +17,8 @@ export default () => {
         <Radio value="vertical">vertical</Radio>
       </Radio.Group>
       <Flex vertical={value === 'vertical'}>
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} style={{ ...baseStyle, backgroundColor: i % 2 ? '#1677ff' : '#1677ffbf' }} />
+        {[1, 2, 3, 4].map((_, i) => (
+          <div key={_} style={{ ...baseStyle, backgroundColor: i % 2 ? '#1677ff' : '#1677ffbf' }} />
         ))}
       </Flex>
     </Flex>

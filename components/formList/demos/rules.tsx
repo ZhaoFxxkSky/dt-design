@@ -51,7 +51,7 @@ export default () => {
             title: 'gender',
             dataIndex: 'gender',
             render: (_, namePath, formInstance) => (
-              <span>{formInstance?.getFieldValue(['data', ...namePath] || '-')}</span>
+              <span>{formInstance?.getFieldValue(['data', ...namePath]) || '-'}</span>
             ),
           },
           {

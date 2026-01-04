@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import React, { useMemo } from 'react';
 import { Utils } from '@dtinsight/dt-utils';
-import { Form, Table } from 'antd';
 import type { FormListFieldData, TableProps } from 'antd';
+import { Form, Table } from 'antd';
 import { globalConfig } from 'antd/es/config-provider';
 import type { FormItemProps, FormListProps, Rule, RuleObject, RuleRender } from 'antd/lib/form';
 import type { ColumnsType, ColumnType as TableColumnType } from 'antd/lib/table';
@@ -172,11 +172,11 @@ export default function InternalTable({
 
         return {
           ...cols,
-          title: (
-            <>
+          title: (...titleProps) => (
+            <React.Fragment>
               {isRequired && <span className="dtc-form__table__column--required" />}
-              {cols.title}
-            </>
+              {typeof cols.title === 'function' ? cols.title(...titleProps) : cols.title}
+            </React.Fragment>
           ),
           render(_, fieldData) {
             const currentNamePath = [fieldData.name, cols.dataIndex]

@@ -5,6 +5,7 @@ import { globalConfig } from 'antd/es/config-provider';
 import './style';
 
 import clsx from 'clsx';
+import { uniqueId } from 'lodash-es';
 
 import ReactResizeObserver from '../resizeObserver';
 
@@ -129,7 +130,7 @@ class OverflowList<T extends object> extends Component<OverflowListProps<T>, Ove
 
         return (
           <div
-            key={i}
+            key={uniqueId('overflow-list-item')}
             ref={(el) => {
               if (el) this.itemRefs.set(i, el);
               else this.itemRefs.delete(i);

@@ -28,11 +28,18 @@ export default () => {
     <Flex gap="middle" align="start" vertical>
       <p>Select justify :</p>
       <div>
-        <Segmented blcok={false} options={justifyOptions} onChange={setJustify} />
+        <Segmented
+          block={false}
+          options={justifyOptions}
+          onChange={(value) => setJustify(value as FlexProps['justify'])}
+        />
       </div>
       <p>Select align :</p>
       <div>
-        <Segmented options={alignOptions} onChange={setAlignItems} />
+        <Segmented
+          options={alignOptions}
+          onChange={(value) => setAlignItems(value as FlexProps['align'])}
+        />
       </div>
       <Flex style={boxStyle} justify={justify} align={alignItems}>
         <Button type="primary">Primary</Button>

@@ -1,0 +1,55 @@
+@import '../../style/themes/index.less';
+
+@table-prefix-cls: ~'@{ant-prefix}-table';
+
+@table-scroll-thumb-bg: #c1c1c1;
+@table-scroll-thumb-bg-hover: #a8a8a8;
+@table-scroll-thumb-size: 6px;
+@table-scroll-bg: #fafafa;
+@sticky-scroll-bar-border-radius: @border-radius-base;
+@opacity-loading: 0.6;
+
+@motion-duration-slow: 0.3s;
+
+.@{table-prefix-cls}-wrapper {
+    .@{table-prefix-cls}-sticky {
+        &-holder {
+            position: sticky;
+
+            z-index: calc(var(--columns-count) * 2 + @zindex-table-fixed + 1);
+            background: @background-color-base;
+        }
+
+        &-scroll {
+            position: sticky;
+            bottom: 0;
+
+            height: @table-scroll-thumb-size !important;
+            z-index: calc(var(--columns-count) * 2 + @zindex-table-fixed + 1);
+            display: flex;
+            align-items: center;
+            background: @table-scroll-bg;
+            border-top: @border-width-base @border-style-base @border-color-base;
+            opacity: @opacity-loading;
+
+            &:hover {
+                transform-origin: center bottom;
+            }
+
+            &-bar {
+                height: @table-scroll-thumb-size;
+                background-color: @table-scroll-thumb-bg;
+                border-radius: @sticky-scroll-bar-border-radius;
+
+                transition: all @motion-duration-slow, transform 0s;
+                position: absolute;
+                bottom: 0;
+
+                &:hover,
+                &-active {
+                    background-color: @table-scroll-thumb-bg-hover;
+                }
+            }
+        }
+    }
+}

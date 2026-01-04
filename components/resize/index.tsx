@@ -26,7 +26,7 @@ const Resize: React.FC<ResizeProps> = ({ observerEle, onResize, children }) => {
       const resizeObserver = new ResizeObserver(onResizeProxy);
       resizeObserver.observe(observerEle);
       return () => {
-        resizeObserver.unobserve(observerEle);
+        resizeObserver.disconnect();
       };
     }
   }, [observerEle]);

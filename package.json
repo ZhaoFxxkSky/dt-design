@@ -41,7 +41,7 @@
     "docs:build": "dumi build",
     "prepare": "husky install && dumi setup",
     "doctor": "father doctor",
-    "lint": "npm run version && npm run tsc && npm run lint:script && npm run lint:biome",
+    "lint": "npm run tsc && npm run lint:script && npm run lint:biome",
     "lint:es-fix": "eslint \"components/**/*.{js,jsx,ts,tsx}\" \".dumi/**/*.{js,jsx,ts,tsx}\" --fix",
     "lint:css-fix": "stylelint \"components/**/*.{css,less,scss}\" \".dumi/**/*.{css,less,scss}\" --fix",
     "lint:css": "stylelint \"components/**/*.{css,less,scss}\" \".dumi/**/*.{css,less,scss}\"",
@@ -50,8 +50,7 @@
     "deploy": "npm run docs:build && gh-pages -d docs-dist",
     "release": "./scripts/release.sh",
     "tsc": "tsc --noEmit",
-    "tsc:old": "tsc --noEmit -p tsconfig-old-react.json",
-    "version": "tsx scripts/generate-version.ts"
+    "tsc:old": "tsc --noEmit -p tsconfig-old-react.json"
   },
   "commitlint": {
     "extends": [
@@ -69,6 +68,8 @@
   "dependencies": {
     "@ant-design/icons": "^4.8.3",
     "@dtinsight/dt-utils": "^1.3.1",
+    "@rc-component/table": "^1.9.1",
+    "@rc-component/util": "^1.7.0",
     "clsx": "^2.1.1",
     "immer": "~10.1.1",
     "lodash-es": "^4.17.21",
@@ -95,6 +96,7 @@
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^24.3.1",
     "@types/react": "^18.0.0",
+    "@types/react-dom": "18.0.0",
     "@types/react-resizable": "^3.0.8",
     "@types/react-syntax-highlighter": "~15.5.13",
     "@types/shortid": "^0.0.31",

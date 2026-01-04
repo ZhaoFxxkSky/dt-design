@@ -1,0 +1,65 @@
+@import '../../style/themes/index.less';
+
+@table-prefix-cls: ~'@{ant-prefix}-table';
+
+.@{table-prefix-cls}-wrapper {
+    .@{table-prefix-cls}-tbody-virtual {
+        .@{table-prefix-cls}-tbody-virtual-holder-inner {
+            & > .@{table-prefix-cls}-row,
+            & > div:not(.@{table-prefix-cls}-row) > .@{table-prefix-cls}-row {
+                display: flex;
+                box-sizing: border-box;
+                width: 100%;
+            }
+        }
+
+        .@{table-prefix-cls}-cell {
+            border-bottom: @border-width-base @border-style-base @border-color-base;
+            transition: background 0.2s;
+        }
+
+        .@{table-prefix-cls}-expanded-row {
+            .@{table-prefix-cls}-expanded-row-cell.@{table-prefix-cls}-expanded-row-cell-fixed {
+                position: sticky;
+                left: 0;
+                overflow: hidden;
+
+                width: calc(var(--virtual-width) - @border-width-base);
+                border-right: none;
+            }
+        }
+    }
+
+    .@{table-prefix-cls}-bordered {
+        .@{table-prefix-cls}-tbody-virtual {
+            &:after {
+                content: '';
+                left: 0;
+                right: 0;
+                bottom: 0;
+                border-bottom: @border-width-base @border-style-base @border-color-base;
+                position: absolute;
+            }
+
+            .@{table-prefix-cls}-cell {
+                border-right: @border-width-base @border-style-base @border-color-base;
+
+                &.@{table-prefix-cls}-cell-fix-right-first:before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    left: calc(-@border-width-base);
+                    border-left: @border-width-base @border-style-base @border-color-base;
+                }
+            }
+        }
+
+        &.@{table-prefix-cls}-virtual {
+            .@{table-prefix-cls}-placeholder .@{table-prefix-cls}-cell {
+                border-right: @border-width-base @border-style-base @border-color-base;
+                border-bottom: @border-width-base @border-style-base @border-color-base;
+            }
+        }
+    }
+}
