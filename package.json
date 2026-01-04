@@ -41,7 +41,7 @@
     "docs:build": "dumi build",
     "prepare": "husky install && dumi setup",
     "doctor": "father doctor",
-    "lint": "npm run version && npm run tsc && npm run lint:script && npm run lint:biome",
+    "lint": "npm run tsc && npm run lint:script && npm run lint:biome",
     "lint:es-fix": "eslint \"components/**/*.{js,jsx,ts,tsx}\" \".dumi/**/*.{js,jsx,ts,tsx}\" --fix",
     "lint:css-fix": "stylelint \"components/**/*.{css,less,scss}\" \".dumi/**/*.{css,less,scss}\" --fix",
     "lint:css": "stylelint \"components/**/*.{css,less,scss}\" \".dumi/**/*.{css,less,scss}\"",
@@ -50,8 +50,7 @@
     "deploy": "npm run docs:build && gh-pages -d docs-dist",
     "release": "./scripts/release.sh",
     "tsc": "tsc --noEmit",
-    "tsc:old": "tsc --noEmit -p tsconfig-old-react.json",
-    "version": "tsx scripts/generate-version.ts"
+    "tsc:old": "tsc --noEmit -p tsconfig-old-react.json"
   },
   "commitlint": {
     "extends": [
