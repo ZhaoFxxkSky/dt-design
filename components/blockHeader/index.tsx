@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import React, { useState } from 'react';
+// 优化后的代码示例
+import React, { useMemo, useState } from 'react';
 import { QuestionCircleOutlined, UpOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import { globalConfig } from 'antd/es/config-provider';
@@ -7,7 +7,7 @@ import clsx from 'clsx';
 
 import './style';
 
-import type { SizeType } from 'antd/lib/config-provider/SizeContext';
+import type { SizeType } from 'antd/es/config-provider/SizeContext';
 
 import type { LabelTooltipType } from '../_util';
 import { toTooltipProps } from '../_util';
@@ -18,16 +18,18 @@ function isControlled(props: IBlockHeaderProps) {
 }
 
 export interface IBlockHeaderProps {
+  /** id */
+  id?: string;
   /** 标题 */
-  title: ReactNode;
+  title: React.ReactNode;
   /** 标题前的图标，默认是一个色块 */
-  addonBefore?: ReactNode;
+  addonBefore?: React.ReactNode;
   /** 标题后的提示说明文字 */
-  description?: ReactNode;
+  description?: React.ReactNode;
   /** 默认展示为问号的tooltip */
   tooltip?: LabelTooltipType;
   /** 后缀自定义内容块 */
-  addonAfter?: ReactNode;
+  addonAfter?: React.ReactNode;
   /**
    * 小标题 font-size: 12px; line-height: 32px
    * 中标题 font-size: 14px; line-height: 40px
@@ -36,7 +38,12 @@ export interface IBlockHeaderProps {
    */
   size?: SizeType;
   /** 自定义 Bottom 值 */
-  spaceBottom?: number;
+  spaceBottom?:
+    | {
+        expand?: number;
+        collapse?: number;
+      }
+    | number;
   /** 标题一行的样式类名 */
   className?: string;
   /** 标题的样式类名 */
@@ -49,14 +56,20 @@ export interface IBlockHeaderProps {
   background?: boolean;
   /** 当前展开状态 */
   expand?: boolean;
-  /** 是否默认展开内容, 默认为 undefined */
+  /** 是否可展开, 默认 true */
+  expandable?: boolean;
+  /** 是否默认展开内容, 默认为 false */
   defaultExpand?: boolean;
   /** 展开/收起的内容 */
-  children?: ReactNode;
+  children?: React.ReactNode;
   /** 展开/收起时的回调 */
   onExpand?: (expand: boolean) => void;
   /** 标题的样式 */
   titleStyle?: React.CSSProperties;
+  /** 是否保留 DOM 结构, 默认 false */
+  keepDOM?: boolean;
+  /** 是否懒加载, 默认 false */
+  lazy?: boolean;
 }
 
 const prefixCls = globalConfig().getPrefixCls('block-header');
@@ -64,55 +77,61 @@ const preTitleRowCls = `${prefixCls}__title`;
 
 const BlockHeader: React.FC<IBlockHeaderProps> = (props) => {
   const {
+    id,
     title,
     description = '',
     tooltip,
     size = 'middle',
-    spaceBottom = 16,
+    spaceBottom = { expand: 16, collapse: 16 },
     className = '',
     contentClassName = '',
     style = {},
     contentStyle = {},
     background = true,
-    defaultExpand,
+    defaultExpand = true,
     addonAfter,
     expand,
     children = '',
     addonBefore = <div className="addon-before--default" />,
     onExpand,
     titleStyle,
+    keepDOM = false,
+    lazy = false,
+    expandable = true,
   } = props;
 
   const [internalExpand, setInternalExpand] = useState(defaultExpand);
 
-  const currentExpand = isControlled(props) ? expand : internalExpand;
+  const currentExpand = isControlled(props) ? (expand ?? false) : internalExpand;
 
-  // 只有在有了 children 并且设置了 expand/defaultExpand 的时候才能够展开收起
-  const showCollapse =
-    (typeof expand === 'boolean' || typeof defaultExpand === 'boolean') && children;
+  const showCollapse = expandable && !!children;
 
   const tooltipProps = toTooltipProps(tooltip);
 
-  let bottomStyle: React.CSSProperties = {};
-  if (spaceBottom)
-    bottomStyle =
-      showCollapse && !currentExpand ? { marginBottom: 0 } : { marginBottom: spaceBottom };
+  const bottomStyle = useMemo<React.CSSProperties>(() => {
+    if (typeof spaceBottom === 'number') {
+      return { marginBottom: spaceBottom };
+    }
+    const key = currentExpand ? 'expand' : 'collapse';
 
-  const handleExpand = (expand: boolean) => {
-    if (!children) return;
-    !isControlled(props) && setInternalExpand(expand);
-    onExpand?.(expand);
+    return { marginBottom: spaceBottom[key] ?? 0 };
+  }, [spaceBottom, currentExpand]);
+
+  const handleExpand = () => {
+    const newExpandState = !currentExpand;
+    !isControlled(props) && setInternalExpand(newExpandState);
+    onExpand?.(newExpandState);
   };
 
   return (
-    <div className={clsx(`${prefixCls}`, className)} style={{ ...bottomStyle, ...style }}>
+    <div id={id} className={clsx(`${prefixCls}`, className)} style={{ ...bottomStyle, ...style }}>
       <div
         className={clsx(preTitleRowCls, `${preTitleRowCls}--${size}`, {
           [`${preTitleRowCls}--background`]: background,
           [`${preTitleRowCls}--pointer`]: showCollapse,
         })}
         style={titleStyle}
-        onClick={() => showCollapse && handleExpand(!currentExpand)}
+        onClick={showCollapse ? handleExpand : undefined}
       >
         <div className="title__box">
           {addonBefore ? (
@@ -141,18 +160,16 @@ const BlockHeader: React.FC<IBlockHeaderProps> = (props) => {
           </div>
         )}
       </div>
-      {
-        <Collapsible isOpen={!currentExpand}>
-          <div
-            className={clsx(`${prefixCls}__content`, contentClassName, {
-              [`${prefixCls}__content--active`]: currentExpand || !showCollapse,
-            })}
-            style={contentStyle}
-          >
-            {children}
-          </div>
-        </Collapsible>
-      }
+      <Collapsible isOpen={currentExpand} keepDOM={keepDOM} lazyRender={lazy}>
+        <div
+          className={clsx(`${prefixCls}__content`, contentClassName, {
+            [`${prefixCls}__content--active`]: currentExpand || !showCollapse,
+          })}
+          style={contentStyle}
+        >
+          {children}
+        </div>
+      </Collapsible>
     </div>
   );
 };
