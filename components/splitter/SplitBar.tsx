@@ -16,6 +16,9 @@ export interface SplitBarProps {
   endCollapsible: boolean;
   showStartCollapsibleIcon: ShowCollapsibleIconMode;
   showEndCollapsibleIcon: ShowCollapsibleIconMode;
+  draggerIcon?: React.ReactNode;
+  startIcon?: React.ReactNode;
+  endIcon?: React.ReactNode;
   onOffsetStart: (index: number) => void;
   onOffsetUpdate: (index: number, offsetX: number, offsetY: number, lazyEnd?: boolean) => void;
   onOffsetEnd: (lazyEnd?: boolean) => void;
@@ -48,6 +51,9 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
     resizable,
     startCollapsible,
     endCollapsible,
+    draggerIcon,
+    startIcon,
+    endIcon,
     onOffsetStart,
     onOffsetUpdate,
     onOffsetEnd,
@@ -170,8 +176,10 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
     [`--${splitBarPrefixCls}-preview-offset`]: `${constrainedOffset}px`,
   };
 
-  const StartIcon = vertical ? UpOutlined : LeftOutlined;
-  const EndIcon = vertical ? DownOutlined : RightOutlined;
+  const startIconNode = startIcon || (vertical ? <UpOutlined /> : <LeftOutlined />);
+  const endIconNode = endIcon || (vertical ? <DownOutlined /> : <RightOutlined />);
+  const startIconCustomized = startIcon !== undefined;
+  const endIconCustomized = endIcon !== undefined;
 
   return (
     <div
@@ -197,10 +205,15 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
         className={clsx(`${splitBarPrefixCls}-dragger`, {
           [`${splitBarPrefixCls}-dragger-disabled`]: !resizable,
           [`${splitBarPrefixCls}-dragger-active`]: active,
+          [`${splitBarPrefixCls}-dragger-customize`]: draggerIcon !== undefined,
         })}
         onMouseDown={onMouseDown}
         onTouchStart={onTouchStart}
-      />
+      >
+        {draggerIcon !== undefined && (
+          <div className={clsx(`${splitBarPrefixCls}-dragger-icon`)}>{draggerIcon}</div>
+        )}
+      </div>
 
       {/* Start Collapsible */}
       {startCollapsible && (
@@ -208,16 +221,21 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
           className={clsx(
             `${splitBarPrefixCls}-collapse-bar`,
             `${splitBarPrefixCls}-collapse-bar-start`,
+            {
+              [`${splitBarPrefixCls}-collapse-bar-customize`]: startIconCustomized,
+            },
             getVisibilityClass(showStartCollapsibleIcon),
           )}
           onClick={() => onCollapse(index, 'start')}
         >
-          <StartIcon
+          <span
             className={clsx(
               `${splitBarPrefixCls}-collapse-icon`,
               `${splitBarPrefixCls}-collapse-start`,
             )}
-          />
+          >
+            {startIconNode}
+          </span>
         </div>
       )}
 
@@ -226,16 +244,21 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
           className={clsx(
             `${splitBarPrefixCls}-collapse-bar`,
             `${splitBarPrefixCls}-collapse-bar-end`,
+            {
+              [`${splitBarPrefixCls}-collapse-bar-customize`]: endIconCustomized,
+            },
             getVisibilityClass(showEndCollapsibleIcon),
           )}
           onClick={() => onCollapse(index, 'end')}
         >
-          <EndIcon
+          <span
             className={clsx(
               `${splitBarPrefixCls}-collapse-icon`,
               `${splitBarPrefixCls}-collapse-end`,
             )}
-          />
+          >
+            {endIconNode}
+          </span>
         </div>
       )}
     </div>

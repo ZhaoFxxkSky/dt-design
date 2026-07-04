@@ -9,6 +9,7 @@ export type ItemType = Omit<PanelProps, 'collapsible'> & {
     start?: boolean;
     end?: boolean;
     showCollapsibleIcon: 'auto' | boolean;
+    icon?: { start?: React.ReactNode; end?: React.ReactNode };
   };
 };
 

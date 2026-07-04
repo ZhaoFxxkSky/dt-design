@@ -76,6 +76,24 @@
                     display: none;
                 }
             }
+
+            &.@{splitter-prefix-cls}-bar-dragger-customize {
+                &::before {
+                    background: transparent;
+                }
+
+                &::after {
+                    display: none;
+                }
+            }
+
+            .@{splitter-prefix-cls}-bar-dragger-icon {
+                .center-position();
+                z-index: 2;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
         }
 
         .@{splitter-prefix-cls}-bar-collapse-bar {
@@ -97,6 +115,15 @@
 
             &:active {
                 background: @item-active-bg;
+            }
+
+            &.@{splitter-prefix-cls}-bar-collapse-bar-customize {
+                background: transparent;
+
+                &:hover,
+                &:active {
+                    background: transparent;
+                }
             }
         }
 

@@ -208,4 +208,73 @@ describe('Splitter', () => {
       (global as any).__mockSplitterResize__ = false;
     }
   });
+
+  it('renders custom dragger icon', async () => {
+    (global as any).__mockSplitterResize__ = true;
+    try {
+      const { container } = render(
+        <Splitter draggerIcon={<span data-testid="custom-dragger" />}>
+          <Splitter.Panel>left</Splitter.Panel>
+          <Splitter.Panel>right</Splitter.Panel>
+        </Splitter>,
+      );
+
+      await reactAct(async () => {
+        await Promise.resolve();
+      });
+
+      expect(container.querySelector('[data-testid="custom-dragger"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('.ant-splitter-bar-dragger-customize'),
+      ).toBeInTheDocument();
+    } finally {
+      (global as any).__mockSplitterResize__ = false;
+    }
+  });
+
+  it('renders custom collapsible icons from adjacent panels', async () => {
+    (global as any).__mockSplitterResize__ = true;
+    try {
+      const { container } = render(
+        <Splitter>
+          <Splitter.Panel
+            collapsible={{
+              end: true,
+              icon: { end: <span data-testid="prev-end-icon">prev-end</span> },
+            }}
+          >
+            left
+          </Splitter.Panel>
+          <Splitter.Panel
+            collapsible={{
+              start: true,
+              icon: { start: <span data-testid="next-start-icon">next-start</span> },
+            }}
+          >
+            right
+          </Splitter.Panel>
+        </Splitter>,
+      );
+
+      await reactAct(async () => {
+        await Promise.resolve();
+      });
+
+      const startBar = container.querySelector('.ant-splitter-bar-collapse-bar-start');
+      const endBar = container.querySelector('.ant-splitter-bar-collapse-bar-end');
+      expect(startBar).toBeInTheDocument();
+      expect(endBar).toBeInTheDocument();
+      expect(startBar).toContainElement(
+        container.querySelector('[data-testid="prev-end-icon"]'),
+      );
+      expect(endBar).toContainElement(
+        container.querySelector('[data-testid="next-start-icon"]'),
+      );
+      expect(
+        container.querySelector('.ant-splitter-bar-collapse-bar-customize'),
+      ).toBeInTheDocument();
+    } finally {
+      (global as any).__mockSplitterResize__ = false;
+    }
+  });
 });

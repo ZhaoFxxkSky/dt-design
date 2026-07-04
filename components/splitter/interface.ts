@@ -12,6 +12,7 @@ export interface SplitterProps {
   onCollapse?: (collapsed: boolean[], sizes: number[]) => void;
   lazy?: boolean;
   destroyOnHidden?: boolean;
+  draggerIcon?: React.ReactNode;
 }
 
 export interface PanelProps {
@@ -23,7 +24,12 @@ export interface PanelProps {
   size?: number | string;
   collapsible?:
     | boolean
-    | { start?: boolean; end?: boolean; showCollapsibleIcon?: ShowCollapsibleIconMode };
+    | {
+        start?: boolean;
+        end?: boolean;
+        showCollapsibleIcon?: ShowCollapsibleIconMode;
+        icon?: { start?: React.ReactNode; end?: React.ReactNode };
+      };
   resizable?: boolean;
   defaultSize?: number | string;
   destroyOnHidden?: boolean;

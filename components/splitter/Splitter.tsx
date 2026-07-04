@@ -29,6 +29,7 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
     onResizeEnd,
     lazy,
     destroyOnHidden,
+    draggerIcon,
   } = props;
 
   const { getPrefixCls, direction } = useContext(ConfigContext);
@@ -194,6 +195,9 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
                 prefixCls={prefixCls}
                 vertical={isVertical}
                 resizable={resizableInfo.resizable}
+                draggerIcon={draggerIcon}
+                startIcon={resizableInfo.startIcon}
+                endIcon={resizableInfo.endIcon}
                 ariaNow={stackSizes[idx] * 100}
                 ariaMin={Math.max(ariaMinStart, ariaMinEnd) * 100}
                 ariaMax={Math.min(ariaMaxStart, ariaMaxEnd) * 100}
