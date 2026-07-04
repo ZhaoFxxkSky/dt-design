@@ -1,11 +1,44 @@
 import fs from 'fs';
 import path from 'path';
 import React from 'react';
+import { act as reactAct } from 'react';
 import { fireEvent, render } from '@testing-library/react';
 
 import '@testing-library/jest-dom/extend-expect';
 
 import Splitter from '..';
+
+jest.mock('resize-observer-polyfill', () => {
+  return class ResizeObserver {
+    callback: any;
+    constructor(callback: any) {
+      this.callback = callback;
+    }
+    observe(target: HTMLElement) {
+      if (!(global as any).__mockSplitterResize__) {
+        return;
+      }
+      Promise.resolve().then(() => {
+        Object.defineProperty(target, 'offsetWidth', { value: 1000, configurable: true });
+        Object.defineProperty(target, 'offsetHeight', { value: 200, configurable: true });
+        target.getBoundingClientRect = () => ({
+          width: 1000,
+          height: 200,
+          top: 0,
+          left: 0,
+          right: 1000,
+          bottom: 200,
+          x: 0,
+          y: 0,
+          toJSON: () => {},
+        });
+        this.callback([{ target }], this);
+      });
+    }
+    unobserve() {}
+    disconnect() {}
+  };
+});
 
 describe('Splitter', () => {
   it('renders panels and separator', () => {
@@ -122,5 +155,57 @@ describe('Splitter', () => {
     const stylePath = path.resolve(__dirname, '../style/index.less');
     const lessContent = fs.readFileSync(stylePath, 'utf-8');
     expect(lessContent).not.toContain('padding: 0 1px');
+  });
+
+  it('unmounts panel content when destroyOnHidden is true and collapsed', async () => {
+    (global as any).__mockSplitterResize__ = true;
+    try {
+      const { container, queryByText } = render(
+        <Splitter>
+          <Splitter.Panel collapsible destroyOnHidden>
+            content
+          </Splitter.Panel>
+          <Splitter.Panel>right</Splitter.Panel>
+        </Splitter>,
+      );
+
+      await reactAct(async () => {
+        await Promise.resolve();
+      });
+
+      expect(queryByText('content')).toBeInTheDocument();
+
+      const collapseBar = container.querySelector('.ant-splitter-bar-collapse-bar-start');
+      expect(collapseBar).toBeTruthy();
+      fireEvent.click(collapseBar!);
+
+      expect(queryByText('content')).not.toBeInTheDocument();
+    } finally {
+      (global as any).__mockSplitterResize__ = false;
+    }
+  });
+
+  it('keeps panel content when destroyOnHidden is false', async () => {
+    (global as any).__mockSplitterResize__ = true;
+    try {
+      const { container, queryByText } = render(
+        <Splitter>
+          <Splitter.Panel collapsible>content</Splitter.Panel>
+          <Splitter.Panel>right</Splitter.Panel>
+        </Splitter>,
+      );
+
+      await reactAct(async () => {
+        await Promise.resolve();
+      });
+
+      const collapseBar = container.querySelector('.ant-splitter-bar-collapse-bar-start');
+      expect(collapseBar).toBeTruthy();
+      fireEvent.click(collapseBar!);
+
+      expect(queryByText('content')).toBeInTheDocument();
+    } finally {
+      (global as any).__mockSplitterResize__ = false;
+    }
   });
 });

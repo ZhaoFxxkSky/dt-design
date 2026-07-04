@@ -15,6 +15,7 @@ export const InternalPanel = forwardRef<
     size,
     style = {},
     id,
+    destroyOnHidden,
   } = props;
 
   const { getPrefixCls } = useContext(ConfigContext);
@@ -29,6 +30,7 @@ export const InternalPanel = forwardRef<
   );
 
   const hasSize = size !== undefined;
+  const shouldRender = !destroyOnHidden || size !== 0;
 
   return (
     <div
@@ -42,7 +44,7 @@ export const InternalPanel = forwardRef<
         flexGrow: hasSize ? 0 : 1,
       }}
     >
-      {children}
+      {shouldRender ? children : null}
     </div>
   );
 });

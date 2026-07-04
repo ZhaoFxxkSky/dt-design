@@ -28,6 +28,7 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
     onResize,
     onResizeEnd,
     lazy,
+    destroyOnHidden,
   } = props;
 
   const { getPrefixCls, direction } = useContext(ConfigContext);
@@ -167,6 +168,7 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
               id={panelIds[idx]}
               prefixCls={prefixCls}
               size={panelSizes[idx]}
+              destroyOnHidden={item.destroyOnHidden ?? destroyOnHidden}
             />
           );
 

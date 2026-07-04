@@ -11,6 +11,7 @@ export interface SplitterProps {
   onResizeEnd?: (sizes: number[]) => void;
   onCollapse?: (collapsed: boolean[], sizes: number[]) => void;
   lazy?: boolean;
+  destroyOnHidden?: boolean;
 }
 
 export interface PanelProps {
@@ -25,6 +26,7 @@ export interface PanelProps {
     | { start?: boolean; end?: boolean; showCollapsibleIcon?: ShowCollapsibleIconMode };
   resizable?: boolean;
   defaultSize?: number | string;
+  destroyOnHidden?: boolean;
 }
 
 export interface InternalPanelProps extends PanelProps {
