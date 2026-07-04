@@ -13,6 +13,6 @@ module.exports = {
     '@babel/polyfill/lib/noConflict': '<rootDir>/tests/styleMock.js',
     '^lodash-es$': 'lodash',
     'react-markdown': '<rootDir>/node_modules/react-markdown/react-markdown.min.js',
-    '@dtinsight/react-icons': '<rootDir>/tests/iconMock.js',
-  },
+    '@dtinsight/react-icons': '<rootDir>/tests/iconMock.js',    '^antd/es/(.*)$': 'antd/lib/$1',
+    '^rc-util/es/(.*)$': 'rc-util/lib/$1',  },
 };
