@@ -277,4 +277,49 @@ describe('Splitter', () => {
       (global as any).__mockSplitterResize__ = false;
     }
   });
+
+  it('uses vertical prop for orientation', () => {
+    const { container } = render(
+      <Splitter vertical>
+        <Splitter.Panel>top</Splitter.Panel>
+        <Splitter.Panel>bottom</Splitter.Panel>
+      </Splitter>,
+    );
+
+    expect(container.querySelector('.ant-splitter-vertical')).toBeInTheDocument();
+  });
+
+  it('uses orientation prop', () => {
+    const { container } = render(
+      <Splitter orientation="vertical">
+        <Splitter.Panel>top</Splitter.Panel>
+        <Splitter.Panel>bottom</Splitter.Panel>
+      </Splitter>,
+    );
+
+    expect(container.querySelector('.ant-splitter-vertical')).toBeInTheDocument();
+  });
+
+  it('prefers orientation over layout', () => {
+    const { container } = render(
+      <Splitter layout="horizontal" orientation="vertical">
+        <Splitter.Panel>top</Splitter.Panel>
+        <Splitter.Panel>bottom</Splitter.Panel>
+      </Splitter>,
+    );
+
+    expect(container.querySelector('.ant-splitter-vertical')).toBeInTheDocument();
+    expect(container.querySelector('.ant-splitter-horizontal')).not.toBeInTheDocument();
+  });
+
+  it('falls back to layout when orientation and vertical are not provided', () => {
+    const { container } = render(
+      <Splitter layout="vertical">
+        <Splitter.Panel>top</Splitter.Panel>
+        <Splitter.Panel>bottom</Splitter.Panel>
+      </Splitter>,
+    );
+
+    expect(container.querySelector('.ant-splitter-vertical')).toBeInTheDocument();
+  });
 });

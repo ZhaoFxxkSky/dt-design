@@ -5,6 +5,7 @@ import useEvent from 'rc-util/es/hooks/useEvent';
 import warning from 'rc-util/es/warning';
 
 import useItems from './hooks/useItems';
+import useOrientation from './hooks/useOrientation';
 import useResizable from './hooks/useResizable';
 import useResize from './hooks/useResize';
 import useSizes from './hooks/useSizes';
@@ -21,7 +22,9 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
     prefixCls: customizePrefixCls,
     className,
     style,
-    layout = 'horizontal',
+    layout,
+    orientation,
+    vertical,
     children,
     rootClassName,
     onResizeStart,
@@ -35,7 +38,7 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
   const { getPrefixCls, direction } = useContext(ConfigContext);
   const prefixCls = getPrefixCls('splitter', customizePrefixCls);
 
-  const isVertical = layout === 'vertical';
+  const [mergedOrientation, isVertical] = useOrientation(orientation, vertical, layout);
   const isRTL = direction === 'rtl';
   const reverse = !isVertical && isRTL;
 
@@ -130,7 +133,7 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
   const containerClassName = clsx(
     prefixCls,
     className,
-    `${prefixCls}-${layout}`,
+    `${prefixCls}-${mergedOrientation}`,
     {
       [`${prefixCls}-rtl`]: isRTL,
     },
@@ -224,7 +227,7 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
         })}
 
         {typeof movingIndex === 'number' && (
-          <div aria-hidden className={clsx(maskCls, `${maskCls}-${layout}`)} />
+          <div aria-hidden className={clsx(maskCls, `${maskCls}-${mergedOrientation}`)} />
         )}
       </div>
     </ResizeObserver>
