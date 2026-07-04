@@ -16,6 +16,7 @@ export const InternalPanel = forwardRef<
     style = {},
     id,
     destroyOnHidden,
+    supportMotion,
   } = props;
 
   const { getPrefixCls } = useContext(ConfigContext);
@@ -25,6 +26,7 @@ export const InternalPanel = forwardRef<
     `${prefixCls}-panel`,
     {
       [`${prefixCls}-panel-hidden`]: size === 0,
+      [`${prefixCls}-panel-motion`]: supportMotion,
     },
     className,
   );

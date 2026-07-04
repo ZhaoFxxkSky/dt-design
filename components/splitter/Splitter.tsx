@@ -33,6 +33,7 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
     lazy,
     destroyOnHidden,
     draggerIcon,
+    motion,
   } = props;
 
   const { getPrefixCls, direction } = useContext(ConfigContext);
@@ -87,6 +88,11 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
     containerSize,
     updateSizes,
     isRTL,
+  );
+
+  const supportMotion = React.useMemo(
+    () => (motion || items.some((item) => item.collapsible?.motion)) && movingIndex === undefined,
+    [items, motion, movingIndex],
   );
 
   const onInternalResizeStart = useEvent((index: number) => {
@@ -173,6 +179,7 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
               prefixCls={prefixCls}
               size={panelSizes[idx]}
               destroyOnHidden={item.destroyOnHidden ?? destroyOnHidden}
+              supportMotion={supportMotion}
             />
           );
 
@@ -186,9 +193,7 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
             const ariaMaxStart = (stackSizes[idx - 1] || 0) + itemPtgMaxSizes[idx];
             const ariaMaxEnd = (stackSizes[idx + 1] || 100) - itemPtgMinSizes[idx + 1];
 
-            const ariaControls = [panelIds[idx], panelIds[idx + 1]]
-              .filter(Boolean)
-              .join(' ');
+            const ariaControls = [panelIds[idx], panelIds[idx + 1]].filter(Boolean).join(' ');
 
             splitBar = (
               <SplitBar

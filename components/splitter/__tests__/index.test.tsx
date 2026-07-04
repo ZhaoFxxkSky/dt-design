@@ -322,4 +322,31 @@ describe('Splitter', () => {
 
     expect(container.querySelector('.ant-splitter-vertical')).toBeInTheDocument();
   });
+
+  it('adds motion class when panel collapsible.motion is true', () => {
+    const { container } = render(
+      <Splitter>
+        <Splitter.Panel collapsible={{ motion: true }}>left</Splitter.Panel>
+        <Splitter.Panel>right</Splitter.Panel>
+      </Splitter>,
+    );
+
+    const panels = container.querySelectorAll('.ant-splitter-panel');
+    panels.forEach((panel) => {
+      expect(panel).toHaveClass('ant-splitter-panel-motion');
+    });
+  });
+
+  it('adds motion class to all panels when Splitter.motion is true', () => {
+    const { container } = render(
+      <Splitter motion>
+        <Splitter.Panel>left</Splitter.Panel>
+        <Splitter.Panel>right</Splitter.Panel>
+      </Splitter>,
+    );
+
+    const panels = container.querySelectorAll('.ant-splitter-panel');
+    expect(panels[0]).toHaveClass('ant-splitter-panel-motion');
+    expect(panels[1]).toHaveClass('ant-splitter-panel-motion');
+  });
 });

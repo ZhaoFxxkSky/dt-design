@@ -15,6 +15,7 @@ export interface SplitterProps {
   lazy?: boolean;
   destroyOnHidden?: boolean;
   draggerIcon?: React.ReactNode;
+  motion?: boolean;
 }
 
 export interface PanelProps {
@@ -31,6 +32,7 @@ export interface PanelProps {
         end?: boolean;
         showCollapsibleIcon?: ShowCollapsibleIconMode;
         icon?: { start?: React.ReactNode; end?: React.ReactNode };
+        motion?: boolean;
       };
   resizable?: boolean;
   defaultSize?: number | string;
@@ -41,4 +43,5 @@ export interface InternalPanelProps extends PanelProps {
   className?: string;
   prefixCls?: string;
   id?: string;
+  supportMotion?: boolean;
 }

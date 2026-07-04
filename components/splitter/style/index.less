@@ -297,6 +297,10 @@
         overflow: auto;
         box-sizing: border-box;
 
+        &.@{splitter-prefix-cls}-panel-motion {
+            transition: flex-basis 0.3s ease-in-out;
+        }
+
         &::-webkit-scrollbar {
             width: 8px;
             height: 8px;
