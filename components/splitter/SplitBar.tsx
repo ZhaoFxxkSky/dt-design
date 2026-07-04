@@ -114,9 +114,11 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
         offsetY = isHorizontal ? 0 : STEP;
         break;
       case 'Home':
+        e.preventDefault();
         onOffsetUpdate(index, isHorizontal ? -containerSize : 0, isHorizontal ? 0 : -containerSize);
         return;
       case 'End':
+        e.preventDefault();
         onOffsetUpdate(index, isHorizontal ? containerSize : 0, isHorizontal ? 0 : containerSize);
         return;
       default:

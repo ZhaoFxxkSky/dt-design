@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import React from 'react';
-import { act as reactAct } from 'react';
+import React, { act as reactAct } from 'react';
 import { fireEvent, render } from '@testing-library/react';
 
 import '@testing-library/jest-dom/extend-expect';

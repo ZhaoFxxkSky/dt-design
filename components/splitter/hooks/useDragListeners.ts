@@ -103,12 +103,16 @@ export default function useDragListeners(options: UseDragListenersOptions) {
 
     for (const [event, handler] of Object.entries(eventHandlerMap)) {
       // eslint-disable-next-line react-web-api/no-leaked-event-listener
-      window.addEventListener(event, handler);
+      const options =
+        event === 'touchmove' ? ({ passive: false } as AddEventListenerOptions) : undefined;
+      window.addEventListener(event, handler, options);
     }
 
     return () => {
       for (const [event, handler] of Object.entries(eventHandlerMap)) {
-        window.removeEventListener(event, handler);
+        const options =
+          event === 'touchmove' ? ({ passive: false } as AddEventListenerOptions) : undefined;
+        window.removeEventListener(event, handler, options);
       }
     };
   }, [startPos, index, lazy]);
