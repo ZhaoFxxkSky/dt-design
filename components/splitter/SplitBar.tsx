@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { DownOutlined, LeftOutlined, RightOutlined, UpOutlined } from '@ant-design/icons';
 import clsx from 'clsx';
 import useEvent from 'rc-util/es/hooks/useEvent';
-import useLayoutEffect from 'rc-util/es/hooks/useLayoutEffect';
+
+import useDragListeners from './hooks/useDragListeners';
 
 export type ShowCollapsibleIconMode = boolean | 'auto';
 
@@ -57,7 +58,7 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
 
   const splitBarPrefixCls = `${prefixCls}-bar`;
 
-  const [startPos, setStartPos] = useState<[x: number, y: number] | null>(null);
+  const [startPos, setStartPos] = useState<readonly [number, number] | null>(null);
   const [constrainedOffset, setConstrainedOffset] = useState<number>(0);
 
   const constrainedOffsetX = vertical ? 0 : constrainedOffset;
@@ -65,6 +66,7 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
 
   const onMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
     if (resizable && e.currentTarget) {
+      e.preventDefault();
       setStartPos([e.pageX, e.pageY]);
       onOffsetStart(index);
     }
@@ -72,6 +74,7 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
 
   const onTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
     if (resizable && e.touches.length === 1) {
+      e.preventDefault();
       const touch = e.touches[0];
       setStartPos([touch.pageX, touch.pageY]);
       onOffsetStart(index);
@@ -111,71 +114,17 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
     }
   };
 
-  useLayoutEffect(() => {
-    if (!startPos) {
-      return;
-    }
-
-    const onMouseMove = (e: MouseEvent) => {
-      const { pageX, pageY } = e;
-      const offsetX = pageX - startPos[0];
-      const offsetY = pageY - startPos[1];
-      if (lazy) {
-        handleLazyMove(offsetX, offsetY);
-      } else {
-        onOffsetUpdate(index, offsetX, offsetY);
-      }
-    };
-
-    const onMouseUp = () => {
-      if (lazy) {
-        handleLazyEnd();
-      } else {
-        onOffsetEnd();
-      }
-      setStartPos(null);
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length === 1) {
-        const touch = e.touches[0];
-        const offsetX = touch.pageX - startPos[0];
-        const offsetY = touch.pageY - startPos[1];
-        if (lazy) {
-          handleLazyMove(offsetX, offsetY);
-        } else {
-          onOffsetUpdate(index, offsetX, offsetY);
-        }
-      }
-    };
-
-    const handleTouchEnd = () => {
-      if (lazy) {
-        handleLazyEnd();
-      } else {
-        onOffsetEnd();
-      }
-      setStartPos(null);
-    };
-
-    const eventHandlerMap: Partial<Record<keyof WindowEventMap, EventListener>> = {
-      mousemove: onMouseMove as EventListener,
-      mouseup: onMouseUp,
-      touchmove: handleTouchMove as EventListener,
-      touchend: handleTouchEnd,
-    };
-
-    for (const [event, handler] of Object.entries(eventHandlerMap)) {
-      // eslint-disable-next-line react-web-api/no-leaked-event-listener
-      window.addEventListener(event, handler);
-    }
-
-    return () => {
-      for (const [event, handler] of Object.entries(eventHandlerMap)) {
-        window.removeEventListener(event, handler);
-      }
-    };
-  }, [startPos, index, lazy]);
+  useDragListeners({
+    startPos,
+    vertical,
+    lazy,
+    onOffsetUpdate,
+    onOffsetEnd,
+    handleLazyMove,
+    handleLazyEnd,
+    setStartPos,
+    index,
+  });
 
   const transformStyle: React.CSSProperties = {
     [`--${splitBarPrefixCls}-preview-offset`]: `${constrainedOffset}px`,
