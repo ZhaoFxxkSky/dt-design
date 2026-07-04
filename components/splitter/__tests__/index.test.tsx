@@ -1,0 +1,104 @@
+import React from 'react';
+import { fireEvent, render } from '@testing-library/react';
+
+import '@testing-library/jest-dom/extend-expect';
+
+import Splitter from '..';
+
+describe('Splitter', () => {
+  it('renders panels and separator', () => {
+    const { container } = render(
+      <Splitter>
+        <Splitter.Panel defaultSize="30%">left</Splitter.Panel>
+        <Splitter.Panel>right</Splitter.Panel>
+      </Splitter>,
+    );
+
+    expect(container.querySelector('.ant-splitter')).toBeInTheDocument();
+    expect(container.querySelectorAll('.ant-splitter-panel')).toHaveLength(2);
+    expect(container.querySelectorAll('.ant-splitter-bar')).toHaveLength(1);
+  });
+
+  it('sets aria attributes on separator', () => {
+    const { container } = render(
+      <Splitter>
+        <Splitter.Panel defaultSize="30%">left</Splitter.Panel>
+        <Splitter.Panel>right</Splitter.Panel>
+      </Splitter>,
+    );
+
+    const bar = container.querySelector('.ant-splitter-bar');
+    expect(bar).toHaveAttribute('role', 'separator');
+    expect(bar).toHaveAttribute('tabindex', '0');
+    expect(bar).toHaveAttribute('aria-valuenow');
+    expect(bar).toHaveAttribute('aria-valuemin');
+    expect(bar).toHaveAttribute('aria-valuemax');
+    expect(bar).toHaveAttribute('aria-controls');
+  });
+
+  it('links aria-controls to panel ids', () => {
+    const { container } = render(
+      <Splitter>
+        <Splitter.Panel id="panel-a" defaultSize="30%">
+          left
+        </Splitter.Panel>
+        <Splitter.Panel id="panel-b">right</Splitter.Panel>
+      </Splitter>,
+    );
+
+    const bar = container.querySelector('.ant-splitter-bar');
+    expect(bar).toHaveAttribute('aria-controls', 'panel-a panel-b');
+    expect(container.querySelector('#panel-a')).toBeInTheDocument();
+    expect(container.querySelector('#panel-b')).toBeInTheDocument();
+  });
+
+  it('calls onResizeStart and onResizeEnd on mouse drag', () => {
+    const onResizeStart = jest.fn();
+    const onResizeEnd = jest.fn();
+    const { container } = render(
+      <Splitter onResizeStart={onResizeStart} onResizeEnd={onResizeEnd}>
+        <Splitter.Panel defaultSize="30%">left</Splitter.Panel>
+        <Splitter.Panel>right</Splitter.Panel>
+      </Splitter>,
+    );
+
+    const dragger = container.querySelector('.ant-splitter-bar-dragger');
+    expect(dragger).toBeTruthy();
+
+    fireEvent.mouseDown(dragger!, { pageX: 100, pageY: 100 });
+    expect(onResizeStart).toHaveBeenCalledTimes(1);
+
+    fireEvent.mouseMove(window, { pageX: 120, pageY: 100 });
+    fireEvent.mouseUp(window);
+    expect(onResizeEnd).toHaveBeenCalledTimes(1);
+  });
+
+  it('adjusts size with keyboard arrows', () => {
+    const onResize = jest.fn();
+    const { container } = render(
+      <Splitter onResize={onResize}>
+        <Splitter.Panel defaultSize="30%">left</Splitter.Panel>
+        <Splitter.Panel>right</Splitter.Panel>
+      </Splitter>,
+    );
+
+    const bar = container.querySelector('.ant-splitter-bar');
+    fireEvent.keyDown(bar!, { key: 'ArrowRight' });
+    expect(onResize).toHaveBeenCalled();
+  });
+
+  it('does not allow keyboard control when disabled', () => {
+    const onResize = jest.fn();
+    const { container } = render(
+      <Splitter onResize={onResize}>
+        <Splitter.Panel resizable={false} size={100}>
+          fixed
+        </Splitter.Panel>
+        <Splitter.Panel>right</Splitter.Panel>
+      </Splitter>,
+    );
+
+    const bar = container.querySelector('.ant-splitter-bar');
+    expect(bar).toHaveAttribute('tabindex', '-1');
+  });
+});

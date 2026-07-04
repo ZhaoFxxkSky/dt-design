@@ -16,6 +16,7 @@ export interface SplitterProps {
 export interface PanelProps {
   className?: string;
   style?: React.CSSProperties;
+  id?: string;
   min?: number | string;
   max?: number | string;
   size?: number | string;
