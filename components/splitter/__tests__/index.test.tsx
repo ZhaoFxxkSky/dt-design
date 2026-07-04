@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
 
@@ -114,5 +116,11 @@ describe('Splitter', () => {
     expect(panels[0]).toHaveStyle({ flexBasis: '30%' });
     // The uncontrolled panel should be auto-filled, not stick to defaultSize
     expect(panels[1]).toHaveStyle({ flexBasis: 'auto' });
+  });
+
+  it('does not add unexpected horizontal padding on panels', () => {
+    const stylePath = path.resolve(__dirname, '../style/index.less');
+    const lessContent = fs.readFileSync(stylePath, 'utf-8');
+    expect(lessContent).not.toContain('padding: 0 1px');
   });
 });
