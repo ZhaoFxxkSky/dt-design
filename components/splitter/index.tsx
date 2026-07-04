@@ -1,7 +1,8 @@
 import Panel from './Panel';
 import SplitterComp from './Splitter';
 
-export type { SplitterProps } from './interface';
+export type { PanelProps, SplitterProps } from './interface';
+export type { ShowCollapsibleIconMode } from './SplitBar';
 
 type CompoundedComponent = typeof SplitterComp & {
   Panel: typeof Panel;
