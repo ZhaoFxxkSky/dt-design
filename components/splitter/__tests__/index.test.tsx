@@ -101,4 +101,18 @@ describe('Splitter', () => {
     const bar = container.querySelector('.ant-splitter-bar');
     expect(bar).toHaveAttribute('tabindex', '-1');
   });
+
+  it('recalculates uncontrolled panel size when a controlled size exists', () => {
+    const { container } = render(
+      <Splitter onResize={jest.fn()}>
+        <Splitter.Panel size="30%">left</Splitter.Panel>
+        <Splitter.Panel defaultSize="50%">right</Splitter.Panel>
+      </Splitter>,
+    );
+
+    const panels = container.querySelectorAll('.ant-splitter-panel');
+    expect(panels[0]).toHaveStyle({ flexBasis: '30%' });
+    // The uncontrolled panel should be auto-filled, not stick to defaultSize
+    expect(panels[1]).toHaveStyle({ flexBasis: 'auto' });
+  });
 });
