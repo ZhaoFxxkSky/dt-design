@@ -22,7 +22,7 @@ demo:
 
 [//]: # '<code src="./demos/size.tsx" description="自定义面板大小">自定义面板大小</code>'
 
-<code src="./demos/group.tsx" description="复杂组合面板，快捷折叠，禁止改变大小">复杂组合</code> <code src="./demos/lazy.tsx" description="延迟渲染模式，拖拽时不会立即更新大小，而是等到松手时才更新。">延迟渲染模式</code>
+<code src="./demos/group.tsx" description="复杂组合面板，快捷折叠，禁止改变大小">复杂组合</code> <code src="./demos/lazy.tsx" description="延迟渲染模式，拖拽时不会立即更新大小，而是等到松手时才更新。">延迟渲染模式</code> <code src="./demos/destroyOnHidden.tsx" description="配置 `destroyOnHidden` 折叠后销毁面板内容，再次展开时状态会重置。">折叠销毁内容</code> <code src="./demos/motion.tsx" description="配置 `motion` 启用折叠展开动画。">折叠动画</code> <code src="./demos/draggerIcon.tsx" description="使用 `draggerIcon` 自定义拖拽条图标。">自定义拖拽图标</code>
 
 ## API
 
@@ -30,19 +30,19 @@ demo:
 
 ### Splitter
 
-| 参数          | 说明             | 类型                        | 默认值       | 版本 |
-| ------------- | ---------------- | --------------------------- | ------------ | ---- |
-| layout        | 布局方向（兼容旧属性） | `horizontal` \| `vertical`  | `horizontal` | - |
-| orientation   | 布局方向，优先级高于 `layout` | `horizontal` \| `vertical`  | - | 1.0.3 |
-| vertical      | 是否垂直布局，优先级低于 `orientation` | `boolean` | `false` | 1.0.3 |
+| 参数 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| layout | 布局方向（兼容旧属性） | `horizontal` \| `vertical` | `horizontal` | - |
+| orientation | 布局方向，优先级高于 `layout` | `horizontal` \| `vertical` | - | 1.0.3 |
+| vertical | 是否垂直布局，优先级低于 `orientation` | `boolean` | `false` | 1.0.3 |
 | onResizeStart | 开始拖拽之前回调 | `(sizes: number[]) => void` | - | - |
-| onResize      | 面板大小变化回调 | `(sizes: number[]) => void` | - | - |
-| onResizeEnd   | 拖拽结束回调 | `(sizes: number[]) => void` | - | - |
-| onCollapse    | 面板折叠状态变化回调 | `(collapsed: boolean[], sizes: number[]) => void` | - | 1.0.3 |
-| lazy          | 延迟渲染模式 | `boolean` | `false` | - |
+| onResize | 面板大小变化回调 | `(sizes: number[]) => void` | - | - |
+| onResizeEnd | 拖拽结束回调 | `(sizes: number[]) => void` | - | - |
+| onCollapse | 面板折叠状态变化回调 | `(collapsed: boolean[], sizes: number[]) => void` | - | 1.0.3 |
+| lazy | 延迟渲染模式 | `boolean` | `false` | - |
 | destroyOnHidden | 折叠后是否销毁面板内容 | `boolean` | `false` | 1.0.3 |
-| draggerIcon   | 自定义拖拽图标 | `ReactNode` | - | 1.0.3 |
-| motion        | 是否启用折叠展开动画 | `boolean` | `false` | 1.0.3 |
+| draggerIcon | 自定义拖拽图标 | `ReactNode` | - | 1.0.3 |
+| motion | 是否启用折叠展开动画 | `boolean` | `false` | 1.0.3 |
 
 ### Panel
 
