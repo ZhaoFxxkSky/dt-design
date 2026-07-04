@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { DownOutlined, LeftOutlined, RightOutlined, UpOutlined } from '@ant-design/icons';
 import clsx from 'clsx';
-import useEvent from 'rc-util/lib/hooks/useEvent';
-import useLayoutEffect from 'rc-util/lib/hooks/useLayoutEffect';
+import useEvent from 'rc-util/es/hooks/useEvent';
+import useLayoutEffect from 'rc-util/es/hooks/useLayoutEffect';
 
 export type ShowCollapsibleIconMode = boolean | 'auto';
 

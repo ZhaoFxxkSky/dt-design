@@ -15,7 +15,6 @@ import SplitBar from './SplitBar';
 import './style/index.less';
 
 import clsx from 'clsx';
-import { uniqueId } from 'lodash-es';
 
 const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
   const {
@@ -190,7 +189,7 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
           }
 
           return (
-            <React.Fragment key={`split-panel-${uniqueId()}`}>
+            <React.Fragment key={`split-panel-${idx}`}>
               {panel}
               {splitBar}
             </React.Fragment>
