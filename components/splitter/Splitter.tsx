@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { ConfigContext } from 'antd/es/config-provider';
 import ResizeObserver from 'rc-resize-observer';
 import useEvent from 'rc-util/es/hooks/useEvent';
@@ -150,13 +150,25 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
     return mergedSizes;
   }, [itemPtgSizes, items.length]);
 
+  const panelIds = useMemo(
+    () => items.map((item, idx) => item.id || `${prefixCls}-panel-${idx}`),
+    [items, prefixCls],
+  );
+
   const mergedStyle: React.CSSProperties = { ...style };
 
   return (
     <ResizeObserver onResize={onContainerResize}>
       <div style={mergedStyle} className={containerClassName}>
         {items.map((item, idx) => {
-          const panel = <InternalPanel {...item} prefixCls={prefixCls} size={panelSizes[idx]} />;
+          const panel = (
+            <InternalPanel
+              {...item}
+              id={panelIds[idx]}
+              prefixCls={prefixCls}
+              size={panelSizes[idx]}
+            />
+          );
 
           let splitBar: React.ReactElement | null = null;
 
@@ -167,6 +179,10 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
 
             const ariaMaxStart = (stackSizes[idx - 1] || 0) + itemPtgMaxSizes[idx];
             const ariaMaxEnd = (stackSizes[idx + 1] || 100) - itemPtgMinSizes[idx + 1];
+
+            const ariaControls = [panelIds[idx], panelIds[idx + 1]]
+              .filter(Boolean)
+              .join(' ');
 
             splitBar = (
               <SplitBar
@@ -179,6 +195,7 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
                 ariaNow={stackSizes[idx] * 100}
                 ariaMin={Math.max(ariaMinStart, ariaMinEnd) * 100}
                 ariaMax={Math.min(ariaMaxStart, ariaMaxEnd) * 100}
+                ariaControls={ariaControls}
                 startCollapsible={resizableInfo.startCollapsible}
                 endCollapsible={resizableInfo.endCollapsible}
                 showStartCollapsibleIcon={resizableInfo.showStartCollapsibleIcon}

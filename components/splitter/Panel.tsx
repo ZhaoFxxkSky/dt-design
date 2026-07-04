@@ -8,7 +8,14 @@ export const InternalPanel = forwardRef<
   HTMLDivElement,
   React.PropsWithChildren<InternalPanelProps>
 >((props, ref) => {
-  const { prefixCls: customizePrefixCls, className, children, size, style = {} } = props;
+  const {
+    prefixCls: customizePrefixCls,
+    className,
+    children,
+    size,
+    style = {},
+    id,
+  } = props;
 
   const { getPrefixCls } = useContext(ConfigContext);
   const prefixCls = getPrefixCls('splitter', customizePrefixCls);
@@ -26,6 +33,7 @@ export const InternalPanel = forwardRef<
   return (
     <div
       ref={ref}
+      id={id}
       className={panelClassName}
       style={{
         ...style,
@@ -40,9 +48,13 @@ export const InternalPanel = forwardRef<
 });
 
 if (process.env.NODE_ENV !== 'production') {
-  InternalPanel.displayName = 'Panel';
+  InternalPanel.displayName = 'Splitter.Panel';
 }
 
 const Panel: React.FC<React.PropsWithChildren<PanelProps>> = () => null;
+
+if (process.env.NODE_ENV !== 'production') {
+  Panel.displayName = 'Splitter.Panel';
+}
 
 export default Panel;

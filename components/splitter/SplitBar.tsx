@@ -24,6 +24,7 @@ export interface SplitBarProps {
   ariaNow: number;
   ariaMin: number;
   ariaMax: number;
+  ariaControls: string;
   lazy?: boolean;
   containerSize: number;
 }
@@ -43,6 +44,7 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
     ariaNow,
     ariaMin,
     ariaMax,
+    ariaControls,
     resizable,
     startCollapsible,
     endCollapsible,
@@ -64,6 +66,8 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
   const constrainedOffsetX = vertical ? 0 : constrainedOffset;
   const constrainedOffsetY = vertical ? constrainedOffset : 0;
 
+  const STEP = 10;
+
   const onMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
     if (resizable && e.currentTarget) {
       e.preventDefault();
@@ -79,6 +83,42 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
       setStartPos([touch.pageX, touch.pageY]);
       onOffsetStart(index);
     }
+  };
+
+  const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
+    if (!resizable) {
+      return;
+    }
+
+    const isHorizontal = !vertical;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    switch (e.key) {
+      case 'ArrowLeft':
+        offsetX = isHorizontal ? -STEP : 0;
+        break;
+      case 'ArrowRight':
+        offsetX = isHorizontal ? STEP : 0;
+        break;
+      case 'ArrowUp':
+        offsetY = isHorizontal ? 0 : -STEP;
+        break;
+      case 'ArrowDown':
+        offsetY = isHorizontal ? 0 : STEP;
+        break;
+      case 'Home':
+        onOffsetUpdate(index, isHorizontal ? -containerSize : 0, isHorizontal ? 0 : -containerSize);
+        return;
+      case 'End':
+        onOffsetUpdate(index, isHorizontal ? containerSize : 0, isHorizontal ? 0 : containerSize);
+        return;
+      default:
+        return;
+    }
+
+    e.preventDefault();
+    onOffsetUpdate(index, offsetX, offsetY);
   };
 
   const getConstrainedOffset = (rawOffset: number) => {
@@ -137,9 +177,12 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
     <div
       className={splitBarPrefixCls}
       role="separator"
+      tabIndex={resizable ? 0 : -1}
       aria-valuenow={getValidNumber(ariaNow)}
       aria-valuemin={getValidNumber(ariaMin)}
       aria-valuemax={getValidNumber(ariaMax)}
+      aria-controls={ariaControls}
+      onKeyDown={onKeyDown}
     >
       {lazy && (
         <div

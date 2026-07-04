@@ -100,6 +100,15 @@
             }
         }
 
+        &:focus-visible {
+            outline: none;
+
+            .@{splitter-prefix-cls}-bar-dragger::before {
+                background: @item-active-bg;
+                box-shadow: 0 0 0 2px @outline-color;
+            }
+        }
+
         &:hover,
         &:active {
             .@{splitter-prefix-cls}-bar-collapse-bar-hover-only {
