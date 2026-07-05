@@ -1,5 +1,6 @@
 import React from 'react';
 
+import isNonNullable from '../../_util/isNonNullable';
 import type { PanelProps } from '../interface';
 import { autoPtgSizes } from './sizeUtil';
 
@@ -23,13 +24,10 @@ export default function useSizes(items: PanelProps[], containerSize?: number) {
     items.map((item) => item.defaultSize),
   );
   const sizes = React.useMemo(() => {
-    const mergedSizes: PanelProps['size'][] = [];
-
-    for (let i = 0; i < itemsCount; i += 1) {
-      mergedSizes[i] = propSizes[i] ?? innerSizes[i];
-    }
-
-    return mergedSizes;
+    // If any panel has a controlled `size`, use only prop sizes.
+    // Undefined panels will be auto-filled by autoPtgSizes.
+    // Otherwise, use innerSizes for fully uncontrolled mode.
+    return propSizes.some(isNonNullable) ? propSizes : innerSizes;
   }, [itemsCount, innerSizes, propSizes]);
 
   const postPercentMinSizes = React.useMemo(

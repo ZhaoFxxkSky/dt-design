@@ -1,10 +1,11 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { ConfigContext } from 'antd/es/config-provider';
 import ResizeObserver from 'rc-resize-observer';
 import useEvent from 'rc-util/es/hooks/useEvent';
 import warning from 'rc-util/es/warning';
 
 import useItems from './hooks/useItems';
+import useOrientation from './hooks/useOrientation';
 import useResizable from './hooks/useResizable';
 import useResize from './hooks/useResize';
 import useSizes from './hooks/useSizes';
@@ -15,26 +16,30 @@ import SplitBar from './SplitBar';
 import './style/index.less';
 
 import clsx from 'clsx';
-import { uniqueId } from 'lodash-es';
 
 const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
   const {
     prefixCls: customizePrefixCls,
     className,
     style,
-    layout = 'horizontal',
+    layout,
+    orientation,
+    vertical,
     children,
     rootClassName,
     onResizeStart,
     onResize,
     onResizeEnd,
     lazy,
+    destroyOnHidden,
+    draggerIcon,
+    motion,
   } = props;
 
   const { getPrefixCls, direction } = useContext(ConfigContext);
   const prefixCls = getPrefixCls('splitter', customizePrefixCls);
 
-  const isVertical = layout === 'vertical';
+  const [mergedOrientation, isVertical] = useOrientation(orientation, vertical, layout);
   const isRTL = direction === 'rtl';
   const reverse = !isVertical && isRTL;
 
@@ -85,6 +90,11 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
     isRTL,
   );
 
+  const supportMotion = React.useMemo(
+    () => (motion || items.some((item) => item.collapsible?.motion)) && movingIndex === undefined,
+    [items, motion, movingIndex],
+  );
+
   const onInternalResizeStart = useEvent((index: number) => {
     onOffsetStart(index);
     onResizeStart?.(itemPxSizes);
@@ -108,6 +118,16 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
     }
   });
 
+  const onInternalOffsetUpdate = useEvent(
+    (index: number, offsetX: number, offsetY: number, lazyEnd?: boolean) => {
+      let offset = isVertical ? offsetY : offsetX;
+      if (reverse) {
+        offset = -offset;
+      }
+      onInternalResizeUpdate(index, offset, lazyEnd);
+    },
+  );
+
   const onInternalCollapse = useEvent((index: number, type: 'start' | 'end') => {
     const nextSizes = onCollapse(index, type);
     onResize?.(nextSizes);
@@ -119,7 +139,7 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
   const containerClassName = clsx(
     prefixCls,
     className,
-    `${prefixCls}-${layout}`,
+    `${prefixCls}-${mergedOrientation}`,
     {
       [`${prefixCls}-rtl`]: isRTL,
     },
@@ -141,13 +161,27 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
     return mergedSizes;
   }, [itemPtgSizes, items.length]);
 
+  const panelIds = useMemo(
+    () => items.map((item, idx) => item.id || `${prefixCls}-panel-${idx}`),
+    [items, prefixCls],
+  );
+
   const mergedStyle: React.CSSProperties = { ...style };
 
   return (
     <ResizeObserver onResize={onContainerResize}>
       <div style={mergedStyle} className={containerClassName}>
         {items.map((item, idx) => {
-          const panel = <InternalPanel {...item} prefixCls={prefixCls} size={panelSizes[idx]} />;
+          const panel = (
+            <InternalPanel
+              {...item}
+              id={panelIds[idx]}
+              prefixCls={prefixCls}
+              size={panelSizes[idx]}
+              destroyOnHidden={item.destroyOnHidden ?? destroyOnHidden}
+              supportMotion={supportMotion}
+            />
+          );
 
           let splitBar: React.ReactElement | null = null;
 
@@ -159,6 +193,8 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
             const ariaMaxStart = (stackSizes[idx - 1] || 0) + itemPtgMaxSizes[idx];
             const ariaMaxEnd = (stackSizes[idx + 1] || 100) - itemPtgMinSizes[idx + 1];
 
+            const ariaControls = [panelIds[idx], panelIds[idx + 1]].filter(Boolean).join(' ');
+
             splitBar = (
               <SplitBar
                 lazy={lazy}
@@ -167,21 +203,19 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
                 prefixCls={prefixCls}
                 vertical={isVertical}
                 resizable={resizableInfo.resizable}
+                draggerIcon={draggerIcon}
+                startIcon={resizableInfo.startIcon}
+                endIcon={resizableInfo.endIcon}
                 ariaNow={stackSizes[idx] * 100}
                 ariaMin={Math.max(ariaMinStart, ariaMinEnd) * 100}
                 ariaMax={Math.min(ariaMaxStart, ariaMaxEnd) * 100}
+                ariaControls={ariaControls}
                 startCollapsible={resizableInfo.startCollapsible}
                 endCollapsible={resizableInfo.endCollapsible}
                 showStartCollapsibleIcon={resizableInfo.showStartCollapsibleIcon}
                 showEndCollapsibleIcon={resizableInfo.showEndCollapsibleIcon}
                 onOffsetStart={onInternalResizeStart}
-                onOffsetUpdate={(index, offsetX, offsetY, lazyEnd) => {
-                  let offset = isVertical ? offsetY : offsetX;
-                  if (reverse) {
-                    offset = -offset;
-                  }
-                  onInternalResizeUpdate(index, offset, lazyEnd);
-                }}
+                onOffsetUpdate={onInternalOffsetUpdate}
                 onOffsetEnd={onInternalResizeEnd}
                 onCollapse={onInternalCollapse}
                 containerSize={containerSize || 0}
@@ -190,7 +224,7 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
           }
 
           return (
-            <React.Fragment key={`split-panel-${uniqueId()}`}>
+            <React.Fragment key={`split-panel-${idx}`}>
               {panel}
               {splitBar}
             </React.Fragment>
@@ -198,7 +232,7 @@ const Splitter: React.FC<React.PropsWithChildren<SplitterProps>> = (props) => {
         })}
 
         {typeof movingIndex === 'number' && (
-          <div aria-hidden className={clsx(maskCls, `${maskCls}-${layout}`)} />
+          <div aria-hidden className={clsx(maskCls, `${maskCls}-${mergedOrientation}`)} />
         )}
       </div>
     </ResizeObserver>

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { DownOutlined, LeftOutlined, RightOutlined, UpOutlined } from '@ant-design/icons';
 import clsx from 'clsx';
-import useEvent from 'rc-util/lib/hooks/useEvent';
-import useLayoutEffect from 'rc-util/lib/hooks/useLayoutEffect';
+import useEvent from 'rc-util/es/hooks/useEvent';
+
+import useDragListeners from './hooks/useDragListeners';
 
 export type ShowCollapsibleIconMode = boolean | 'auto';
 
@@ -15,6 +16,9 @@ export interface SplitBarProps {
   endCollapsible: boolean;
   showStartCollapsibleIcon: ShowCollapsibleIconMode;
   showEndCollapsibleIcon: ShowCollapsibleIconMode;
+  draggerIcon?: React.ReactNode;
+  startIcon?: React.ReactNode;
+  endIcon?: React.ReactNode;
   onOffsetStart: (index: number) => void;
   onOffsetUpdate: (index: number, offsetX: number, offsetY: number, lazyEnd?: boolean) => void;
   onOffsetEnd: (lazyEnd?: boolean) => void;
@@ -23,6 +27,7 @@ export interface SplitBarProps {
   ariaNow: number;
   ariaMin: number;
   ariaMax: number;
+  ariaControls: string;
   lazy?: boolean;
   containerSize: number;
 }
@@ -42,9 +47,13 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
     ariaNow,
     ariaMin,
     ariaMax,
+    ariaControls,
     resizable,
     startCollapsible,
     endCollapsible,
+    draggerIcon,
+    startIcon,
+    endIcon,
     onOffsetStart,
     onOffsetUpdate,
     onOffsetEnd,
@@ -57,14 +66,17 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
 
   const splitBarPrefixCls = `${prefixCls}-bar`;
 
-  const [startPos, setStartPos] = useState<[x: number, y: number] | null>(null);
+  const [startPos, setStartPos] = useState<readonly [number, number] | null>(null);
   const [constrainedOffset, setConstrainedOffset] = useState<number>(0);
 
   const constrainedOffsetX = vertical ? 0 : constrainedOffset;
   const constrainedOffsetY = vertical ? constrainedOffset : 0;
 
+  const STEP = 10;
+
   const onMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
     if (resizable && e.currentTarget) {
+      e.preventDefault();
       setStartPos([e.pageX, e.pageY]);
       onOffsetStart(index);
     }
@@ -72,10 +84,49 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
 
   const onTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
     if (resizable && e.touches.length === 1) {
+      e.preventDefault();
       const touch = e.touches[0];
       setStartPos([touch.pageX, touch.pageY]);
       onOffsetStart(index);
     }
+  };
+
+  const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
+    if (!resizable) {
+      return;
+    }
+
+    const isHorizontal = !vertical;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    switch (e.key) {
+      case 'ArrowLeft':
+        offsetX = isHorizontal ? -STEP : 0;
+        break;
+      case 'ArrowRight':
+        offsetX = isHorizontal ? STEP : 0;
+        break;
+      case 'ArrowUp':
+        offsetY = isHorizontal ? 0 : -STEP;
+        break;
+      case 'ArrowDown':
+        offsetY = isHorizontal ? 0 : STEP;
+        break;
+      case 'Home':
+        e.preventDefault();
+        onOffsetUpdate(index, isHorizontal ? -containerSize : 0, isHorizontal ? 0 : -containerSize);
+        return;
+      case 'End':
+        e.preventDefault();
+        onOffsetUpdate(index, isHorizontal ? containerSize : 0, isHorizontal ? 0 : containerSize);
+        return;
+      default:
+        return;
+    }
+
+    e.preventDefault();
+    onOffsetUpdate(index, offsetX, offsetY);
   };
 
   const getConstrainedOffset = (rawOffset: number) => {
@@ -111,86 +162,37 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
     }
   };
 
-  useLayoutEffect(() => {
-    if (!startPos) {
-      return;
-    }
-
-    const onMouseMove = (e: MouseEvent) => {
-      const { pageX, pageY } = e;
-      const offsetX = pageX - startPos[0];
-      const offsetY = pageY - startPos[1];
-      if (lazy) {
-        handleLazyMove(offsetX, offsetY);
-      } else {
-        onOffsetUpdate(index, offsetX, offsetY);
-      }
-    };
-
-    const onMouseUp = () => {
-      if (lazy) {
-        handleLazyEnd();
-      } else {
-        onOffsetEnd();
-      }
-      setStartPos(null);
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length === 1) {
-        const touch = e.touches[0];
-        const offsetX = touch.pageX - startPos[0];
-        const offsetY = touch.pageY - startPos[1];
-        if (lazy) {
-          handleLazyMove(offsetX, offsetY);
-        } else {
-          onOffsetUpdate(index, offsetX, offsetY);
-        }
-      }
-    };
-
-    const handleTouchEnd = () => {
-      if (lazy) {
-        handleLazyEnd();
-      } else {
-        onOffsetEnd();
-      }
-      setStartPos(null);
-    };
-
-    const eventHandlerMap: Partial<Record<keyof WindowEventMap, EventListener>> = {
-      mousemove: onMouseMove as EventListener,
-      mouseup: onMouseUp,
-      touchmove: handleTouchMove as EventListener,
-      touchend: handleTouchEnd,
-    };
-
-    for (const [event, handler] of Object.entries(eventHandlerMap)) {
-      // eslint-disable-next-line react-web-api/no-leaked-event-listener
-      window.addEventListener(event, handler);
-    }
-
-    return () => {
-      for (const [event, handler] of Object.entries(eventHandlerMap)) {
-        window.removeEventListener(event, handler);
-      }
-    };
-  }, [startPos, index, lazy]);
+  useDragListeners({
+    startPos,
+    vertical,
+    lazy,
+    onOffsetUpdate,
+    onOffsetEnd,
+    handleLazyMove,
+    handleLazyEnd,
+    setStartPos,
+    index,
+  });
 
   const transformStyle: React.CSSProperties = {
     [`--${splitBarPrefixCls}-preview-offset`]: `${constrainedOffset}px`,
   };
 
-  const StartIcon = vertical ? UpOutlined : LeftOutlined;
-  const EndIcon = vertical ? DownOutlined : RightOutlined;
+  const startIconNode = startIcon || (vertical ? <UpOutlined /> : <LeftOutlined />);
+  const endIconNode = endIcon || (vertical ? <DownOutlined /> : <RightOutlined />);
+  const startIconCustomized = startIcon !== undefined;
+  const endIconCustomized = endIcon !== undefined;
 
   return (
     <div
       className={splitBarPrefixCls}
       role="separator"
+      tabIndex={resizable ? 0 : -1}
       aria-valuenow={getValidNumber(ariaNow)}
       aria-valuemin={getValidNumber(ariaMin)}
       aria-valuemax={getValidNumber(ariaMax)}
+      aria-controls={ariaControls}
+      onKeyDown={onKeyDown}
     >
       {lazy && (
         <div
@@ -205,10 +207,15 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
         className={clsx(`${splitBarPrefixCls}-dragger`, {
           [`${splitBarPrefixCls}-dragger-disabled`]: !resizable,
           [`${splitBarPrefixCls}-dragger-active`]: active,
+          [`${splitBarPrefixCls}-dragger-customize`]: draggerIcon !== undefined,
         })}
         onMouseDown={onMouseDown}
         onTouchStart={onTouchStart}
-      />
+      >
+        {draggerIcon !== undefined && (
+          <div className={clsx(`${splitBarPrefixCls}-dragger-icon`)}>{draggerIcon}</div>
+        )}
+      </div>
 
       {/* Start Collapsible */}
       {startCollapsible && (
@@ -216,16 +223,21 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
           className={clsx(
             `${splitBarPrefixCls}-collapse-bar`,
             `${splitBarPrefixCls}-collapse-bar-start`,
+            {
+              [`${splitBarPrefixCls}-collapse-bar-customize`]: startIconCustomized,
+            },
             getVisibilityClass(showStartCollapsibleIcon),
           )}
           onClick={() => onCollapse(index, 'start')}
         >
-          <StartIcon
+          <span
             className={clsx(
               `${splitBarPrefixCls}-collapse-icon`,
               `${splitBarPrefixCls}-collapse-start`,
             )}
-          />
+          >
+            {startIconNode}
+          </span>
         </div>
       )}
 
@@ -234,16 +246,21 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
           className={clsx(
             `${splitBarPrefixCls}-collapse-bar`,
             `${splitBarPrefixCls}-collapse-bar-end`,
+            {
+              [`${splitBarPrefixCls}-collapse-bar-customize`]: endIconCustomized,
+            },
             getVisibilityClass(showEndCollapsibleIcon),
           )}
           onClick={() => onCollapse(index, 'end')}
         >
-          <EndIcon
+          <span
             className={clsx(
               `${splitBarPrefixCls}-collapse-icon`,
               `${splitBarPrefixCls}-collapse-end`,
             )}
-          />
+          >
+            {endIconNode}
+          </span>
         </div>
       )}
     </div>

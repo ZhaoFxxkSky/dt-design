@@ -11,8 +11,8 @@ const Desc: React.FC<Readonly<{ text?: string | number }>> = (props) => (
 );
 
 const App: React.FC = () => (
-  <Splitter vertical style={{ height: 300, boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
-    <Splitter.Panel>
+  <Splitter motion style={{ height: 200, boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+    <Splitter.Panel collapsible min="20%">
       <Desc text="First" />
     </Splitter.Panel>
     <Splitter.Panel>

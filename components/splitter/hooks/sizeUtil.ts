@@ -48,7 +48,7 @@ export function autoPtgSizes(
     limitMax = Math.min(limitMax, max);
   }
 
-  if (sumMin > 1 && sumMax < 1) {
+  if (sumMin > 1 || sumMax < 1) {
     const avg = 1 / undefinedCount;
     return ptgSizes.map((size) => (size === undefined ? avg : size));
   }

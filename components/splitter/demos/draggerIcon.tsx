@@ -1,4 +1,5 @@
 import React from 'react';
+import { MoreOutlined } from '@ant-design/icons';
 import { Typography } from 'antd';
 import { Flex, Splitter } from '@dtjoy/dt-design';
 
@@ -11,7 +12,10 @@ const Desc: React.FC<Readonly<{ text?: string | number }>> = (props) => (
 );
 
 const App: React.FC = () => (
-  <Splitter vertical style={{ height: 300, boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+  <Splitter
+    draggerIcon={<MoreOutlined />}
+    style={{ height: 200, boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}
+  >
     <Splitter.Panel>
       <Desc text="First" />
     </Splitter.Panel>

@@ -9,6 +9,8 @@ export type ResizableInfo = {
   endCollapsible: boolean;
   showStartCollapsibleIcon: ShowCollapsibleIconMode;
   showEndCollapsibleIcon: ShowCollapsibleIconMode;
+  startIcon?: React.ReactNode;
+  endIcon?: React.ReactNode;
 };
 
 type Option = { collapsible: boolean; showCollapsibleIcon: ShowCollapsibleIconMode };
@@ -98,6 +100,8 @@ export default function useResizable(items: ItemType[], pxSizes: number[], isRTL
         endCollapsible: !!(isRTL ? startCollapsible : endCollapsible),
         showStartCollapsibleIcon: isRTL ? showEndCollapsibleIcon : showStartCollapsibleIcon,
         showEndCollapsibleIcon: isRTL ? showStartCollapsibleIcon : showEndCollapsibleIcon,
+        startIcon: isRTL ? prevCollapsible.icon?.start : prevCollapsible.icon?.end,
+        endIcon: isRTL ? nextCollapsible.icon?.end : nextCollapsible.icon?.start,
       };
     }
 

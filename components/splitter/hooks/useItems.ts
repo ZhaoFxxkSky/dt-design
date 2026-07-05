@@ -1,13 +1,16 @@
 import * as React from 'react';
-import toArray from 'rc-util/lib/Children/toArray';
+import toArray from 'rc-util/es/Children/toArray';
 
 import type { PanelProps } from '../interface';
 
 export type ItemType = Omit<PanelProps, 'collapsible'> & {
+  id?: string;
   collapsible: {
     start?: boolean;
     end?: boolean;
     showCollapsibleIcon: 'auto' | boolean;
+    icon?: { start?: React.ReactNode; end?: React.ReactNode };
+    motion?: boolean;
   };
 };
 
