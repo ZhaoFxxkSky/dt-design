@@ -1,0 +1,334 @@
+@import (reference) '~antd/es/style/themes/index.less';
+
+.tableWrap {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #262626;
+  flex-shrink: 0;
+}
+
+.toolbarActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.toolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 48px 24px;
+}
+
+.viewportEmpty {
+  .emptyState {
+    flex: 1;
+  }
+}
+
+.viewport {
+  overflow: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.table {
+  display: grid;
+  width: 100%;
+}
+
+.thead {
+  display: grid;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.headerRow {
+  display: flex;
+  width: 100%;
+}
+
+.th {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  border-right: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+  font-weight: 500;
+  font-size: 13px;
+  color: #595959;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:last-child {
+    border-right: none;
+  }
+}
+
+// 分组表头文字居中（非叶子列的 th 都居中）
+.th:not(.pinned-header) {
+  justify-content: center;
+}
+
+.headerCheckboxCell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.headerCheckboxBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  :global {
+    .ant-checkbox {
+      padding: 0;
+    }
+  }
+}
+
+.headerCheckboxArrow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -10px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 9px;
+  color: #8c8c8c;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1;
+  transition: color 0.2s;
+}
+
+.headerCheckboxArrowOnly {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 9px;
+  color: #8c8c8c;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.headerCheckboxCell:hover .headerCheckboxArrow,
+.headerCheckboxCell:active .headerCheckboxArrow,
+.headerCheckboxCell:hover .headerCheckboxArrowOnly,
+.headerCheckboxCell:active .headerCheckboxArrowOnly {
+  color: #262626;
+}
+
+.tbody {
+  display: grid;
+  position: relative;
+  width: 100%;
+}
+
+.dataRow {
+  display: flex;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fff;
+  box-sizing: border-box;
+
+  &:hover {
+    background: #f6f7f9;
+  }
+}
+
+.dataRowStriped {
+  background: #fafafa;
+
+  &:hover {
+    background: #f6f7f9;
+  }
+}
+
+.dataRowSelected {
+  background: #e6f7ff !important;
+
+  &:hover {
+    background: #bae7ff !important;
+  }
+
+  .pinnedCell {
+    background: inherit !important;
+  }
+}
+
+.td {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  border-right: 1px solid #f0f0f0;
+  overflow: hidden;
+
+  &:last-child {
+    border-right: none;
+  }
+}
+
+.centerCell {
+  justify-content: center;
+
+  :global {
+    .ant-checkbox {
+      padding: 0;
+    }
+  }
+}
+
+.cellWrapper {
+  width: 100%;
+}
+
+.cellError {
+  :global {
+    .ant-input,
+    .ant-input-number,
+    .ant-select-selector,
+    .ant-picker {
+      border-color: #ff4d4f;
+    }
+  }
+}
+
+.cellErrorTrigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.cellErrorOverlay {
+  :global {
+    .ant-popover-inner {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12),
+        0 9px 28px 8px rgba(0, 0, 0, 0.05);
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .ant-popover-inner-content {
+      padding: 0;
+    }
+  }
+}
+
+.errorPopoverContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  min-width: 100px;
+}
+
+.errorPopoverText {
+  font-size: 13px;
+  color: #ff4d4f;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.deleteIcon {
+  color: #ff4d4f;
+  cursor: pointer;
+  font-size: 14px;
+
+  &:hover {
+    color: #ff7875;
+  }
+}
+
+.rowWarningIcon {
+  color: #ff4d4f;
+  font-size: 14px;
+  margin-right: 6px;
+}
+
+.required {
+  color: #ff4d4f;
+  margin-left: 4px;
+}
+
+.headerTipIcon {
+  color: #8c8c8c;
+  font-size: 12px;
+  margin-left: 6px;
+  cursor: help;
+}
+
+.emptyText {
+  color: #bfbfbf;
+}
+
+// 固定列背景：与行背景保持一致，避免割裂；表头保持独立背景
+.pinnedHeader {
+  background: #fafafa;
+}
+
+.pinnedCell {
+  background: inherit;
+}
+
+// 阴影：只有容器向对应方向滚动时才显示
+.viewport.scrolledLeft .pinnedLeftLast {
+  box-shadow: 4px 0 6px -3px rgba(0, 0, 0, 0.15);
+}
+
+.viewport.scrolledRight .pinnedRightFirst {
+  box-shadow: -4px 0 6px -3px rgba(0, 0, 0, 0.15);
+}

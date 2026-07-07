@@ -1,0 +1,63 @@
+@import './variables.less';
+
+// ============================================================
+// === selection.ts: genSelectionStyle ===
+// ============================================================
+.@{table-prefix-cls}-wrapper {
+  .@{table-prefix-cls}-selection-col {
+    width: @table-selection-column-width;
+  }
+
+  table tr th.@{table-prefix-cls}-selection-column,
+  table tr td.@{table-prefix-cls}-selection-column,
+  .@{table-prefix-cls}-selection-column {
+    padding-inline-end: @table-padding-xs;
+    padding-inline-start: @table-padding-xs;
+    text-align: center;
+  }
+
+  table tr th.@{table-prefix-cls}-selection-column.@{table-prefix-cls}-cell-fix-left {
+    z-index: @table-z-index-fixed + 1;
+  }
+
+  table tr th.@{table-prefix-cls}-selection-column::after {
+    background-color: transparent !important;
+  }
+
+  .@{table-prefix-cls}-selection {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+  }
+
+  .@{table-prefix-cls}-selection-extra {
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    cursor: pointer;
+    transition: all @table-motion-duration-slow;
+    margin-inline-start: 100%;
+    padding-inline-start: calc(@table-padding-horizontal / 4);
+  }
+
+  // ============================= Rows =============================
+  .@{table-prefix-cls}-tbody {
+    .@{table-prefix-cls}-row {
+      // row selected
+      &.@{table-prefix-cls}-row-selected {
+        > .@{table-prefix-cls}-cell {
+          background: @table-selected-row-bg;
+
+          &-row-hover {
+            background: @table-selected-row-hover-bg;
+          }
+        }
+      }
+
+      // cell hover (cell-row-hover class on td)
+      > .@{table-prefix-cls}-cell-row-hover {
+        background: @table-row-hover-bg;
+      }
+    }
+  }
+}

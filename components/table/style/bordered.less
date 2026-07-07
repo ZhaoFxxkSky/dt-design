@@ -1,0 +1,83 @@
+@import './variables.less';
+
+// ============================================================
+// === bordered.ts: genBorderedStyle ===
+// ============================================================
+.@{table-prefix-cls}-wrapper {
+  .@{table-prefix-cls}.@{table-prefix-cls}-bordered {
+    // ============================ Title =============================
+    > .@{table-prefix-cls}-title {
+      border: @table-border;
+      border-bottom: 0;
+    }
+
+    // ============================ Content ============================
+    > .@{table-prefix-cls}-container {
+      border-inline-start: @table-border;
+      border-top: @table-border;
+
+      > .@{table-prefix-cls}-content,
+      > .@{table-prefix-cls}-header,
+      > .@{table-prefix-cls}-body,
+      > .@{table-prefix-cls}-summary {
+        > table {
+          > thead > tr > th,
+          > thead > tr > td,
+          > tbody > tr > th,
+          > tbody > tr > td,
+          > tfoot > tr > th,
+          > tfoot > tr > td {
+            border-inline-end: @table-border;
+          }
+
+          > thead {
+            > tr:not(:last-child) > th {
+              border-bottom: @table-border;
+            }
+
+            > tr > th::before {
+              background-color: transparent !important;
+            }
+          }
+
+          // Fixed right should provides additional border
+          > thead > tr,
+          > tbody > tr,
+          > tfoot > tr {
+            > .@{table-prefix-cls}-cell-fix-right-first:not(.@{table-prefix-cls}-cell-fix-right-last)::after {
+              border-inline-end: @table-border;
+            }
+          }
+        }
+      }
+    }
+
+    // ============================ Scroll ============================
+    &.@{table-prefix-cls}-scroll-horizontal {
+      > .@{table-prefix-cls}-container > .@{table-prefix-cls}-body {
+        > table > tbody {
+          > tr.@{table-prefix-cls}-expanded-row,
+          > tr.@{table-prefix-cls}-placeholder {
+            > th,
+            > td {
+              border-inline-end: 0;
+            }
+          }
+        }
+      }
+    }
+
+    // ============================ Footer ============================
+    > .@{table-prefix-cls}-footer {
+      border: @table-border;
+      border-top: 0;
+    }
+  }
+
+  // ============================ Nested ============================
+  .@{table-prefix-cls}-cell {
+    .@{table-prefix-cls}-container:first-child {
+      border-top: 0;
+    }
+  }
+}

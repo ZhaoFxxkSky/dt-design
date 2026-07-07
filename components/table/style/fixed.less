@@ -1,0 +1,85 @@
+@import './variables.less';
+
+// ============================================================
+// === fixed.ts: genFixedStyle ===
+// ============================================================
+.@{table-prefix-cls}-wrapper {
+  // ====================== Cell ======================
+  .@{table-prefix-cls}-cell.@{table-prefix-cls}-cell-fix {
+    position: sticky;
+  }
+
+  .@{table-prefix-cls}-cell-fix {
+    z-index: calc(var(--z-offset-reverse) + @table-z-index-fixed);
+    background: @table-bg;
+
+    &::after {
+      position: absolute;
+      top: 0;
+      bottom: -@table-line-width;
+      width: 30px;
+      transition: box-shadow @table-motion-duration-slow;
+      content: '';
+      pointer-events: none;
+    }
+
+    // Position
+    &-start::after {
+      inset-inline-start: 100%;
+    }
+
+    &-end::after {
+      inset-inline-end: 100%;
+    }
+
+    // visible shadow
+    &-start-shadow-show::after {
+      box-shadow: inset 10px 0 8px -8px @table-color-split;
+    }
+
+    &-end-shadow-show::after {
+      box-shadow: inset -10px 0 8px -8px @table-color-split;
+    }
+  }
+
+  // =================== Container ====================
+  .@{table-prefix-cls}-container {
+    position: relative;
+
+    &::before,
+    &::after {
+      position: absolute;
+      top: 0;
+      bottom: -@table-line-width;
+      z-index: calc(var(--columns-count) * 2 + @table-z-index-fixed + 1);
+      width: 30px;
+      transition: box-shadow @table-motion-duration-slow;
+      content: '';
+      pointer-events: none;
+    }
+
+    &::before {
+      inset-inline-start: 0;
+    }
+
+    &::after {
+      inset-inline-end: 0;
+    }
+  }
+
+  .@{table-prefix-cls}-has-fix-start .@{table-prefix-cls}-container::before {
+    display: none;
+  }
+
+  .@{table-prefix-cls}-has-fix-end .@{table-prefix-cls}-container::after {
+    display: none;
+  }
+
+  .@{table-prefix-cls}-fix-start-shadow-show .@{table-prefix-cls}-container::before {
+    box-shadow: inset 10px 0 8px -8px @table-color-split;
+  }
+
+  .@{table-prefix-cls}-fix-end-shadow-show .@{table-prefix-cls}-container::after {
+    box-shadow: inset -10px 0 8px -8px @table-color-split;
+  }
+}

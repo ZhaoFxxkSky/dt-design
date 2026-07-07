@@ -1,0 +1,99 @@
+@import './variables.less';
+
+// ============================================================
+// === sorter.ts: genSorterStyle ===
+// ============================================================
+.@{table-prefix-cls}-wrapper {
+  .@{table-prefix-cls}-thead th.@{table-prefix-cls}-column-has-sorters {
+    outline: none;
+    cursor: pointer;
+    transition: all @table-motion-duration-slow, left 0s;
+
+    &:hover {
+      background: @table-header-sort-hover-bg;
+
+      &::before {
+        background-color: transparent !important;
+      }
+    }
+
+    &:focus-visible {
+      color: @table-color-primary;
+    }
+
+    &.@{table-prefix-cls}-cell-fix-left:hover,
+    &.@{table-prefix-cls}-cell-fix-right:hover {
+      background: @table-fixed-header-sort-active-bg;
+    }
+  }
+
+  .@{table-prefix-cls}-thead th.@{table-prefix-cls}-column-sort {
+    background: @table-header-sort-bg;
+
+    &::before {
+      background-color: transparent !important;
+    }
+  }
+
+  td.@{table-prefix-cls}-column-sort {
+    background: @table-body-sort-bg;
+  }
+
+  .@{table-prefix-cls}-column-title {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .@{table-prefix-cls}-column-sorters {
+    display: flex;
+    flex: auto;
+    align-items: center;
+    justify-content: space-between;
+
+    &::after {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      content: '';
+    }
+  }
+
+  .@{table-prefix-cls}-column-sorters-tooltip-target-sorter {
+    &::after {
+      content: none;
+    }
+  }
+
+  .@{table-prefix-cls}-column-sorter {
+    margin-inline-start: @table-margin-xxs;
+    color: @table-header-icon-color;
+    font-size: 0;
+    transition: color @table-motion-duration-slow;
+
+    &-inner {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    &-up,
+    &-down {
+      font-size: @table-font-size-icon;
+
+      &.active {
+        color: @table-color-primary;
+      }
+    }
+
+    .@{table-prefix-cls}-column-sorter-up + .@{table-prefix-cls}-column-sorter-down {
+      margin-top: -0.3em;
+    }
+  }
+
+  .@{table-prefix-cls}-column-sorters:hover .@{table-prefix-cls}-column-sorter {
+    color: @table-header-icon-hover-color;
+  }
+}

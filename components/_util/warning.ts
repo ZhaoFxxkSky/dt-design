@@ -1,9 +1,7 @@
 import * as React from 'react';
-import { warning as rcWarning } from '@rc-component/util';
+import { resetWarned as rcResetWarned, warning as rcWarning } from 'rc-util/es/warning';
 
 export function noop() {}
-
-const { resetWarned: rcResetWarned } = rcWarning;
 let deprecatedWarnList: Record<string, string[]> | null = null;
 
 export function resetWarned() {

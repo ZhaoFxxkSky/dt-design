@@ -1,0 +1,95 @@
+@import './variables.less';
+
+// ============================================================
+// === virtual.ts: genVirtualStyle ===
+// ============================================================
+.@{table-prefix-cls}-wrapper {
+  .@{table-prefix-cls}-tbody-virtual {
+    .@{table-prefix-cls}-tbody-virtual-holder-inner {
+      & > .@{table-prefix-cls}-row,
+      & > div:not(.@{table-prefix-cls}-row) > .@{table-prefix-cls}-row {
+        display: flex;
+        box-sizing: border-box;
+        width: 100%;
+      }
+    }
+
+    .@{table-prefix-cls}-cell {
+      border-bottom: @table-border;
+      transition: background-color @table-motion-duration-mid;
+    }
+  }
+
+  // Bordered virtual
+  .@{table-prefix-cls}-bordered {
+    .@{table-prefix-cls}-tbody-virtual {
+      &::after {
+        position: absolute;
+        bottom: 0;
+        border-bottom: @table-border;
+        content: '';
+        inset-inline: 0;
+      }
+
+      .@{table-prefix-cls}-cell {
+        border-inline-end: @table-border;
+
+        &.@{table-prefix-cls}-cell-fix-right-first::before {
+          position: absolute;
+          content: '';
+          inset-block: 0;
+          inset-inline-start: -@table-line-width;
+          border-inline-start: @table-border;
+        }
+      }
+    }
+
+    // Empty placeholder
+    &.@{table-prefix-cls}-virtual {
+      .@{table-prefix-cls}-placeholder .@{table-prefix-cls}-cell {
+        border-inline-end: @table-border;
+        border-bottom: @table-border;
+      }
+    }
+  }
+
+  // Virtual list styles (for BodyGrid component)
+  .@{table-prefix-cls}-virtual-list {
+    position: relative;
+
+    .@{table-prefix-cls}-virtual-row {
+      display: flex;
+      box-sizing: border-box;
+      width: 100%;
+      border-bottom: @table-border;
+      transition: background @table-motion-duration-mid;
+
+      &:hover {
+        background: @table-row-hover-bg;
+      }
+    }
+
+    .@{table-prefix-cls}-row-hover {
+      background: @table-row-hover-bg;
+    }
+
+    .@{table-prefix-cls}-virtual-cell {
+      display: flex;
+      flex-shrink: 0;
+      align-items: center;
+      box-sizing: border-box;
+      padding: @table-padding-vertical @table-padding-horizontal;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .@{table-prefix-cls}.@{table-prefix-cls}-bordered {
+    .@{table-prefix-cls}-virtual-list {
+      .@{table-prefix-cls}-virtual-cell {
+        border-right: @table-border;
+      }
+    }
+  }
+}

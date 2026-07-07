@@ -1,0 +1,16 @@
+@import './variables.less';
+
+// ============================================================
+// === empty.ts: genEmptyStyle ===
+// ============================================================
+.@{table-prefix-cls}-wrapper {
+  .@{table-prefix-cls}-tbody > tr.@{table-prefix-cls}-placeholder {
+    color: @table-color-text-disabled;
+    text-align: center;
+
+    &:hover > th,
+    &:hover > td {
+      background: @table-color-bg-container;
+    }
+  }
+}

@@ -1,0 +1,52 @@
+@import './variables.less';
+
+// ============================================================
+// === rtl.ts: genRtlStyle ===
+// ============================================================
+.@{table-prefix-cls}-wrapper-rtl {
+  direction: rtl;
+
+  table {
+    direction: rtl;
+  }
+
+  .@{table-prefix-cls}-row-expand-icon {
+    float: right;
+
+    &::after {
+      transform: rotate(-90deg);
+    }
+
+    &-collapsed::before {
+      transform: rotate(180deg);
+    }
+
+    &-collapsed::after {
+      transform: rotate(0deg);
+    }
+  }
+
+  .@{table-prefix-cls}-cell-fix {
+    &-start-shadow-show::after {
+      box-shadow: inset -10px 0 8px -8px @table-color-split;
+    }
+
+    &-end-shadow-show::after {
+      box-shadow: inset 10px 0 8px -8px @table-color-split;
+    }
+  }
+
+  .@{table-prefix-cls}-container {
+    .@{table-prefix-cls}-row-indent {
+      float: right;
+    }
+  }
+
+  .@{table-prefix-cls}-fix-start-shadow-show .@{table-prefix-cls}-container::before {
+    box-shadow: inset -10px 0 8px -8px @table-color-split;
+  }
+
+  .@{table-prefix-cls}-fix-end-shadow-show .@{table-prefix-cls}-container::after {
+    box-shadow: inset 10px 0 8px -8px @table-color-split;
+  }
+}

@@ -1,0 +1,33 @@
+@import './variables.less';
+
+// ============================================================
+// === ellipsis.ts: genEllipsisStyle ===
+// ============================================================
+.@{table-prefix-cls}-wrapper {
+  .@{table-prefix-cls}-cell-ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    word-break: keep-all;
+
+    // Fixed first or last should special process
+    &.@{table-prefix-cls}-cell-fix-start-shadow,
+    &.@{table-prefix-cls}-cell-fix-end-shadow {
+      overflow: visible;
+
+      .@{table-prefix-cls}-cell-content {
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .@{table-prefix-cls}-column-title {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      word-break: keep-all;
+    }
+  }
+}

@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`table public API structure should expose expected named exports: table-named-exports 1`] = `
+[
+  "Column",
+  "ColumnGroup",
+  "DEFAULT_PREFIX",
+  "EXPAND_COLUMN",
+  "INTERNAL_COL_DEFINE",
+  "INTERNAL_HOOKS",
+  "Summary",
+  "Table",
+  "TableContext",
+  "VirtualTable",
+  "convertChildrenToColumns",
+  "genTable",
+  "genVirtualTable",
+  "makeImmutable",
+  "responseImmutable",
+]
+`;

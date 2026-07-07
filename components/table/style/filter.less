@@ -1,0 +1,34 @@
+@import './variables.less';
+
+// ============================================================
+// === filter.ts: genFilterStyle ===
+// ============================================================
+.@{table-prefix-cls}-wrapper {
+  .@{table-prefix-cls}-filter-column {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .@{table-prefix-cls}-filter-trigger {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-block: -@table-padding-xxs;
+    margin-inline: @table-padding-xxs calc(-@table-padding-horizontal / 2);
+    padding: 0 @table-padding-xxs;
+    color: @table-header-icon-color;
+    font-size: @table-font-size-sm;
+    border-radius: @table-border-radius;
+    cursor: pointer;
+    transition: all @table-motion-duration-slow;
+
+    &:hover {
+      color: rgba(0, 0, 0, 0.88);
+      background: @table-header-filter-active-bg;
+    }
+
+    &.active {
+      color: @table-color-primary;
+    }
+  }
+}
