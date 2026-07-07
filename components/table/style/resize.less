@@ -1,0 +1,85 @@
+@import '../variables.less';
+
+// ============================================================
+// === Column Resize Handle ===
+// ============================================================
+
+.@{table-prefix-cls}-resize-handle {
+  position: absolute;
+  top: 0;
+  right: -5px;
+  bottom: 0;
+  z-index: 1;
+  width: 10px;
+  cursor: col-resize;
+  user-select: none;
+
+  // 默认状态下不显示边框，只有 hover 时才高亮
+  &::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 4px;
+    width: 0;
+    background-color: transparent;
+    transition: width 0.15s ease, background-color 0.15s ease;
+    content: '';
+  }
+
+  // hover 时高亮 - 显示一条粗边框
+  &:hover::after {
+    width: 3px;
+    background-color: @table-color-primary;
+  }
+
+  // 最后一列的 handle 需要限制在单元格内
+  .@{table-prefix-cls}-thead > tr > th:last-child & {
+    right: 0;
+    width: 8px;
+
+    &:hover::after {
+      right: 0;
+    }
+  }
+}
+
+// 拖拽中的列高亮
+.@{table-prefix-cls}-thead > tr > th {
+  // 当列正在被拖拽时，th 添加一个 class
+  &.@{table-prefix-cls}-cell-resizing {
+    .@{table-prefix-cls}-resize-handle::after {
+      width: 3px;
+      background-color: @table-color-primary;
+    }
+  }
+}
+
+// 拖拽时的竖线指示器（覆盖整个表格的 overlay）
+.@{table-prefix-cls}-resize-indicator-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: @table-color-primary;
+  z-index: 99;
+  pointer-events: none;
+  box-shadow: 0 0 4px rgba(22, 119, 255, 0.3);
+}
+
+// 拖拽时的 overlay 容器
+.@{table-prefix-cls}-resize-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+// 可调整列宽的 th 添加一个标记
+.@{table-prefix-cls}-thead > tr > th.@{table-prefix-cls}-cell-resizable {
+  position: relative;
+  overflow: visible;
+}

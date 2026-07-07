@@ -182,6 +182,37 @@ export interface ColumnType<RecordType = AnyObject> extends ColumnSharedType<Rec
   /** @deprecated Please use `onCell` instead */
   onCellClick?: (record: RecordType, e: React.MouseEvent<HTMLElement>) => void;
 
+  /** 列宽拖拽调整配置 */
+  resize?: {
+    /** 是否可拖拽调整列宽 */
+    resizable?: boolean;
+    /** 最小列宽 (px)，默认 60 */
+    minWidth?: number;
+    /** 最大列宽 (px) */
+    maxWidth?: number;
+  };
+
+  /** 可编辑配置 */
+  editable?: {
+    /** 是否可编辑 */
+    editable?: boolean;
+    /** 是否必填 */
+    required?: boolean;
+    /** 校验规则 */
+    rules?: {
+      validator: (value: any, record: any) => string | undefined | Promise<string | undefined>;
+      trigger?: 'onChange' | 'onBlur';
+    }[];
+    /** 编辑器类型 */
+    editor?: 'input' | 'input-number' | 'select' | 'date' | 'textarea' | 'switch';
+    /** 编辑器额外属性 */
+    editorProps?: Record<string, any>;
+    /** 下拉选项（editor 为 select 时使用） */
+    options?: { label: React.ReactNode; value: any }[];
+    /** 只读 */
+    readOnly?: boolean;
+  };
+
   // antd wrapper extensions
   title?: ColumnTitle<RecordType>;
   sorter?: boolean | CompareFn<RecordType> | ColumnSorter<RecordType>;

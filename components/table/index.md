@@ -87,6 +87,14 @@ demo:
 
 <code src="./demos/comprehensive.tsx" description="固定列 + 固定表头 + 行展开 + 合计行 + 排序 的综合示例。">综合示例</code>
 
+## 列宽拖拽
+
+<code src="./demos/resize.tsx" description="通过 `resizable` 属性和 `column.resize` 配置实现表头拖拽改变列宽。鼠标悬停到列右边框高亮，拖拽时显示竖线指示器，松开后改变宽度。">拖拽调整列宽</code>
+
+## 可编辑单元格
+
+<code src="./demos/editable.tsx" description="通过 `editable` 属性和 `column.editable` 配置实现可编辑单元格，支持校验规则、Popover 错误提示、自动滚动到错误行。">可编辑与校验</code>
+
 ## API
 
 ### Table
@@ -121,6 +129,11 @@ demo:
 | className | 表格容器类名 | `string` | - |
 | style | 表格容器样式 | `CSSProperties` | - |
 | prefixCls | 样式前缀 | `string` | `ant-table` |
+| resizable | 是否全局开启列宽拖拽调整 | `boolean` | `false` |
+| onColumnResize | 列宽调整完成回调 | `(key, width) => void` | - |
+| editable | 是否全局开启可编辑 | `boolean` | `false` |
+| onEditableChange | 可编辑模式数据变化回调 | `(data) => void` | - |
+| onValidate | 校验回调 | `(result) => void` | - |
 
 ### Column
 
@@ -150,6 +163,8 @@ demo:
 | style | 列的样式 | `CSSProperties` | - |
 | onCell | 设置单元格属性 | `(record, index) => HTMLAttributes` | - |
 | onHeaderCell | 设置头部单元格属性 | `(column) => HTMLAttributes` | - |
+| resize | 列宽拖拽配置 | `{ resizable?: boolean; minWidth?: number; maxWidth?: number }` | - |
+| editable | 可编辑配置 | `{ editable?: boolean; required?: boolean; rules?: Rule[]; editor?: string; editorProps?: any; options?: Option[] }` | - |
 
 ### ExpandableConfig
 

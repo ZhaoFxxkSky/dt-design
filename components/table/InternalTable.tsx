@@ -54,6 +54,10 @@ import type {
 import RcTable from './components/RcTable';
 import RcVirtualTable from './components/VirtualTable';
 import DefaultRenderEmpty from 'antd/es/config-provider/defaultRenderEmpty';
+import { useResize } from './features/resize';
+import ResizeContext from './features/resize/ResizeContext';
+import { useEditable, EditableCell, EditableContext } from './features/editable';
+import type { EditableValidateResult } from './features/editable';
 
 export type { ColumnsType, TablePaginationConfig };
 
@@ -132,6 +136,16 @@ export interface TableProps<RecordType = AnyObject>
   sortDirections?: SortOrder[];
   showSorterTooltip?: boolean | SorterTooltipProps;
   virtual?: boolean;
+  /** 是否全局开启列宽拖拽调整 */
+  resizable?: boolean;
+  /** 列宽拖拽回调 */
+  onColumnResize?: (key: React.Key, width: number) => void;
+  /** 是否全局开启可编辑 */
+  editable?: boolean;
+  /** 数据变化回调（可编辑模式） */
+  onEditableChange?: (data: any[]) => void;
+  /** 校验回调 */
+  onValidate?: (result: EditableValidateResult) => void;
 }
 
 /** Same as `TableProps` but we need record parent render times */
@@ -173,6 +187,11 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     locale,
     showSorterTooltip = { target: 'full-header' },
     virtual,
+    resizable = false,
+    onColumnResize: onColumnResizeProp,
+    editable: editableEnabled = false,
+    onEditableChange,
+    onValidate: onValidateProp,
   } = props;
 
   const warning = devUseWarning('Table');
@@ -194,6 +213,54 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
 
     return baseColumns.filter((c) => !c.responsive || c.responsive.some((r) => matched.has(r)));
   }, [baseColumns, screens]);
+
+  // ========================= Column Resize =========================
+  const hasResizableColumns = React.useMemo(
+    () => resizable || mergedColumns.some((col: any) => col?.resize?.resizable),
+    [resizable, mergedColumns],
+  );
+
+  const resizeResult = useResize({
+    columns: mergedColumns as ColumnsType,
+    enabled: resizable,
+    onColumnResize: onColumnResizeProp,
+  });
+
+  // 用 resize 后的宽度覆盖列的 width
+  const finalColumns = React.useMemo(() => {
+    if (!hasResizableColumns) return mergedColumns;
+    return mergedColumns.map(col => {
+      const width = resizeResult.getColumnWidth(col as ColumnType);
+      return width != null ? { ...col, width } : col;
+    });
+  }, [mergedColumns, hasResizableColumns, resizeResult.columnWidths, resizeResult.resizingKey, resizeResult.draggingWidth]);
+
+  const resizeContextValue = React.useMemo(
+    () =>
+      hasResizableColumns
+        ? {
+            resizingKey: resizeResult.resizingKey,
+            draggingWidth: resizeResult.draggingWidth,
+            getColumnWidth: resizeResult.getColumnWidth,
+            isColumnResizable: resizeResult.isColumnResizable,
+            onStartResize: resizeResult.onStartResize,
+          }
+        : null,
+    [
+      hasResizableColumns,
+      resizeResult.resizingKey,
+      resizeResult.draggingWidth,
+      resizeResult.getColumnWidth,
+      resizeResult.isColumnResizable,
+      resizeResult.onStartResize,
+    ],
+  );
+
+  // ========================= Editable (moved below after getRowKey/tblRef) =========================
+  const hasEditableColumns = React.useMemo(
+    () => editableEnabled || mergedColumns.some((col: any) => col?.editable?.editable),
+    [editableEnabled, mergedColumns],
+  );
 
   const tableProps: TableProps<RecordType> = omit(props, [
     'className',
@@ -294,9 +361,17 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   const rootRef = React.useRef<HTMLDivElement>(null);
   const tblRef = React.useRef<RcReference>(null);
 
+  // 用于暴露 validate / resetErrors 的 ref
+  const editableMethodsRef = React.useRef<{
+    validate: () => import('./features/editable').EditableValidateResult;
+    resetErrors: () => void;
+  } | null>(null);
+
   useProxyImperativeHandle(ref, () => ({
     ...tblRef.current!,
     nativeElement: rootRef.current!,
+    validate: () => editableMethodsRef.current?.validate() ?? { valid: true, errors: new Map() },
+    resetErrors: () => editableMethodsRef.current?.resetErrors(),
   }));
 
   // ============================ RowKey ============================
@@ -322,6 +397,65 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   }, [rowKey]);
 
   const [getRecordByKey] = useLazyKVMap(rawData, childrenColumnName, getRowKey);
+
+  // ============================ Editable =============================
+  const editableResult = useEditable({
+    columns: mergedColumns as any[],
+    data: rawData as any[],
+    onChange: onEditableChange,
+    onValidate: onValidateProp,
+    getRowKey: getRowKey as any,
+    scrollToRow: (idx: number) => {
+      tblRef.current?.scrollTo({ index: idx, align: 'center' });
+    },
+    enabled: hasEditableColumns,
+  });
+
+  // 暴露 validate / resetErrors 到 ref
+  editableMethodsRef.current = hasEditableColumns
+    ? {
+        validate: () => editableResult.validateAll(rawData as any[], getRowKey as any),
+        resetErrors: editableResult.resetErrors,
+      }
+    : null;
+
+  // 可编辑列 transform
+  const transformEditableColumns = React.useCallback(
+    (cols: ColumnsType<RecordType>): ColumnsType<RecordType> => {
+      if (!hasEditableColumns) return cols;
+      return cols.map((col: any) => {
+        const editableCfg = col.editable;
+        if (!editableCfg || (!editableCfg.editable && !editableEnabled)) return col;
+
+        const originalRender = col.render;
+        const mergedEditableCfg = {
+          ...editableCfg,
+          editable: editableCfg.editable ?? editableEnabled,
+        };
+
+        return {
+          ...col,
+          render: (value: any, record: any, index: number) => {
+            const displayNode = originalRender ? originalRender(value, record, index) : value;
+            return (
+              <EditableCell
+                dataIndex={col.dataIndex}
+                title={col.title}
+                rowIndex={index}
+                record={record}
+                value={value}
+                editableConfig={mergedEditableCfg}
+                prefixCls={prefixCls}
+              >
+                {displayNode as React.ReactNode}
+              </EditableCell>
+            );
+          },
+        };
+      });
+    },
+    [hasEditableColumns, editableEnabled, prefixCls, editableResult.errorsVersion],
+  );
 
   // ============================ Events =============================
   const changeEventInfo: Partial<ChangeEventInfo<RecordType>> = {};
@@ -528,9 +662,13 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   const transformColumns = React.useCallback(
     (innerColumns: ColumnsType<RecordType>): ColumnsType<RecordType> =>
       transformTitleColumns(
-        transformSelectionColumns(transformFilterColumns(transformSorterColumns(innerColumns))),
+        transformSelectionColumns(
+          transformFilterColumns(
+            transformSorterColumns(transformEditableColumns(innerColumns)),
+          ),
+        ),
       ),
-    [transformSorterColumns, transformFilterColumns, transformSelectionColumns],
+    [transformSorterColumns, transformFilterColumns, transformSelectionColumns, transformEditableColumns],
   );
 
   let topPaginationNode: React.ReactNode;
@@ -653,36 +791,40 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     <div ref={rootRef} className={wrappercls} style={style}>
       <Spin spinning={false} {...spinProps}>
         {topPaginationNode}
-        <HeaderTableContext.Provider value={headerTableContext}>
-          <TableComponent
-            {...virtualProps}
-            {...tableProps}
-            components={mergedComponents}
-            scroll={mergedScroll}
-            ref={tblRef}
-            columns={mergedColumns as RcTableProps<RecordType>['columns']}
-            direction={'ltr'}
-            expandable={mergedExpandable}
-            prefixCls={prefixCls}
-            className={clsx(
-              {
-                [`${prefixCls}-middle`]: customizeSize === 'middle',
-                [`${prefixCls}-small`]: customizeSize === 'small',
-                [`${prefixCls}-bordered`]: bordered,
-                [`${prefixCls}-empty`]: rawData.length === 0,
-              },
-            )}
-            data={pageData}
-            rowKey={getRowKey}
-            rowClassName={internalRowClassName}
-            emptyText={mergedEmptyNode}
-            // Internal
-            internalHooks={INTERNAL_HOOKS}
-            internalRefs={internalRef}
-            transformColumns={transformColumns as any}
-            getContainerWidth={getContainerWidth}
-          />
-        </HeaderTableContext.Provider>
+        <ResizeContext.Provider value={resizeContextValue}>
+          <EditableContext.Provider value={hasEditableColumns ? editableResult.contextValue : null}>
+            <HeaderTableContext.Provider value={headerTableContext}>
+              <TableComponent
+                {...virtualProps}
+                {...tableProps}
+                components={mergedComponents}
+                scroll={mergedScroll}
+                ref={tblRef}
+                columns={finalColumns as RcTableProps<RecordType>['columns']}
+                direction={'ltr'}
+                expandable={mergedExpandable}
+                prefixCls={prefixCls}
+                className={clsx(
+                  {
+                    [`${prefixCls}-middle`]: customizeSize === 'middle',
+                    [`${prefixCls}-small`]: customizeSize === 'small',
+                    [`${prefixCls}-bordered`]: bordered,
+                    [`${prefixCls}-empty`]: rawData.length === 0,
+                  },
+                )}
+                data={pageData}
+                rowKey={getRowKey}
+                rowClassName={internalRowClassName}
+                emptyText={mergedEmptyNode}
+                // Internal
+                internalHooks={INTERNAL_HOOKS}
+                internalRefs={internalRef}
+                transformColumns={transformColumns as any}
+                getContainerWidth={getContainerWidth}
+              />
+            </HeaderTableContext.Provider>
+          </EditableContext.Provider>
+        </ResizeContext.Provider>
         {bottomPaginationNode}
       </Spin>
     </div>

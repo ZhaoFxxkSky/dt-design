@@ -7,11 +7,14 @@ import type {
   ColumnType,
   CustomizeComponent,
   GetComponentProps,
+  Key,
   StickyOffsets,
 } from '../../interface';
 import { getCellFixedInfo } from '../../features/fixed/fixUtil';
 import { getColumnsKey } from '../../shared/utils/valueUtil';
 import type { TableProps } from '../RcTable';
+import ResizeContext from '../../features/resize/ResizeContext';
+import ResizeHandle from '../../features/resize/ResizeHandle';
 
 export interface RowProps<RecordType> {
   cells: readonly CellType<RecordType>[];
@@ -38,6 +41,8 @@ const HeaderRow = <RecordType extends any>(props: RowProps<RecordType>) => {
     styles,
   } = props;
   const { prefixCls } = useContext(TableContext, ['prefixCls']);
+  const resizeCtx = React.useContext(ResizeContext);
+
   let rowProps: React.HTMLAttributes<HTMLElement>;
   if (onHeaderRow) {
     rowProps = onHeaderRow(
@@ -56,6 +61,21 @@ const HeaderRow = <RecordType extends any>(props: RowProps<RecordType>) => {
 
         const additionalProps: React.HTMLAttributes<HTMLElement> = column?.onHeaderCell?.(column) || {};
 
+        // 检查是否需要 resize handle
+        const isResizable = resizeCtx?.isColumnResizable(column) ?? false;
+        const columnKey: Key = column?.key ?? column?.dataIndex ?? columnsKey[cellIndex];
+        const isResizing = resizeCtx?.resizingKey === columnKey;
+
+        const resizeHandle = isResizable && resizeCtx ? (
+          <ResizeHandle
+            column={column}
+            columnKey={columnKey}
+            isResizing={isResizing}
+            onStartResize={resizeCtx.onStartResize}
+            prefixCls={prefixCls}
+          />
+        ) : undefined;
+
         return (
           <Cell
             {...cell}
@@ -68,6 +88,8 @@ const HeaderRow = <RecordType extends any>(props: RowProps<RecordType>) => {
             {...fixedInfo}
             additionalProps={additionalProps}
             rowType="header"
+            resizeHandle={resizeHandle}
+            isResizing={isResizing}
           />
         );
       })}
