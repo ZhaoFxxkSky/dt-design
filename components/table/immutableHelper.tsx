@@ -6,9 +6,10 @@ import isEqual from 'rc-util/es/isEqual';
  */
 export function makeImmutable<T extends React.ComponentType<any>>(Component: T): T {
   const componentName = Component.displayName || Component.name || 'Component';
+  const ComponentWithRef = Component as any;
 
   const ForwardedComponent = React.forwardRef<any, any>((props, ref) => (
-    <Component ref={ref} {...props} />
+    <ComponentWithRef ref={ref} {...props} />
   ));
   ForwardedComponent.displayName = `Immutable(${componentName})`;
 
@@ -17,7 +18,7 @@ export function makeImmutable<T extends React.ComponentType<any>>(Component: T):
   );
   (MemoComponent as any).displayName = `Immutable(${componentName})`;
 
-  return MemoComponent as T;
+  return MemoComponent as unknown as T;
 }
 
 /**
@@ -32,5 +33,5 @@ export function responseImmutable<T extends React.ComponentType<any>>(Component:
   const MemoComponent = React.memo(ResponseComponent);
   (MemoComponent as any).displayName = `ResponseImmutable(${componentName})`;
 
-  return MemoComponent as T;
+  return MemoComponent as unknown as T;
 }
