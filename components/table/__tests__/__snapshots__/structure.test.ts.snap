@@ -19,3 +19,25 @@ exports[`table public API structure should expose expected named exports: table-
   "responseImmutable",
 ]
 `;
+
+exports[`table public API structure should snapshot Summary static property keys: summary-static-keys 1`] = `
+[
+  "Cell",
+  "Row",
+]
+`;
+
+exports[`table public API structure should snapshot Table static property keys: table-static-keys 1`] = `
+[
+  "$$typeof",
+  "Column",
+  "ColumnGroup",
+  "EXPAND_COLUMN",
+  "SELECTION_ALL",
+  "SELECTION_COLUMN",
+  "SELECTION_INVERT",
+  "SELECTION_NONE",
+  "Summary",
+  "render",
+]
+`;

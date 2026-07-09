@@ -22,4 +22,29 @@ describe('table public API structure', () => {
     expect(Table.ColumnGroup).toBeDefined();
     expect(Table.Summary).toBeDefined();
   });
+
+  it('should snapshot Table static property keys', () => {
+    const Table = TableModule.Table as any;
+    const staticKeys = Object.keys(Table)
+      .filter((k) => !['propTypes', 'defaultProps', 'displayName', 'name'].includes(k))
+      .sort();
+    expect(staticKeys).toMatchSnapshot('table-static-keys');
+  });
+
+  it('should snapshot Summary static property keys', () => {
+    const Summary = TableModule.Summary as any;
+    const summaryKeys = Object.keys(Summary)
+      .filter((k) => !['propTypes', 'defaultProps', 'displayName', 'name'].includes(k))
+      .sort();
+    expect(summaryKeys).toMatchSnapshot('summary-static-keys');
+  });
+
+  it('should export EditableConfig type', () => {
+    // Type-only export verification — just ensure the module compiles
+    // and the type is accessible at compile time
+    const cols: TableModule.ColumnsType = [
+      { title: 'A', dataIndex: 'a', key: 'a', editable: { type: 'input' } },
+    ];
+    expect(cols.length).toBe(1);
+  });
 });

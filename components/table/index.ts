@@ -34,6 +34,10 @@ export type {
   ColumnGroupType,
   ColumnsType,
   ColumnType,
+  EditableConfig,
+  EditableRule,
+  EditorType,
+  EditableError,
 } from './interface';
 
 // Core-only types (not in antd wrapper)

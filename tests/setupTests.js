@@ -41,3 +41,6 @@ window.IntersectionObserver = class IntersectionObserver {
 };
 
 Object.assign(global, { TextDecoder, TextEncoder });
+
+// jsdom does not implement scrollIntoView — add a no-op stub
+window.HTMLElement.prototype.scrollIntoView = function () {};

@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`table rendering structure snapshots basic table renders expected DOM structure: basic-table-structure 1`] = `
+{
+  "bodyRowCount": 2,
+  "columnCount": 2,
+  "headerRowCount": 1,
+  "tableClass": "ant-table",
+  "wrapperClass": "ant-table-wrapper",
+}
+`;
+
+exports[`table rendering structure snapshots table with empty data renders placeholder: empty-structure 1`] = `
+{
+  "bodyRowCount": 1,
+  "hasPlaceholder": true,
+}
+`;
+
+exports[`table rendering structure snapshots table with loading renders spin: loading-structure 1`] = `
+{
+  "hasSpin": true,
+}
+`;
+
+exports[`table rendering structure snapshots table with resizable renders resize elements: resizable-structure 1`] = `
+{
+  "hasResizeLine": true,
+  "resizeHandleCount": 2,
+}
+`;
+
+exports[`table rendering structure snapshots table with scroll.y renders split header/body: scroll-y-structure 1`] = `
+{
+  "hasBody": true,
+  "hasHeader": true,
+  "tableCount": 2,
+}
+`;
+
+exports[`table rendering structure snapshots table with selection renders checkbox column: selection-structure 1`] = `
+{
+  "checkboxCount": 3,
+  "hasSelectionCol": true,
+}
+`;
+
+exports[`table rendering structure snapshots table with virtual renders virtual body: virtual-structure 1`] = `
+{
+  "hasVirtualBody": true,
+  "virtualRowCount": 5,
+}
+`;

@@ -50,8 +50,12 @@ const EditableCell: React.FC<EditableCellProps> = ({
 
   const handleChange = React.useCallback(
     (nextValue: any) => {
-      editCtx?.onCellChange(rowIndex, dataIndex, nextValue, record);
-      editCtx?.validateCell(rowIndex, dataIndex, nextValue, record);
+      // antd Input passes a ChangeEvent; antd Select passes a value directly.
+      // Normalize: extract value from event when the argument has .target.value
+      const normalized =
+        nextValue?.target?.value !== undefined ? nextValue.target.value : nextValue;
+      editCtx?.onCellChange(rowIndex, dataIndex, normalized, record);
+      editCtx?.validateCell(rowIndex, dataIndex, normalized, record);
     },
     [editCtx, rowIndex, dataIndex, record],
   );

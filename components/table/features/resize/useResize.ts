@@ -70,7 +70,8 @@ function useResize({
     flattenColumns.forEach((col) => {
       const key = (col.key ?? col.dataIndex ?? '') as Key;
       if (col.width != null) {
-        map.set(key, Number(col.width));
+        const w = Number(col.width);
+        if (!Number.isNaN(w)) map.set(key, w);
       }
     });
     return map;
@@ -86,7 +87,8 @@ function useResize({
       flattenColumns.forEach((col) => {
         const key = (col.key ?? col.dataIndex ?? '') as Key;
         if (col.width != null && !next.has(key)) {
-          next.set(key, Number(col.width));
+          const w = Number(col.width);
+          if (!Number.isNaN(w)) next.set(key, w);
         }
       });
       return next;
@@ -209,7 +211,9 @@ function useResize({
     flattenColumns.forEach((col) => {
       const key = (col.key ?? col.dataIndex ?? '') as Key;
       const mapWidth = columnWidths.get(key);
-      const baseWidth = mapWidth ?? (col.width ? Number(col.width) : 0);
+      // Guard against NaN: non-numeric string widths default to 0
+      const rawW = col.width != null ? Number(col.width) : 0;
+      const baseWidth = mapWidth ?? (Number.isNaN(rawW) ? 0 : rawW);
       const flex = !resizedKeys.has(key) && baseWidth > 0;
       entries.push({ key, width: baseWidth, flex });
       totalWidth += baseWidth;
@@ -313,7 +317,10 @@ function useResize({
       // 使用 DOM 测量的实际渲染宽度作为拖拽起点（包含 remainder）
       // 参考 Element Plus：columnWidth = finalLeft - startColumnLeft
       // 用户拖 3px → 新宽度 = 渲染宽度 - 3px，松手后变固定列，视觉无跳变
-      const baseWidth = columnWidths.get(key) ?? (col.width ? Number(col.width) : 0);
+      // Guard against NaN: if col.width is a non-numeric string (e.g. 'auto'),
+      // Number(col.width) returns NaN, which would corrupt the drag math.
+      const rawWidth = col.width != null ? Number(col.width) : 0;
+      const baseWidth = columnWidths.get(key) ?? (Number.isNaN(rawWidth) ? 0 : rawWidth);
       const currentWidth = actualWidth ?? baseWidth;
 
       dragRef.current = {
@@ -407,15 +414,7 @@ function useResize({
       document.body.style.cursor = 'col-resize';
       document.body.style.userSelect = 'none';
     },
-    [
-      columnWidths,
-      renderWidths,
-      getResizeConfig,
-      onColumnResize,
-      flattenColumns,
-      updateLinePosition,
-      hideLine,
-    ],
+    [columnWidths, getResizeConfig, onColumnResize, flattenColumns, updateLinePosition, hideLine],
   );
 
   // 获取列的用户宽度（拖拽过程中不返回 draggingWidth，保持原宽度，松开后才更新）
