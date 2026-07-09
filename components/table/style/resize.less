@@ -1,9 +1,21 @@
-@import '../variables.less';
+@import './variables.less';
 
 // ============================================================
 // === Column Resize Handle ===
 // ============================================================
 
+// 表格容器需要 relative 定位，让竖线可以 absolute 定位
+.@{table-prefix-cls}-wrapper {
+  position: relative;
+}
+
+// 可调整列宽的 th 添加标记
+.@{table-prefix-cls}-thead > tr > th.@{table-prefix-cls}-cell-resizable {
+  position: relative;
+  overflow: visible;
+}
+
+// 拖拽手柄（通过 transformResizableColumns 注入到 title 中）
 .@{table-prefix-cls}-resize-handle {
   position: absolute;
   top: 0;
@@ -43,43 +55,24 @@
   }
 }
 
-// 拖拽中的列高亮
-.@{table-prefix-cls}-thead > tr > th {
-  // 当列正在被拖拽时，th 添加一个 class
-  &.@{table-prefix-cls}-cell-resizing {
-    .@{table-prefix-cls}-resize-handle::after {
-      width: 3px;
-      background-color: @table-color-primary;
-    }
+// 拖拽进行中时，通过 wrapper 级联隐藏所有 hover 高亮
+.@{table-prefix-cls}-wrapper-resizing {
+  .@{table-prefix-cls}-resize-handle::after,
+  .@{table-prefix-cls}-resize-handle:hover::after {
+    width: 0 !important;
+    background-color: transparent !important;
   }
 }
 
-// 拖拽时的竖线指示器（覆盖整个表格的 overlay）
-.@{table-prefix-cls}-resize-indicator-line {
+// 拖拽时的竖线指示器（绝对定位在表格容器内）
+.@{table-prefix-cls}-resize-line {
   position: absolute;
   top: 0;
-  bottom: 0;
   width: 2px;
+  margin-left: -1px;
   background-color: @table-color-primary;
-  z-index: 99;
+  z-index: 10;
   pointer-events: none;
-  box-shadow: 0 0 4px rgba(22, 119, 255, 0.3);
-}
-
-// 拖拽时的 overlay 容器
-.@{table-prefix-cls}-resize-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 100;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-// 可调整列宽的 th 添加一个标记
-.@{table-prefix-cls}-thead > tr > th.@{table-prefix-cls}-cell-resizable {
-  position: relative;
-  overflow: visible;
+  display: none;
+  box-shadow: 0 0 6px rgba(22, 119, 255, 0.4);
 }

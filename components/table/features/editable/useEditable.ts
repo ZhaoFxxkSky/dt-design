@@ -1,50 +1,8 @@
 import * as React from 'react';
-
-/**
- * 可编辑单元格的配置
- */
-export interface EditableColumnConfig {
-  /** 是否可编辑 */
-  editable?: boolean;
-  /** 是否必填 */
-  required?: boolean;
-  /** 校验规则 */
-  rules?: EditableRule[];
-  /** 编辑器类型 */
-  editor?: 'input' | 'input-number' | 'select' | 'date' | 'textarea' | 'switch';
-  /** 编辑器额外属性 */
-  editorProps?: Record<string, any>;
-  /** 下拉选项（editor 为 select 时使用） */
-  options?: { label: React.ReactNode; value: any }[];
-  /** 只读 */
-  readOnly?: boolean;
-}
-
-export interface EditableRule {
-  /** 校验函数，返回错误消息或 undefined */
-  validator: (value: any, record: any) => string | undefined | Promise<string | undefined>;
-  /** 触发时机 */
-  trigger?: 'onChange' | 'onBlur';
-}
+import type { EditableConfig } from '../../interface';
+import type { EditableContextValue } from './EditableContext';
 
 export type EditableErrors = Map<string, string[]>;
-
-export interface EditableContextValue {
-  /** 错误 Map: key = `${rowIndex}-${dataIndex}` */
-  errors: EditableErrors;
-  /** 校验单个单元格 */
-  validateCell: (rowIndex: number, dataIndex: string | number, value: any, record: any) => void;
-  /** 校验全部数据 */
-  validateAll: (data: any[], getRowKey?: (record: any, index: number) => React.Key) => EditableValidateResult;
-  /** 重置所有错误 */
-  resetErrors: () => void;
-  /** 更新单元格值 */
-  onCellChange: (rowIndex: number, dataIndex: string | number, value: any, record: any) => void;
-  /** 错误版本号（驱动重渲染） */
-  errorsVersion: number;
-  /** 滚动到错误行 */
-  scrollToError: (rowIndex: number) => void;
-}
 
 export interface EditableValidateResult {
   valid: boolean;
@@ -52,17 +10,9 @@ export interface EditableValidateResult {
   errors: EditableErrors;
 }
 
-/**
- * useEditable hook
- *
- * 管理表格的可编辑状态、校验、错误展示
- *
- * 特性：
- * - 单元格级别的值管理（通过 onCellChange 回调）
- * - 校验规则支持同步和异步
- * - 校验失败时 Popover 提示错误
- * - 自动滚动到第一个错误行
- */
+// 重新导出，保持 index.ts 的 API 不变
+export type { EditableContextValue } from './EditableContext';
+
 export interface UseEditableOptions {
   /** 列配置（含 editable 配置） */
   columns: any[];
@@ -80,18 +30,28 @@ export interface UseEditableOptions {
   enabled?: boolean;
 }
 
-function useEditable({
-  columns,
-  data,
-  onChange,
-  onValidate,
-  scrollToRow,
-}: UseEditableOptions) {
-  // 错误 Map
+/**
+ * 解析列的 editable 配置
+ */
+export function parseEditableConfig(
+  editable: boolean | EditableConfig | undefined,
+  globalEnabled?: boolean,
+): { enabled: boolean; config: EditableConfig | null } {
+  if (editable === true) return { enabled: true, config: {} };
+  if (editable && typeof editable === 'object') return { enabled: true, config: editable };
+  if (globalEnabled) return { enabled: true, config: {} };
+  return { enabled: false, config: null };
+}
+
+/**
+ * useEditable hook
+ *
+ * 管理表格的可编辑状态、校验、错误展示
+ */
+function useEditable({ columns, data, onChange, onValidate, scrollToRow }: UseEditableOptions) {
   const [errors, setErrors] = React.useState<EditableErrors>(new Map());
   const [errorsVersion, setErrorsVersion] = React.useState(0);
 
-  // ref 保持最新值
   const dataRef = React.useRef(data);
   dataRef.current = data;
   const columnsRef = React.useRef(columns);
@@ -103,22 +63,62 @@ function useEditable({
   const scrollToRowRef = React.useRef(scrollToRow);
   scrollToRowRef.current = scrollToRow;
 
-  // 错误 key 生成
   const errorKey = React.useCallback(
     (rowIndex: number, dataIndex: string | number) => `${rowIndex}-${dataIndex}`,
     [],
   );
 
-  // 获取列的可编辑配置
-  const getEditableConfig = React.useCallback((col: any): EditableColumnConfig | null => {
+  const getEditableConfig = React.useCallback((col: any): EditableConfig | null => {
     if (!col) return null;
-    const editableCfg = col.editable;
-    if (!editableCfg) return null;
-    if (typeof editableCfg === 'boolean') {
-      return { editable: true };
-    }
-    return editableCfg as EditableColumnConfig;
+    const ed = col.editable;
+    if (ed === true) return {};
+    if (ed && typeof ed === 'object') return ed as EditableConfig;
+    return null;
   }, []);
+
+  // 校验单个值
+  const validateValue = React.useCallback(
+    async (
+      value: any,
+      record: any,
+      config: EditableConfig,
+      colTitle?: any,
+      dataIndex?: any,
+    ): Promise<string[]> => {
+      const messages: string[] = [];
+
+      if (config.rules) {
+        for (const rule of config.rules) {
+          if (rule.required) {
+            const isEmpty =
+              value === undefined ||
+              value === null ||
+              value === '' ||
+              (Array.isArray(value) && value.length === 0);
+            if (isEmpty) {
+              messages.push(rule.message || `${colTitle || dataIndex} 必填`);
+              continue;
+            }
+          }
+
+          if (rule.pattern && value != null && value !== '') {
+            if (!rule.pattern.test(String(value))) {
+              messages.push(rule.message || `${colTitle || dataIndex} 格式不正确`);
+              continue;
+            }
+          }
+
+          if (rule.validator) {
+            const msg = await rule.validator(value, record);
+            if (msg) messages.push(msg);
+          }
+        }
+      }
+
+      return messages;
+    },
+    [],
+  );
 
   // 校验单个单元格
   const validateCell = React.useCallback(
@@ -129,30 +129,10 @@ function useEditable({
       const config = getEditableConfig(col);
       if (!config) return;
 
-      const messages: string[] = [];
-
-      // 必填校验
-      if (config.required) {
-        const isEmpty =
-          value === undefined ||
-          value === null ||
-          value === '' ||
-          (Array.isArray(value) && value.length === 0);
-        if (isEmpty) {
-          messages.push(`${col.title || dataIndex} 必填`);
-        }
-      }
-
-      // 自定义规则校验
-      if (config.rules) {
-        for (const rule of config.rules) {
-          const msg = await rule.validator(value, record);
-          if (msg) messages.push(msg);
-        }
-      }
+      const messages = await validateValue(value, record, config, col.title, dataIndex);
 
       const key = errorKey(rowIndex, dataIndex);
-      setErrors(prev => {
+      setErrors((prev) => {
         const next = new Map(prev);
         if (messages.length > 0) {
           next.set(key, messages);
@@ -161,9 +141,9 @@ function useEditable({
         }
         return next;
       });
-      setErrorsVersion(v => v + 1);
+      setErrorsVersion((v) => v + 1);
     },
-    [errorKey, getEditableConfig],
+    [errorKey, getEditableConfig, validateValue],
   );
 
   // 校验全部数据
@@ -182,23 +162,31 @@ function useEditable({
           const value = row[dataIndex];
           const messages: string[] = [];
 
-          // 必填校验
-          if (config.required) {
-            const isEmpty =
-              value === undefined ||
-              value === null ||
-              value === '' ||
-              (Array.isArray(value) && value.length === 0);
-            if (isEmpty) {
-              messages.push(`${col.title || dataIndex} 必填`);
-            }
-          }
-
-          // 同步规则校验
           if (config.rules) {
             for (const rule of config.rules) {
-              const msg = rule.validator(value, row);
-              if (typeof msg === 'string') messages.push(msg);
+              if (rule.required) {
+                const isEmpty =
+                  value === undefined ||
+                  value === null ||
+                  value === '' ||
+                  (Array.isArray(value) && value.length === 0);
+                if (isEmpty) {
+                  messages.push(rule.message || `${col.title || dataIndex} 必填`);
+                  continue;
+                }
+              }
+
+              if (rule.pattern && value != null && value !== '') {
+                if (!rule.pattern.test(String(value))) {
+                  messages.push(rule.message || `${col.title || dataIndex} 格式不正确`);
+                  continue;
+                }
+              }
+
+              if (rule.validator) {
+                const msg = rule.validator(value, row);
+                if (typeof msg === 'string') messages.push(msg);
+              }
             }
           }
 
@@ -213,7 +201,7 @@ function useEditable({
       });
 
       setErrors(nextErrors);
-      setErrorsVersion(v => v + 1);
+      setErrorsVersion((v) => v + 1);
 
       const result: EditableValidateResult = {
         valid: nextErrors.size === 0,
@@ -223,7 +211,6 @@ function useEditable({
 
       onValidateRef.current?.(result);
 
-      // 自动滚动到第一个错误行
       if (!result.valid && firstError && scrollToRowRef.current) {
         scrollToRowRef.current(firstError.rowIndex);
       }
@@ -233,15 +220,13 @@ function useEditable({
     [errorKey, getEditableConfig],
   );
 
-  // 重置所有错误
   const resetErrors = React.useCallback(() => {
     setErrors(new Map());
-    setErrorsVersion(v => v + 1);
+    setErrorsVersion((v) => v + 1);
   }, []);
 
-  // 更新单元格值
   const onCellChange = React.useCallback(
-    (rowIndex: number, dataIndex: string | number, value: any, _record: any) => {
+    (rowIndex: number, dataIndex: string | number, value: any, record: any) => {
       const currentData = dataRef.current;
       const newData = currentData.map((row, i) => {
         if (i === rowIndex) {
@@ -250,11 +235,15 @@ function useEditable({
         return row;
       });
       onChangeRef.current?.(newData);
+
+      // 触发列的 onChange 回调
+      const col = columnsRef.current.find((c: any) => c.dataIndex === dataIndex);
+      const config = getEditableConfig(col);
+      config?.onChange?.(value, record, rowIndex);
     },
-    [],
+    [getEditableConfig],
   );
 
-  // 滚动到错误行
   const scrollToError = React.useCallback((rowIndex: number) => {
     scrollToRowRef.current?.(rowIndex);
   }, []);

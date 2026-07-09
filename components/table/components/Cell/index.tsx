@@ -56,11 +56,6 @@ export interface CellProps<RecordType extends DefaultRecordType> {
   rowType?: 'header' | 'body' | 'footer';
 
   isSticky?: boolean;
-
-  /** 表头拖拽手柄（仅 header 行使用） */
-  resizeHandle?: React.ReactNode;
-  /** 当前列是否正在被拖拽 */
-  isResizing?: boolean;
 }
 
 const getTitleFromCellRenderChildren = ({
@@ -129,8 +124,6 @@ const Cell = <RecordType,>(props: CellProps<RecordType>) => {
     appendNode,
     additionalProps = {},
     isSticky,
-    resizeHandle,
-    isResizing,
   } = props;
 
   const cellPrefixCls = `${prefixCls}-cell`;
@@ -194,7 +187,7 @@ const Cell = <RecordType,>(props: CellProps<RecordType>) => {
   // ====================== Hover =======================
   const [hovering, onHover] = useHoverState(index, mergedRowSpan);
 
-  const onMouseEnter: React.MouseEventHandler<HTMLTableCellElement> = useEvent(event => {
+  const onMouseEnter: React.MouseEventHandler<HTMLTableCellElement> = useEvent((event) => {
     if (record) {
       onHover(index, index + mergedRowSpan - 1);
     }
@@ -202,7 +195,7 @@ const Cell = <RecordType,>(props: CellProps<RecordType>) => {
     additionalProps?.onMouseEnter?.(event);
   });
 
-  const onMouseLeave: React.MouseEventHandler<HTMLTableCellElement> = useEvent(event => {
+  const onMouseLeave: React.MouseEventHandler<HTMLTableCellElement> = useEvent((event) => {
     if (record) {
       onHover(-1, -1);
     }
@@ -244,10 +237,6 @@ const Cell = <RecordType,>(props: CellProps<RecordType>) => {
       [`${cellPrefixCls}-with-append`]: appendNode,
       [`${cellPrefixCls}-fix-sticky`]: (isFixStart || isFixEnd) && isSticky,
       [`${cellPrefixCls}-row-hover`]: !legacyCellProps && hovering,
-
-      // Resize
-      [`${cellPrefixCls}-resizable`]: !!resizeHandle,
-      [`${cellPrefixCls}-resizing`]: isResizing,
     },
     additionalProps.className,
     legacyCellProps?.className,
@@ -303,7 +292,6 @@ const Cell = <RecordType,>(props: CellProps<RecordType>) => {
     >
       {appendNode}
       {mergedChildNode}
-      {resizeHandle}
     </Component>
   );
 };

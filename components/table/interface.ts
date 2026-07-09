@@ -35,7 +35,7 @@ export type DeepNamePath<
         ? Store
         : {
             // Convert `Store` to <key, value>. We mark key a `FieldKey`
-            [FieldKey in keyof Store]: Store[FieldKey] extends Function
+            [FieldKey in keyof Store]: Store[FieldKey] extends (...args: any[]) => any
               ? never
               :
                   | (ParentNamePath['length'] extends 0 ? FieldKey : never) // If `ParentNamePath` is empty, it can use `FieldKey` without array path
@@ -147,6 +147,37 @@ export type RowScopeType = 'row' | 'rowgroup';
 
 export type ScopeType = ColScopeType | RowScopeType;
 
+// ===================== Editable Types =====================
+
+export type EditorType = 'input' | 'select' | 'custom';
+
+export interface EditableRule {
+  required?: boolean;
+  message?: string;
+  pattern?: RegExp;
+  validator?: (value: any, record: any) => string | undefined | Promise<string | undefined>;
+}
+
+export interface EditableConfig<RecordType = any> {
+  type?: EditorType;
+  options?: { label: React.ReactNode; value: any }[];
+  renderEditor?: (
+    value: any,
+    record: RecordType,
+    index: number,
+    onChange: (value: any) => void,
+  ) => React.ReactNode;
+  rules?: EditableRule[];
+  onChange?: (value: any, record: RecordType, index: number) => void;
+  onSave?: (value: any, record: RecordType, index: number) => void;
+}
+
+export interface EditableError {
+  rowKey: React.Key;
+  dataIndex: string;
+  message: string;
+}
+
 interface ColumnSharedType<RecordType> {
   title?: React.ReactNode;
   key?: Key;
@@ -178,40 +209,19 @@ export interface ColumnType<RecordType = AnyObject> extends ColumnSharedType<Rec
   rowSpan?: number;
   width?: number | string;
   minWidth?: number;
+  /** 最大列宽（用于列宽拖拽限制） */
+  maxWidth?: number;
   onCell?: GetComponentProps<RecordType>;
   /** @deprecated Please use `onCell` instead */
   onCellClick?: (record: RecordType, e: React.MouseEvent<HTMLElement>) => void;
 
-  /** 列宽拖拽调整配置 */
-  resize?: {
-    /** 是否可拖拽调整列宽 */
-    resizable?: boolean;
-    /** 最小列宽 (px)，默认 60 */
-    minWidth?: number;
-    /** 最大列宽 (px) */
-    maxWidth?: number;
-  };
+  /** 是否可拖拽调整列宽，覆盖 Table.resizable */
+  resizable?: boolean;
+  /** 列宽变化回调 */
+  onResize?: (width: number) => void;
 
-  /** 可编辑配置 */
-  editable?: {
-    /** 是否可编辑 */
-    editable?: boolean;
-    /** 是否必填 */
-    required?: boolean;
-    /** 校验规则 */
-    rules?: {
-      validator: (value: any, record: any) => string | undefined | Promise<string | undefined>;
-      trigger?: 'onChange' | 'onBlur';
-    }[];
-    /** 编辑器类型 */
-    editor?: 'input' | 'input-number' | 'select' | 'date' | 'textarea' | 'switch';
-    /** 编辑器额外属性 */
-    editorProps?: Record<string, any>;
-    /** 下拉选项（editor 为 select 时使用） */
-    options?: { label: React.ReactNode; value: any }[];
-    /** 只读 */
-    readOnly?: boolean;
-  };
+  /** 可编辑配置，可为 boolean 或详细配置对象 */
+  editable?: boolean | EditableConfig<RecordType>;
 
   // antd wrapper extensions
   title?: ColumnTitle<RecordType>;
@@ -505,13 +515,7 @@ export interface FilterDropdownProps {
 }
 
 interface CoverableDropdownProps
-  extends Omit<
-    DropdownProps,
-    | 'onOpenChange'
-    | 'overlay'
-    | 'visible'
-    | 'onVisibleChange'
-  > {
+  extends Omit<DropdownProps, 'onOpenChange' | 'overlay' | 'visible' | 'onVisibleChange'> {
   onOpenChange?: (open: boolean) => void;
 }
 

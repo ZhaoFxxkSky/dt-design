@@ -4,7 +4,7 @@ import { act, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
 import { createContext, useContext } from '../../_util/context';
-import { makeImmutable, responseImmutable } from './immutable';
+import { makeImmutable, responseImmutable } from '../immutableHelper';
 import useLayoutEffect from '../../_util/hooks/useLayoutEffect';
 import { getScrollBarSize } from '../../_util/scrollbar';
 
@@ -410,7 +410,7 @@ describe('selective context — createContext / useContext', () => {
       setVal: (v: Ctx) => void;
       unmount: () => void;
     }
-    const Wrapper = React.forwardRef<WrapperHandle, {}>((_props, ref) => {
+    const Wrapper = React.forwardRef<WrapperHandle, object>((_props, ref) => {
       const [val, setVal] = React.useState<Ctx>({ val: 0 });
       const [show, setShow] = React.useState(true);
       React.useImperativeHandle(ref, () => ({
@@ -498,7 +498,7 @@ describe('makeImmutable', () => {
       setValue: (v: string) => void;
       setOther: (v: number) => void;
     }
-    const Wrapper = React.forwardRef<WrapperHandle, {}>((_props, ref) => {
+    const Wrapper = React.forwardRef<WrapperHandle, object>((_props, ref) => {
       const [value, setValue] = React.useState('hello');
       const [, setOther] = React.useState(0);
       React.useImperativeHandle(ref, () => ({ setValue, setOther }), []);

@@ -1,11 +1,9 @@
 import * as React from 'react';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Input, InputNumber, Select, DatePicker, Switch, Popover } from 'antd';
+import { Input, Popover, Select } from 'antd';
 import { clsx } from 'clsx';
-import type { EditableColumnConfig, EditableContextValue } from './useEditable';
+import type { EditableConfig } from '../../interface';
 import EditableContext from './EditableContext';
-
-const { TextArea } = Input;
 
 export interface EditableCellProps {
   /** 列的 dataIndex */
@@ -19,7 +17,7 @@ export interface EditableCellProps {
   /** 当前值 */
   value: any;
   /** 可编辑配置 */
-  editableConfig: EditableColumnConfig;
+  editableConfig: EditableConfig;
   /** prefixCls */
   prefixCls: string;
   /** 原始 children（非编辑模式时渲染） */
@@ -29,7 +27,7 @@ export interface EditableCellProps {
 /**
  * 可编辑单元格
  *
- * - 编辑模式下渲染对应的编辑器（Input/Select/DatePicker 等）
+ * - 编辑模式下渲染对应的编辑器（Input/Select/自定义）
  * - 校验失败时用 Popover 显示错误消息
  * - 聚焦时触发校验
  */
@@ -41,7 +39,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
   value,
   editableConfig,
   prefixCls,
-  children,
+  children: _children,
 }) => {
   const editCtx = React.useContext(EditableContext);
   const [focused, setFocused] = React.useState(false);
@@ -53,7 +51,6 @@ const EditableCell: React.FC<EditableCellProps> = ({
   const handleChange = React.useCallback(
     (nextValue: any) => {
       editCtx?.onCellChange(rowIndex, dataIndex, nextValue, record);
-      // 触发校验（同步规则）
       editCtx?.validateCell(rowIndex, dataIndex, nextValue, record);
     },
     [editCtx, rowIndex, dataIndex, record],
@@ -65,58 +62,45 @@ const EditableCell: React.FC<EditableCellProps> = ({
 
   const handleBlur = React.useCallback(() => {
     setFocused(false);
-    // blur 时触发校验
     editCtx?.validateCell(rowIndex, dataIndex, value, record);
-  }, [editCtx, rowIndex, dataIndex, value, record]);
+    // 触发 onSave
+    editableConfig.onSave?.(value, record, rowIndex);
+  }, [editCtx, rowIndex, dataIndex, value, record, editableConfig]);
 
-  // 渲染编辑器
-  const renderEditor = () => {
-    const { editor = 'input', editorProps, options, readOnly } = editableConfig;
+  // 渲染内置编辑器
+  const renderBuiltinEditor = () => {
+    const { type = 'input', options } = editableConfig;
     const commonProps = {
       value,
       onChange: handleChange,
       onFocus: handleFocus,
       onBlur: handleBlur,
-      disabled: readOnly,
       status: hasError ? ('error' as const) : undefined,
       style: { width: '100%' },
     };
 
-    switch (editor) {
-      case 'input':
-        return (
-          <Input
-            {...commonProps}
-            {...editorProps}
-            placeholder={editorProps?.placeholder ?? `请输入${typeof title === 'string' ? title : ''}`}
-          />
-        );
-      case 'input-number':
-        return <InputNumber {...commonProps} {...editorProps} />;
-      case 'select':
-        return (
-          <Select
-            {...commonProps}
-            {...editorProps}
-            options={options}
-            placeholder={editorProps?.placeholder ?? `请选择${typeof title === 'string' ? title : ''}`}
-          />
-        );
-      case 'date':
-        return <DatePicker {...commonProps} {...editorProps} />;
-      case 'textarea':
-        return <TextArea {...commonProps} {...editorProps} autoSize={{ minRows: 1, maxRows: 3 }} />;
-      case 'switch':
-        return <Switch checked={value} onChange={handleChange} disabled={readOnly} />;
-      default:
-        return <Input {...commonProps} {...editorProps} />;
+    if (type === 'select') {
+      return (
+        <Select
+          {...commonProps}
+          options={options}
+          placeholder={`请选择${typeof title === 'string' ? title : ''}`}
+        />
+      );
     }
+
+    return (
+      <Input {...commonProps} placeholder={`请输入${typeof title === 'string' ? title : ''}`} />
+    );
   };
 
-  // 如果不可编辑，渲染原始 children
-  if (!editableConfig.editable) {
-    return <>{children}</>;
-  }
+  // 渲染编辑器
+  const renderEditor = () => {
+    if (editableConfig.renderEditor) {
+      return editableConfig.renderEditor(value, record, rowIndex, handleChange);
+    }
+    return renderBuiltinEditor();
+  };
 
   const errorContent = (
     <div className={`${prefixCls}-editable-error-content`}>
@@ -149,9 +133,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
         destroyTooltipOnHide
         overlayClassName={`${prefixCls}-editable-error-popover`}
       >
-        <div className={`${prefixCls}-editable-cell-trigger`}>
-          {renderEditor()}
-        </div>
+        <div className={`${prefixCls}-editable-cell-trigger`}>{renderEditor()}</div>
       </Popover>
     </div>
   );

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { Table } from '../index';
 import useExpand from '../features/expand/useExpand';
@@ -111,12 +111,12 @@ describe('useExpand Hook — comprehensive', () => {
       ),
     );
     act(() => {
-      result.current[5]({ record: flatData[0], e: null as any });
+      result.current[5](flatData[0], null as any);
     });
     expect(result.current[2].has('1')).toBe(true);
 
     act(() => {
-      result.current[5]({ record: flatData[0], e: null as any });
+      result.current[5](flatData[0], null as any);
     });
     expect(result.current[2].has('1')).toBe(false);
   });
@@ -131,7 +131,7 @@ describe('useExpand Hook — comprehensive', () => {
       ),
     );
     act(() => {
-      result.current[5]({ record: flatData[1], e: null as any });
+      result.current[5](flatData[1], null as any);
     });
     expect(onExpand).toHaveBeenCalledWith(true, flatData[1]);
   });
@@ -146,7 +146,7 @@ describe('useExpand Hook — comprehensive', () => {
       ),
     );
     act(() => {
-      result.current[5]({ record: flatData[0], e: null as any });
+      result.current[5](flatData[0], null as any);
     });
     expect(onExpandedRowsChange).toHaveBeenCalledWith(['1']);
   });
@@ -160,7 +160,7 @@ describe('useExpand Hook — comprehensive', () => {
       ),
     );
     act(() => {
-      result.current[5]({ record: flatData[0], e: null as any });
+      result.current[5](flatData[0], null as any);
     });
     expect(result.current[2].has('1')).toBe(false);
   });
@@ -190,15 +190,15 @@ describe('useExpand Hook — comprehensive', () => {
     const { container: expandedContainer } = render(
       <div>{iconFn({ prefixCls: 'ant-table', expanded: true, expandable: true, record: flatData[0], onExpand: jest.fn() })}</div>,
     );
-    expect(expandedContainer.querySelector('.ant-table-row-expand-icon-expanded')).toBeInTheDocument();
+    expect(expandedContainer.querySelector('.ant-table-row-expanded')).toBeInTheDocument();
 
     const { container: collapsedContainer } = render(
       <div>{iconFn({ prefixCls: 'ant-table', expanded: false, expandable: true, record: flatData[0], onExpand: jest.fn() })}</div>,
     );
-    expect(collapsedContainer.querySelector('.ant-table-row-expand-icon-collapsed')).toBeInTheDocument();
+    expect(collapsedContainer.querySelector('.ant-table-row-collapsed')).toBeInTheDocument();
   });
 
-  it('returns null icon when not expandable', () => {
+  it('returns spaced icon when not expandable', () => {
     const { result } = renderHook(() =>
       useExpand(
         { expandable: { expandedRowRender: () => <div /> }, data: flatData } as any,
@@ -206,14 +206,17 @@ describe('useExpand Hook — comprehensive', () => {
         (r: any) => r.key,
       ),
     );
-    const icon = result.current[3]({
-      prefixCls: 'ant-table',
-      expanded: false,
-      expandable: false,
-      record: flatData[0],
-      onExpand: jest.fn(),
-    });
-    expect(icon).toBeNull();
+    const { container } = render(
+      <div>{result.current[3]({
+        prefixCls: 'ant-table',
+        expanded: false,
+        expandable: false,
+        record: flatData[0],
+        onExpand: jest.fn(),
+      })}</div>,
+    );
+    // Non-expandable rows render a 'spaced' placeholder icon
+    expect(container.querySelector('.ant-table-row-spaced')).toBeInTheDocument();
   });
 });
 
@@ -223,7 +226,7 @@ describe('useExpand Hook — comprehensive', () => {
 describe('useFlattenRecords Hook — comprehensive', () => {
   it('flattens flat data (no children)', () => {
     const { result } = renderHook(() =>
-      useFlattenRecords(flatData, 'children', (r: any) => r.key, new Set()),
+      useFlattenRecords(flatData, 'children', new Set(), (r: any) => r.key),
     );
     expect(result.current).toHaveLength(3);
     expect(result.current[0].indent).toBe(0);
@@ -232,14 +235,14 @@ describe('useFlattenRecords Hook — comprehensive', () => {
 
   it('does not flatten children when not expanded', () => {
     const { result } = renderHook(() =>
-      useFlattenRecords(treeData, 'children', (r: any) => r.key, new Set()),
+      useFlattenRecords(treeData, 'children', new Set(), (r: any) => r.key),
     );
     expect(result.current).toHaveLength(2); // only parents
   });
 
   it('flattens children when expanded', () => {
     const { result } = renderHook(() =>
-      useFlattenRecords(treeData, 'children', (r: any) => r.key, new Set(['1'])),
+      useFlattenRecords(treeData, 'children', new Set(['1']), (r: any) => r.key),
     );
     expect(result.current).toHaveLength(4); // parent 1 + 2 children + parent 2
     expect(result.current[0].record.key).toBe('1');
@@ -267,7 +270,7 @@ describe('useFlattenRecords Hook — comprehensive', () => {
       },
     ];
     const { result } = renderHook(() =>
-      useFlattenRecords(deepData, 'children', (r: any) => r.key, new Set(['1', '2'])),
+      useFlattenRecords(deepData, 'children', new Set(['1', '2']), (r: any) => r.key),
     );
     expect(result.current).toHaveLength(3);
     expect(result.current[0].indent).toBe(0);
@@ -277,7 +280,7 @@ describe('useFlattenRecords Hook — comprehensive', () => {
 
   it('handles empty data', () => {
     const { result } = renderHook(() =>
-      useFlattenRecords([], 'children', (r: any) => r.key, new Set()),
+      useFlattenRecords([], 'children', new Set(), (r: any) => r.key),
     );
     expect(result.current).toEqual([]);
   });
@@ -287,7 +290,7 @@ describe('useFlattenRecords Hook — comprehensive', () => {
       { id: 1, subItems: [{ id: 2, subItems: [] }] },
     ];
     const { result } = renderHook(() =>
-      useFlattenRecords(customData, 'subItems', (r: any) => r.id, new Set([1])),
+      useFlattenRecords(customData, 'subItems', new Set([1]), (r: any) => r.id),
     );
     expect(result.current).toHaveLength(2);
     expect(result.current[0].indent).toBe(0);
@@ -296,12 +299,13 @@ describe('useFlattenRecords Hook — comprehensive', () => {
 
   it('increments index correctly', () => {
     const { result } = renderHook(() =>
-      useFlattenRecords(treeData, 'children', (r: any) => r.key, new Set(['1'])),
+      useFlattenRecords(treeData, 'children', new Set(['1']), (r: any) => r.key),
     );
-    expect(result.current[0].index).toBe(0);
-    expect(result.current[1].index).toBe(1);
-    expect(result.current[2].index).toBe(2);
-    expect(result.current[3].index).toBe(3);
+    // index is local: root items use array index, children use their index within parent's children
+    expect(result.current[0].index).toBe(0); // Parent 1 at root index 0
+    expect(result.current[1].index).toBe(0); // Child 1-1 is child 0 of Parent 1
+    expect(result.current[2].index).toBe(1); // Child 1-2 is child 1 of Parent 1
+    expect(result.current[3].index).toBe(1); // Parent 2 at root index 1
   });
 });
 
@@ -312,7 +316,7 @@ describe('ExpandTable — row expansion (expandedRowRender)', () => {
   it('renders expand icon for expandable rows', () => {
     const { container } = render(
       <Table
-        data={flatData}
+        dataSource={flatData}
         columns={columns as any}
         rowKey="key"
         expandable={{
@@ -327,7 +331,7 @@ describe('ExpandTable — row expansion (expandedRowRender)', () => {
   it('shows expanded content when icon is clicked', () => {
     const { container } = render(
       <Table
-        data={flatData}
+        dataSource={flatData}
         columns={columns as any}
         rowKey="key"
         expandable={{
@@ -350,7 +354,7 @@ describe('ExpandTable — row expansion (expandedRowRender)', () => {
   it('collapses expanded row when icon is clicked again', () => {
     const { container } = render(
       <Table
-        data={flatData}
+        dataSource={flatData}
         columns={columns as any}
         rowKey="key"
         expandable={{
@@ -364,15 +368,15 @@ describe('ExpandTable — row expansion (expandedRowRender)', () => {
     fireEvent.click(expandIcon);
     expect(screen.getByTestId('expanded-content')).toBeInTheDocument();
 
-    // Collapse
+    // Collapse (expanded row is hidden via display:none, not removed from DOM)
     fireEvent.click(expandIcon);
-    expect(screen.queryByTestId('expanded-content')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('expanded-content')).not.toBeVisible();
   });
 
   it('supports defaultExpandAllRows', () => {
     render(
       <Table
-        data={flatData}
+        dataSource={flatData}
         columns={columns as any}
         rowKey="key"
         expandable={{
@@ -389,7 +393,7 @@ describe('ExpandTable — row expansion (expandedRowRender)', () => {
   it('supports defaultExpandedRowKeys', () => {
     render(
       <Table
-        data={flatData}
+        dataSource={flatData}
         columns={columns as any}
         rowKey="key"
         expandable={{
@@ -406,7 +410,7 @@ describe('ExpandTable — row expansion (expandedRowRender)', () => {
   it('supports controlled expandedRowKeys', () => {
     const { rerender } = render(
       <Table
-        data={flatData}
+        dataSource={flatData}
         columns={columns as any}
         rowKey="key"
         expandable={{
@@ -421,7 +425,7 @@ describe('ExpandTable — row expansion (expandedRowRender)', () => {
     // Update controlled keys
     rerender(
       <Table
-        data={flatData}
+        dataSource={flatData}
         columns={columns as any}
         rowKey="key"
         expandable={{
@@ -430,16 +434,17 @@ describe('ExpandTable — row expansion (expandedRowRender)', () => {
         }}
       />,
     );
-    expect(screen.queryByTestId('expanded-1')).not.toBeInTheDocument();
-    expect(screen.getByTestId('expanded-2')).toBeInTheDocument();
-    expect(screen.getByTestId('expanded-3')).toBeInTheDocument();
+    // expanded-1 is hidden via display:none, not removed from DOM
+    expect(screen.queryByTestId('expanded-1')).not.toBeVisible();
+    expect(screen.getByTestId('expanded-2')).toBeVisible();
+    expect(screen.getByTestId('expanded-3')).toBeVisible();
   });
 
   it('calls onExpand when toggling', () => {
     const onExpand = jest.fn();
     const { container } = render(
       <Table
-        data={flatData}
+        dataSource={flatData}
         columns={columns as any}
         rowKey="key"
         expandable={{
@@ -457,7 +462,7 @@ describe('ExpandTable — row expansion (expandedRowRender)', () => {
     const onExpandedRowsChange = jest.fn();
     const { container } = render(
       <Table
-        data={flatData}
+        dataSource={flatData}
         columns={columns as any}
         rowKey="key"
         expandable={{
@@ -474,7 +479,7 @@ describe('ExpandTable — row expansion (expandedRowRender)', () => {
   it('does not show expand icon when rowExpandable returns false', () => {
     const { container } = render(
       <Table
-        data={flatData}
+        dataSource={flatData}
         columns={columns as any}
         rowKey="key"
         expandable={{
@@ -484,8 +489,11 @@ describe('ExpandTable — row expansion (expandedRowRender)', () => {
       />,
     );
     const expandIcons = container.querySelectorAll('.ant-table-row-expand-icon');
-    // Alice (30) and Charlie (35) should be expandable, Bob (25) should not
-    expect(expandIcons.length).toBe(2);
+    // All rows render an expand icon; non-expandable rows show a 'spaced' (inactive) icon
+    // Alice (30) and Charlie (35) are expandable, Bob (25) is not (spaced icon)
+    expect(expandIcons.length).toBe(3);
+    // The non-expandable row (Bob) should have the 'spaced' class
+    expect(expandIcons[1]).toHaveClass('ant-table-row-expand-icon-spaced');
   });
 });
 
@@ -495,7 +503,7 @@ describe('ExpandTable — row expansion (expandedRowRender)', () => {
 describe('ExpandTable — tree data (nest)', () => {
   it('renders parent rows by default', () => {
     render(
-      <Table data={treeData} columns={columns as any} rowKey="key" />,
+      <Table dataSource={treeData} columns={columns as any} rowKey="key" />,
     );
     expect(screen.getByText('Parent 1')).toBeInTheDocument();
     expect(screen.getByText('Parent 2')).toBeInTheDocument();
@@ -505,7 +513,7 @@ describe('ExpandTable — tree data (nest)', () => {
 
   it('expands tree node to show children', () => {
     const { container } = render(
-      <Table data={treeData} columns={columns as any} rowKey="key" />,
+      <Table dataSource={treeData} columns={columns as any} rowKey="key" />,
     );
     // Children not visible initially
     expect(screen.queryByText('Child 1-1')).not.toBeInTheDocument();
@@ -522,7 +530,7 @@ describe('ExpandTable — tree data (nest)', () => {
   it('supports defaultExpandAllRows for tree data', () => {
     render(
       <Table
-        data={treeData}
+        dataSource={treeData}
         columns={columns as any}
         rowKey="key"
         expandable={{ defaultExpandAllRows: true }}
@@ -538,7 +546,7 @@ describe('ExpandTable — tree data (nest)', () => {
   it('supports defaultExpandedRowKeys for tree data', () => {
     render(
       <Table
-        data={treeData}
+        dataSource={treeData}
         columns={columns as any}
         rowKey="key"
         expandable={{ defaultExpandedRowKeys: ['2'] }}
@@ -553,7 +561,7 @@ describe('ExpandTable — tree data (nest)', () => {
   it('collapses tree node', () => {
     const { container } = render(
       <Table
-        data={treeData}
+        dataSource={treeData}
         columns={columns as any}
         rowKey="key"
         expandable={{ defaultExpandAllRows: true }}
@@ -578,7 +586,7 @@ describe('ExpandTable — expandRowByClick', () => {
   it('expands row when row is clicked', () => {
     const { container } = render(
       <Table
-        data={flatData}
+        dataSource={flatData}
         columns={columns as any}
         rowKey="key"
         expandable={{

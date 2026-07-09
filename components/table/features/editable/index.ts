@@ -1,11 +1,10 @@
+export { default as EditableCell } from './EditableCell';
+export type { EditableContextValue } from './EditableContext';
+export { default as EditableContext } from './EditableContext';
 export { default as useEditable } from './useEditable';
 export type {
-  EditableColumnConfig,
-  EditableRule,
   EditableErrors,
-  EditableContextValue,
   EditableValidateResult,
   UseEditableOptions,
 } from './useEditable';
-export { default as EditableContext } from './EditableContext';
-export { default as EditableCell } from './EditableCell';
+export { parseEditableConfig } from './useEditable';

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button, Space, message } from 'antd';
+import { Button, message, Space } from 'antd';
 import { Table } from '../index';
+import type { ColumnsType, EditableConfig } from '../index';
 
 interface RecordType {
   key: string;
@@ -21,25 +22,19 @@ export default function Demo() {
   const [data, setData] = React.useState<RecordType[]>(initialData);
   const tableRef = React.useRef<any>(null);
 
-  const columns = [
+  const columns: ColumnsType<RecordType> = [
     {
       title: '姓名',
       dataIndex: 'name',
       key: 'name',
       width: 150,
       editable: {
-        editable: true,
-        required: true,
-        editor: 'input' as const,
+        type: 'input',
         rules: [
-          {
-            validator: (value: any) => {
-              if (value && value.length < 2) return '姓名至少2个字符';
-              return undefined;
-            },
-          },
+          { required: true, message: '姓名必填' },
+          { validator: (value) => (value && value.length < 2 ? '姓名至少2个字符' : undefined) },
         ],
-      },
+      } as EditableConfig,
     },
     {
       title: '年龄',
@@ -47,20 +42,13 @@ export default function Demo() {
       key: 'age',
       width: 120,
       editable: {
-        editable: true,
-        required: true,
-        editor: 'input-number' as const,
-        editorProps: { min: 0, max: 150 },
+        type: 'input',
         rules: [
-          {
-            validator: (value: any) => {
-              if (value != null && value < 0) return '年龄不能为负数';
-              if (value != null && value > 150) return '年龄不能超过150';
-              return undefined;
-            },
-          },
+          { required: true, message: '年龄必填' },
+          { validator: (value) => (value != null && value < 0 ? '年龄不能为负数' : undefined) },
+          { validator: (value) => (value != null && value > 150 ? '年龄不能超过150' : undefined) },
         ],
-      },
+      } as EditableConfig,
     },
     {
       title: '邮箱',
@@ -68,18 +56,12 @@ export default function Demo() {
       key: 'email',
       width: 220,
       editable: {
-        editable: true,
-        required: true,
-        editor: 'input' as const,
+        type: 'input',
         rules: [
-          {
-            validator: (value: any) => {
-              if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return '邮箱格式不正确';
-              return undefined;
-            },
-          },
+          { required: true, message: '邮箱必填' },
+          { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: '邮箱格式不正确' },
         ],
-      },
+      } as EditableConfig,
     },
     {
       title: '部门',
@@ -87,9 +69,7 @@ export default function Demo() {
       key: 'department',
       width: 150,
       editable: {
-        editable: true,
-        required: true,
-        editor: 'select' as const,
+        type: 'select',
         options: [
           { label: '技术部', value: '技术部' },
           { label: '产品部', value: '产品部' },
@@ -97,7 +77,8 @@ export default function Demo() {
           { label: '市场部', value: '市场部' },
           { label: '运营部', value: '运营部' },
         ],
-      },
+        rules: [{ required: true, message: '部门必填' }],
+      } as EditableConfig,
     },
   ];
 
@@ -118,15 +99,18 @@ export default function Demo() {
   return (
     <div>
       <p style={{ marginBottom: 12, color: '#666' }}>
-        点击单元格可直接编辑。点击「校验」按钮会校验所有数据，错误行会自动滚动定位，鼠标聚焦错误单元格会弹出 Popover 提示。
+        点击单元格可直接编辑。点击「校验」按钮会校验所有数据，错误行会自动滚动定位，鼠标聚焦错误单元格会弹出
+        Popover 提示。
       </p>
       <Space style={{ marginBottom: 12 }}>
-        <Button type="primary" onClick={handleValidate}>校验全部</Button>
+        <Button type="primary" onClick={handleValidate}>
+          校验全部
+        </Button>
         <Button onClick={handleReset}>重置</Button>
       </Space>
       <Table<RecordType>
         ref={tableRef}
-        columns={columns as any}
+        columns={columns}
         dataSource={data}
         rowKey="key"
         editable

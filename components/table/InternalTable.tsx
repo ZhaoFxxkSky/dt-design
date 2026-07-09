@@ -1,35 +1,6 @@
 import * as React from 'react';
 import { INTERNAL_HOOKS } from './constant';
 import { convertChildrenToColumns } from './features/columns/useColumns';
-import type { Reference as RcReference } from './interface';
-import type { TableProps as RcTableProps } from './components/RcTable';
-import { omit, pickAttrs } from '../_util/rcUtil';
-import { clsx } from 'clsx';
-
-import { useProxyImperativeHandle } from '../_util/hooks/useProxyImperativeHandle';
-import { isFunction, isNumber, isPlainObject } from '../_util/is';
-import type { Breakpoint } from '../_util/hooks/useBreakpoint';
-import scrollTo from '../_util/scrollTo';
-import type { AnyObject } from '../_util/type';
-import { devUseWarning } from '../_util/warning';
-import type { SizeType } from '../_util/type';
-import { useBreakpoint } from '../_util/hooks/useBreakpoint';
-import useCssVar from '../_util/hooks/useCssVar';
-import Pagination from 'antd/es/pagination';
-import type { SpinProps } from 'antd/es/spin';
-import Spin from 'antd/es/spin';
-import { ConfigContext, globalConfig } from 'antd/es/config-provider';
-import renderExpandIcon from './components/ExpandIcon';
-import useContainerWidth from './shared/hooks/useContainerWidth';
-import useFilledColumns from './features/columns/useFilledColumns';
-import type { FilterConfig, FilterState } from './features/filter/useFilter';
-import useFilter, { getFilterData } from './features/filter/useFilter';
-import useLazyKVMap from './shared/hooks/useLazyKVMap';
-import usePagination, { DEFAULT_PAGE_SIZE, getPaginationParam } from './features/pagination/usePagination';
-import useSelection from './features/selection/useSelection';
-import type { SortState } from './features/sort/useSorter';
-import useSorter, { getSortData } from './features/sort/useSorter';
-import useTitleColumns from './features/columns/useTitleColumns';
 import type {
   ColumnsType,
   ColumnTitleProps,
@@ -39,6 +10,7 @@ import type {
   FilterValue,
   GetPopupContainer,
   GetRowKey,
+  Reference as RcReference,
   RefInternalTable,
   SorterResult,
   SorterTooltipProps,
@@ -51,12 +23,48 @@ import type {
   TablePaginationPosition,
   TableRowSelection,
 } from './interface';
+import type { TableProps as RcTableProps } from './components/RcTable';
+import { omit, pickAttrs } from '../_util/rcUtil';
+import { clsx } from 'clsx';
+
+import { useProxyImperativeHandle } from '../_util/hooks/useProxyImperativeHandle';
+import { isFunction, isNumber, isPlainObject } from '../_util/is';
+import type { Breakpoint } from '../_util/hooks/useBreakpoint';
+import scrollTo from '../_util/scrollTo';
+import type { AnyObject, SizeType } from '../_util/type';
+import { devUseWarning } from '../_util/warning';
+
+import { useBreakpoint } from '../_util/hooks/useBreakpoint';
+import useCssVar from '../_util/hooks/useCssVar';
+import Pagination from 'antd/es/pagination';
+import type { SpinProps } from 'antd/es/spin';
+import Spin from 'antd/es/spin';
+import { ConfigContext, globalConfig } from 'antd/es/config-provider';
+import renderExpandIcon from './components/ExpandIcon';
+import useContainerWidth from './shared/hooks/useContainerWidth';
+import useFilledColumns from './features/columns/useFilledColumns';
+import type { FilterConfig, FilterState } from './features/filter/useFilter';
+import useFilter, { getFilterData } from './features/filter/useFilter';
+import useLazyKVMap from './shared/hooks/useLazyKVMap';
+import usePagination, {
+  DEFAULT_PAGE_SIZE,
+  getPaginationParam,
+} from './features/pagination/usePagination';
+import useSelection from './features/selection/useSelection';
+import type { SortState } from './features/sort/useSorter';
+import useSorter, { getSortData } from './features/sort/useSorter';
+import useTitleColumns from './features/columns/useTitleColumns';
+
 import RcTable from './components/RcTable';
 import RcVirtualTable from './components/VirtualTable';
 import DefaultRenderEmpty from 'antd/es/config-provider/defaultRenderEmpty';
-import { useResize } from './features/resize';
-import ResizeContext from './features/resize/ResizeContext';
-import { useEditable, EditableCell, EditableContext } from './features/editable';
+import { transformResizableColumns, useResize } from './features/resize';
+import {
+  EditableCell,
+  EditableContext,
+  parseEditableConfig,
+  useEditable,
+} from './features/editable';
 import type { EditableValidateResult } from './features/editable';
 
 export type { ColumnsType, TablePaginationConfig };
@@ -214,51 +222,20 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     return baseColumns.filter((c) => !c.responsive || c.responsive.some((r) => matched.has(r)));
   }, [baseColumns, screens]);
 
-  // ========================= Column Resize =========================
+  // ========================= Column Resize (hasResizableColumns check only) =========================
   const hasResizableColumns = React.useMemo(
-    () => resizable || mergedColumns.some((col: any) => col?.resize?.resizable),
+    () => resizable || mergedColumns.some((col: any) => col?.resizable === true),
     [resizable, mergedColumns],
   );
 
-  const resizeResult = useResize({
-    columns: mergedColumns as ColumnsType,
-    enabled: resizable,
-    onColumnResize: onColumnResizeProp,
-  });
-
-  // 用 resize 后的宽度覆盖列的 width
-  const finalColumns = React.useMemo(() => {
-    if (!hasResizableColumns) return mergedColumns;
-    return mergedColumns.map(col => {
-      const width = resizeResult.getColumnWidth(col as ColumnType);
-      return width != null ? { ...col, width } : col;
-    });
-  }, [mergedColumns, hasResizableColumns, resizeResult.columnWidths, resizeResult.resizingKey, resizeResult.draggingWidth]);
-
-  const resizeContextValue = React.useMemo(
-    () =>
-      hasResizableColumns
-        ? {
-            resizingKey: resizeResult.resizingKey,
-            draggingWidth: resizeResult.draggingWidth,
-            getColumnWidth: resizeResult.getColumnWidth,
-            isColumnResizable: resizeResult.isColumnResizable,
-            onStartResize: resizeResult.onStartResize,
-          }
-        : null,
-    [
-      hasResizableColumns,
-      resizeResult.resizingKey,
-      resizeResult.draggingWidth,
-      resizeResult.getColumnWidth,
-      resizeResult.isColumnResizable,
-      resizeResult.onStartResize,
-    ],
-  );
-
-  // ========================= Editable (moved below after getRowKey/tblRef) =========================
+  // ========================= Editable =========================
   const hasEditableColumns = React.useMemo(
-    () => editableEnabled || mergedColumns.some((col: any) => col?.editable?.editable),
+    () =>
+      editableEnabled ||
+      mergedColumns.some((col: any) => {
+        const ed = col?.editable;
+        return ed === true || (ed && typeof ed === 'object' && (ed as any).type);
+      }),
     [editableEnabled, mergedColumns],
   );
 
@@ -267,6 +244,11 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     'style',
     'column',
     'columns',
+    'resizable',
+    'onColumnResize',
+    'editable',
+    'onEditableChange',
+    'onValidate',
   ]);
 
   const components = tableProps.components as RcTableProps<RecordType>['components'];
@@ -279,11 +261,23 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     }),
     [ariaProps, components?.header?.table],
   );
-  const mergedComponents = React.useMemo<RcTableProps<RecordType>['components']>(() => {
-    if (!hasAriaProps) {
-      return components;
-    }
+  const prefixCls = globalConfig().getPrefixCls('table', customizePrefixCls);
 
+  // ============================= Refs =============================
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const tblRef = React.useRef<RcReference>(null);
+
+  // ========================= Column Resize (hook needs rootRef) =========================
+  const resizeResult = useResize({
+    columns: mergedColumns as ColumnsType,
+    enabled: resizable,
+    containerRef: rootRef,
+    onColumnResize: onColumnResizeProp,
+    prefixCls,
+  });
+
+  const mergedComponents = React.useMemo<RcTableProps<RecordType>['components']>(() => {
+    if (!hasAriaProps) return components;
     return {
       ...components,
       header: {
@@ -294,9 +288,11 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   }, [components, hasAriaProps]);
 
   // Use antd@4 ConfigContext for locale and renderEmpty
-  const { locale: contextLocale, renderEmpty, getPopupContainer: getContextPopupContainer } =
-    React.useContext(ConfigContext) as any;
-
+  const {
+    locale: contextLocale,
+    renderEmpty,
+    getPopupContainer: getContextPopupContainer,
+  } = React.useContext(ConfigContext) as any;
 
   const tableLocale: TableLocale = {
     filterTitle: 'Filter',
@@ -322,7 +318,6 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
 
   const rawData: readonly RecordType[] = dataSource || EMPTY_LIST;
 
-  const prefixCls = globalConfig().getPrefixCls('table', customizePrefixCls);
   const dropdownPrefixCls = globalConfig().getPrefixCls('dropdown', customizeDropdownPrefixCls);
 
   const mergedRowSelection = React.useMemo(() => {
@@ -357,13 +352,19 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   // ============================ Width =============================
   const getContainerWidth = useContainerWidth(prefixCls);
 
-  // ============================= Refs =============================
-  const rootRef = React.useRef<HTMLDivElement>(null);
-  const tblRef = React.useRef<RcReference>(null);
+  // 用 resize 后的渲染宽度覆盖列的 width
+  // renderWidth = column.width + 容器剩余空间分配到最后一列（撑满容器，不留空）
+  const finalColumns = React.useMemo(() => {
+    if (!hasResizableColumns) return mergedColumns;
+    return mergedColumns.map((col) => {
+      const width = resizeResult.getColumnRenderWidth(col as ColumnType);
+      return width != null ? { ...col, width } : col;
+    });
+  }, [mergedColumns, hasResizableColumns, resizeResult.renderWidths]);
 
   // 用于暴露 validate / resetErrors 的 ref
   const editableMethodsRef = React.useRef<{
-    validate: () => import('./features/editable').EditableValidateResult;
+    validate: () => EditableValidateResult;
     resetErrors: () => void;
   } | null>(null);
 
@@ -378,7 +379,14 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   const rowKey = customizeRowKey || 'key';
 
   // ============================ Scroll ============================
-  const mergedScroll = scroll;
+  // 当 resize 启用且容器宽度已测量时，用 scrollX（= renderWidths 总和）覆盖 scroll.x
+  // 确保 table 宽度 = 列宽总和，避免不匹配导致的滚动条问题
+  const mergedScroll = React.useMemo(() => {
+    if (hasResizableColumns && resizeResult.scrollX != null) {
+      return { ...scroll, x: resizeResult.scrollX };
+    }
+    return scroll;
+  }, [scroll, hasResizableColumns, resizeResult.scrollX]);
 
   if (process.env.NODE_ENV !== 'production') {
     warning(
@@ -424,19 +432,12 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     (cols: ColumnsType<RecordType>): ColumnsType<RecordType> => {
       if (!hasEditableColumns) return cols;
       return cols.map((col: any) => {
-        const editableCfg = col.editable;
-        if (!editableCfg || (!editableCfg.editable && !editableEnabled)) return col;
-
-        const originalRender = col.render;
-        const mergedEditableCfg = {
-          ...editableCfg,
-          editable: editableCfg.editable ?? editableEnabled,
-        };
+        const parsed = parseEditableConfig(col.editable, editableEnabled);
+        if (!parsed.enabled) return col;
 
         return {
           ...col,
           render: (value: any, record: any, index: number) => {
-            const displayNode = originalRender ? originalRender(value, record, index) : value;
             return (
               <EditableCell
                 dataIndex={col.dataIndex}
@@ -444,11 +445,9 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
                 rowIndex={index}
                 record={record}
                 value={value}
-                editableConfig={mergedEditableCfg}
+                editableConfig={parsed.config || {}}
                 prefixCls={prefixCls}
-              >
-                {displayNode as React.ReactNode}
-              </EditableCell>
+              />
             );
           },
         };
@@ -660,15 +659,33 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
 
   // ============================ Render ============================
   const transformColumns = React.useCallback(
-    (innerColumns: ColumnsType<RecordType>): ColumnsType<RecordType> =>
-      transformTitleColumns(
+    (innerColumns: ColumnsType<RecordType>): ColumnsType<RecordType> => {
+      let result = transformTitleColumns(
         transformSelectionColumns(
-          transformFilterColumns(
-            transformSorterColumns(transformEditableColumns(innerColumns)),
-          ),
+          transformFilterColumns(transformSorterColumns(transformEditableColumns(innerColumns))),
         ),
-      ),
-    [transformSorterColumns, transformFilterColumns, transformSelectionColumns, transformEditableColumns],
+      );
+      // 在 transformColumns 链末端注入 resize（resize 依赖最终列结构）
+      if (hasResizableColumns) {
+        result = transformResizableColumns(result, {
+          prefixCls,
+          enabled: hasResizableColumns,
+          isColumnResizable: resizeResult.isColumnResizable,
+          onStartResize: resizeResult.onStartResize,
+        });
+      }
+      return result;
+    },
+    [
+      transformSorterColumns,
+      transformFilterColumns,
+      transformSelectionColumns,
+      transformEditableColumns,
+      hasResizableColumns,
+      prefixCls,
+      resizeResult.isColumnResizable,
+      resizeResult.onStartResize,
+    ],
   );
 
   let topPaginationNode: React.ReactNode;
@@ -678,7 +695,8 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     if (mergedPagination.size) {
       paginationSize = mergedPagination.size;
     } else {
-      paginationSize = customizeSize === 'small' || customizeSize === 'middle' ? 'small' : undefined;
+      paginationSize =
+        customizeSize === 'small' || customizeSize === 'middle' ? 'small' : undefined;
     }
 
     const renderPagination = (placement: 'start' | 'end' | 'center' = 'end') => (
@@ -741,6 +759,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
       [`${prefixCls}-wrapper-rtl`]: false,
       [`${prefixCls}-middle`]: customizeSize === 'middle',
       [`${prefixCls}-small`]: customizeSize === 'small',
+      [`${prefixCls}-wrapper-resizing`]: resizeResult.resizingKey != null,
     },
     className,
     rootClassName,
@@ -760,7 +779,6 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     }
     return renderEmpty?.('Table') || <DefaultRenderEmpty componentName="Table" />;
   }, [spinProps?.spinning, rawData, locale?.emptyText, renderEmpty]);
-
 
   // ========================== Render ==========================
   const TableComponent = virtual ? RcVirtualTable : RcTable;
@@ -787,44 +805,46 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     virtualProps.listItemHeight = listItemHeight;
   }
 
+  // ========================== Resize Line ==========================
+  // 竖线 DOM 通过 ref 直接操作，不需要 React state 驱动
+
   return (
     <div ref={rootRef} className={wrappercls} style={style}>
+      {hasResizableColumns && (
+        <div ref={resizeResult.lineRef} className={`${prefixCls}-resize-line`} />
+      )}
       <Spin spinning={false} {...spinProps}>
         {topPaginationNode}
-        <ResizeContext.Provider value={resizeContextValue}>
-          <EditableContext.Provider value={hasEditableColumns ? editableResult.contextValue : null}>
-            <HeaderTableContext.Provider value={headerTableContext}>
-              <TableComponent
-                {...virtualProps}
-                {...tableProps}
-                components={mergedComponents}
-                scroll={mergedScroll}
-                ref={tblRef}
-                columns={finalColumns as RcTableProps<RecordType>['columns']}
-                direction={'ltr'}
-                expandable={mergedExpandable}
-                prefixCls={prefixCls}
-                className={clsx(
-                  {
-                    [`${prefixCls}-middle`]: customizeSize === 'middle',
-                    [`${prefixCls}-small`]: customizeSize === 'small',
-                    [`${prefixCls}-bordered`]: bordered,
-                    [`${prefixCls}-empty`]: rawData.length === 0,
-                  },
-                )}
-                data={pageData}
-                rowKey={getRowKey}
-                rowClassName={internalRowClassName}
-                emptyText={mergedEmptyNode}
-                // Internal
-                internalHooks={INTERNAL_HOOKS}
-                internalRefs={internalRef}
-                transformColumns={transformColumns as any}
-                getContainerWidth={getContainerWidth}
-              />
-            </HeaderTableContext.Provider>
-          </EditableContext.Provider>
-        </ResizeContext.Provider>
+        <EditableContext.Provider value={hasEditableColumns ? editableResult.contextValue : null}>
+          <HeaderTableContext.Provider value={headerTableContext}>
+            <TableComponent
+              {...virtualProps}
+              {...tableProps}
+              components={mergedComponents}
+              scroll={mergedScroll}
+              ref={tblRef}
+              columns={finalColumns as RcTableProps<RecordType>['columns']}
+              direction={'ltr'}
+              expandable={mergedExpandable}
+              prefixCls={prefixCls}
+              className={clsx({
+                [`${prefixCls}-middle`]: customizeSize === 'middle',
+                [`${prefixCls}-small`]: customizeSize === 'small',
+                [`${prefixCls}-bordered`]: bordered,
+                [`${prefixCls}-empty`]: rawData.length === 0,
+              })}
+              data={pageData}
+              rowKey={getRowKey}
+              rowClassName={internalRowClassName}
+              emptyText={mergedEmptyNode}
+              // Internal
+              internalHooks={INTERNAL_HOOKS}
+              internalRefs={internalRef}
+              transformColumns={transformColumns as any}
+              getContainerWidth={getContainerWidth}
+            />
+          </HeaderTableContext.Provider>
+        </EditableContext.Provider>
         {bottomPaginationNode}
       </Spin>
     </div>

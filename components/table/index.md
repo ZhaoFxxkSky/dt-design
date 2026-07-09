@@ -91,6 +91,14 @@ demo:
 
 <code src="./demos/resize.tsx" description="通过 `resizable` 属性和 `column.resize` 配置实现表头拖拽改变列宽。鼠标悬停到列右边框高亮，拖拽时显示竖线指示器，松开后改变宽度。">拖拽调整列宽</code>
 
+<code src="./demos/resize-flex.tsx" description="列宽之和小于容器宽度时，剩余空间按比例平分给所有弹性列。拖拽后该列变固定列，剩余空间在未拖拽列间重新分配。">弹性列分配</code>
+
+<code src="./demos/resize-bounds.tsx" description="minWidth / maxWidth 限制、部分列不可拖拽、onResize / onColumnResize 回调日志。">拖拽边界与回调</code>
+
+<code src="./demos/resize-fixed.tsx" description="固定列（fixed: left / right）同样支持拖拽，竖线限定在表格容器范围内。">固定列拖拽</code>
+
+<code src="./demos/resize-virtual.tsx" description="1000 行数据下虚拟滚动 / 普通模式切换，验证拖拽在两种模式下的表现和性能。">虚拟滚动拖拽</code>
+
 ## 可编辑单元格
 
 <code src="./demos/editable.tsx" description="通过 `editable` 属性和 `column.editable` 配置实现可编辑单元格，支持校验规则、Popover 错误提示、自动滚动到错误行。">可编辑与校验</code>
@@ -164,7 +172,11 @@ demo:
 | onCell | 设置单元格属性 | `(record, index) => HTMLAttributes` | - |
 | onHeaderCell | 设置头部单元格属性 | `(column) => HTMLAttributes` | - |
 | resize | 列宽拖拽配置 | `{ resizable?: boolean; minWidth?: number; maxWidth?: number }` | - |
-| editable | 可编辑配置 | `{ editable?: boolean; required?: boolean; rules?: Rule[]; editor?: string; editorProps?: any; options?: Option[] }` | - |
+| resizable | 是否可拖拽调整列宽，覆盖 Table.resizable | `boolean` | - |
+| minWidth | 最小列宽（拖拽限制） | `number` | `60` |
+| maxWidth | 最大列宽（拖拽限制） | `number` | - |
+| onResize | 列宽变化回调 | `(width: number) => void` | - |
+| editable | 可编辑配置，可为 `boolean` 或详细配置对象 | `boolean \| EditableConfig` | - |
 
 ### ExpandableConfig
 
@@ -203,9 +215,9 @@ demo:
 
 ### TableSticky
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| offsetHeader | 距离顶部多少距离时触发吸顶 | `number` | `0` |
-| offsetScroll | 距离底部多少距离时触发吸底 | `number` | `0` |
-| offsetSummary | 距离顶部多少距离时触发 summary 吸顶 | `number` | `0` |
-| getContainer | 获取吸顶容器 | `() => HTMLElement` | - |
+| 参数          | 说明                                | 类型                | 默认值 |
+| ------------- | ----------------------------------- | ------------------- | ------ |
+| offsetHeader  | 距离顶部多少距离时触发吸顶          | `number`            | `0`    |
+| offsetScroll  | 距离底部多少距离时触发吸底          | `number`            | `0`    |
+| offsetSummary | 距离顶部多少距离时触发 summary 吸顶 | `number`            | `0`    |
+| getContainer  | 获取吸顶容器                        | `() => HTMLElement` | -      |
