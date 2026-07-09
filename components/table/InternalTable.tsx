@@ -777,7 +777,8 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     if (typeof locale?.emptyText !== 'undefined') {
       return locale.emptyText;
     }
-    return renderEmpty?.('Table' as any) || <DefaultRenderEmpty componentName="Table" />;
+    const emptyNode = renderEmpty?.('Table' as any) || DefaultRenderEmpty('Table');
+    return emptyNode as RcTableProps['emptyText'];
   }, [spinProps?.spinning, rawData, locale?.emptyText, renderEmpty]);
 
   // ========================== Render ==========================
