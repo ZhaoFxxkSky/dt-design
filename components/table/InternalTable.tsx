@@ -422,7 +422,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   // 暴露 validate / resetErrors 到 ref
   editableMethodsRef.current = hasEditableColumns
     ? {
-        validate: () => editableResult.validateAll(rawData as any[], getRowKey as any),
+        validate: () => editableResult.validateAll(rawData as any[]),
         resetErrors: editableResult.resetErrors,
       }
     : null;
@@ -777,7 +777,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     if (typeof locale?.emptyText !== 'undefined') {
       return locale.emptyText;
     }
-    return renderEmpty?.('Table') || <DefaultRenderEmpty componentName="Table" />;
+    return renderEmpty?.('Table' as any) || <DefaultRenderEmpty componentName="Table" />;
   }, [spinProps?.spinning, rawData, locale?.emptyText, renderEmpty]);
 
   // ========================== Render ==========================

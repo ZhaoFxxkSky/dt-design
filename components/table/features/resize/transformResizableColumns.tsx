@@ -28,9 +28,9 @@ function transformResizableColumns<RecordType = any>(
       }
 
       const leafCol = col as ColumnType<RecordType>;
-      if (!isColumnResizable(leafCol)) return col;
+      if (!isColumnResizable(leafCol as ColumnType)) return col;
 
-      const originTitle = leafCol.title;
+      const originTitle = leafCol.title as React.ReactNode;
       const title = (
         <>
           {originTitle}
