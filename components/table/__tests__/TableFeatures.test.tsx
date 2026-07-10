@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { Table } from '../index';
 import type { ColumnsType } from '../index';
@@ -585,6 +585,7 @@ describe('TableFeatures — Editable', () => {
 
     const input = container.querySelector('input') as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'Updated Name' } });
+    fireEvent.blur(input);
 
     expect(onEditableChange).toHaveBeenCalled();
     const newData = onEditableChange.mock.calls[0][0];

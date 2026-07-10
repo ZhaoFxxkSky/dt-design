@@ -7,7 +7,7 @@ function parseColWidth(totalWidth: number, width: string | number = '') {
   }
 
   if (width.endsWith('%')) {
-    return (totalWidth * parseFloat(width)) / 100;
+    return (totalWidth * Number.parseFloat(width)) / 100;
   }
   return null;
 }

@@ -9,16 +9,6 @@
   position: relative;
 }
 
-.@{table-prefix-cls}-editable-cell-trigger {
-  width: 100%;
-  display: flex;
-  align-items: center;
-
-  &:focus {
-    outline: none;
-  }
-}
-
 .@{table-prefix-cls}-editable-cell-error {
   .ant-input,
   .ant-input-number,
@@ -28,6 +18,7 @@
   }
 }
 
+// Popover 挂载到表格滚动容器内，随表格滚动
 .@{table-prefix-cls}-editable-error-popover {
   .ant-popover-inner {
     background: #fff;

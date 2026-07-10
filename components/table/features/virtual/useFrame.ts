@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export type Updater<State> = (prev: State) => State;
 
@@ -17,6 +17,7 @@ export function useLayoutState<State>(
   function setFrameState(updater: Updater<State>) {
     updateBatchRef.current.push(updater);
 
+    // eslint-disable-next-line compat/compat
     const promise = Promise.resolve();
     lastPromiseRef.current = promise;
 
@@ -26,7 +27,7 @@ export function useLayoutState<State>(
         const prevState = stateRef.current;
         updateBatchRef.current = [];
 
-        prevBatch.forEach(batchUpdater => {
+        prevBatch.forEach((batchUpdater) => {
           stateRef.current = batchUpdater(stateRef.current);
         });
 

@@ -1,8 +1,10 @@
 import { useContext } from '../../../_util/context';
-import VirtualList, { type ListProps, type ListRef } from 'rc-virtual-list';
+import VirtualList from 'rc-virtual-list';
+import type { ListProps, ListRef } from 'rc-virtual-list';
 import * as React from 'react';
 import TableContext, { responseImmutable } from '../../shared/context/TableContext';
-import useFlattenRecords, { type FlattenData } from '../../features/virtual/useFlattenRecords';
+import useFlattenRecords from '../../features/virtual/useFlattenRecords';
+import type { FlattenData } from '../../features/virtual/useFlattenRecords';
 import type {
   ColumnType,
   OnCustomizeScroll,
@@ -77,7 +79,7 @@ const Grid = React.forwardRef<GridRef, GridProps>((props, ref) => {
   }, [flattenColumns]);
 
   const columnsOffset = React.useMemo<number[]>(
-    () => columnsWidth.map(colWidth => colWidth[2]),
+    () => columnsWidth.map((colWidth) => colWidth[2]),
     [columnsWidth],
   );
 
@@ -140,7 +142,7 @@ const Grid = React.forwardRef<GridRef, GridProps>((props, ref) => {
     return 1;
   };
 
-  const extraRender: ListProps<any>['extraRender'] = info => {
+  const extraRender: ListProps<any>['extraRender'] = (info) => {
     const { start, end, getSize, offsetY } = info;
 
     // Do nothing if no data
@@ -151,12 +153,12 @@ const Grid = React.forwardRef<GridRef, GridProps>((props, ref) => {
     // Find first rowSpan column
     let firstRowSpanColumns = flattenColumns.filter(
       // rowSpan is 0
-      column => getRowSpan(column, start) === 0,
+      (column) => getRowSpan(column, start) === 0,
     );
 
     let startIndex = start;
     for (let i = start; i >= 0; i -= 1) {
-      firstRowSpanColumns = firstRowSpanColumns.filter(column => getRowSpan(column, i) === 0);
+      firstRowSpanColumns = firstRowSpanColumns.filter((column) => getRowSpan(column, i) === 0);
 
       if (!firstRowSpanColumns.length) {
         startIndex = i;
@@ -167,12 +169,12 @@ const Grid = React.forwardRef<GridRef, GridProps>((props, ref) => {
     // Find last rowSpan column
     let lastRowSpanColumns = flattenColumns.filter(
       // rowSpan is not 1
-      column => getRowSpan(column, end) !== 1,
+      (column) => getRowSpan(column, end) !== 1,
     );
 
     let endIndex = end;
     for (let i = end; i < flattenData.length; i += 1) {
-      lastRowSpanColumns = lastRowSpanColumns.filter(column => getRowSpan(column, i) !== 1);
+      lastRowSpanColumns = lastRowSpanColumns.filter((column) => getRowSpan(column, i) !== 1);
 
       if (!lastRowSpanColumns.length) {
         endIndex = Math.max(i - 1, end);
@@ -191,13 +193,13 @@ const Grid = React.forwardRef<GridRef, GridProps>((props, ref) => {
         continue;
       }
 
-      if (flattenColumns.some(column => getRowSpan(column, i) > 1)) {
+      if (flattenColumns.some((column) => getRowSpan(column, i) > 1)) {
         spanLines.push(i);
       }
     }
 
     // Patch extra line on the page
-    const nodes = spanLines.map<React.ReactElement<any>>(index => {
+    const nodes = spanLines.map<React.ReactElement<any>>((index) => {
       const item = flattenData[index];
 
       const rowKey = getRowKey(item.record, index);
@@ -272,7 +274,7 @@ const Grid = React.forwardRef<GridRef, GridProps>((props, ref) => {
         height={scrollY}
         itemHeight={listItemHeight || 24}
         data={flattenData}
-        itemKey={item => getRowKey(item.record)}
+        itemKey={(item) => getRowKey(item.record)}
         component={wrapperComponent}
         scrollWidth={scrollX as number}
         direction={direction}

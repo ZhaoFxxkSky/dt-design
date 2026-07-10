@@ -109,7 +109,7 @@ export function getCellProps<RecordType>(
     key,
     fixedInfo,
     appendCellNode,
-    additionalCellProps: additionalCellProps,
+    additionalCellProps,
   };
 }
 

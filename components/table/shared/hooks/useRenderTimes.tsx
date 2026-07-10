@@ -9,7 +9,7 @@ function useRenderTimes<T extends object>(props?: T, debug?: string) {
   // Props changed
   const propsRef = React.useRef(props);
   const keys: string[] = [];
-  Object.keys(props || {}).map(key => {
+  Object.keys(props || {}).forEach((key) => {
     const nextProps = props as Record<string, any>;
     const prevProps = propsRef.current as Record<string, any>;
     if (nextProps?.[key] !== prevProps?.[key]) {
@@ -28,7 +28,7 @@ function useRenderTimes<T extends object>(props?: T, debug?: string) {
   React.useDebugValue(keysRef.current.join(', '));
 
   if (debug) {
-    console.log(`${debug}:`, timesRef.current, keysRef.current);
+    console.warn(`${debug}:`, timesRef.current, keysRef.current);
   }
 
   return timesRef.current;

@@ -6,7 +6,8 @@ import * as React from 'react';
 import { INTERNAL_HOOKS } from '../../constant';
 import { makeImmutable } from '../../shared/context/TableContext';
 import type { CustomizeScrollBody, GetComponent, Reference } from '../../interface';
-import Table, { DEFAULT_PREFIX, type CompareProps, type TableProps } from '../RcTable';
+import Table, { DEFAULT_PREFIX } from '../RcTable';
+import type { CompareProps, TableProps } from '../RcTable';
 import Grid from './BodyGrid';
 import { StaticContext } from './context';
 

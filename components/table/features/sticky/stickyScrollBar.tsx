@@ -105,12 +105,12 @@ const StickyScrollBar: React.ForwardRefRenderFunction<unknown, StickyScrollBarPr
         tableBottomOffset - getScrollBarSize() <= currentClientOffset ||
         tableOffsetTop >= currentClientOffset - offsetScroll
       ) {
-        setScrollState(state => ({
+        setScrollState((state) => ({
           ...state,
           isHiddenScrollBar: true,
         }));
       } else {
-        setScrollState(state => ({
+        setScrollState((state) => ({
           ...state,
           isHiddenScrollBar: false,
         }));
@@ -119,7 +119,7 @@ const StickyScrollBar: React.ForwardRefRenderFunction<unknown, StickyScrollBarPr
   };
 
   const setScrollLeft = (left: number) => {
-    setScrollState(state => {
+    setScrollState((state) => {
       return {
         ...state,
         scrollLeft: (left / bodyScrollWidth) * bodyWidth || 0,
@@ -151,14 +151,14 @@ const StickyScrollBar: React.ForwardRefRenderFunction<unknown, StickyScrollBarPr
         scrollParents.push(parent);
         parent = parent.parentElement;
       }
-      scrollParents.forEach(p => {
+      scrollParents.forEach((p) => {
         p.addEventListener(SCROLL_EVENT, checkScrollBarVisible, false);
       });
       window.addEventListener(RESIZE_EVENT, checkScrollBarVisible, false);
       window.addEventListener(SCROLL_EVENT, checkScrollBarVisible, false);
       container.addEventListener(SCROLL_EVENT, checkScrollBarVisible, false);
       return () => {
-        scrollParents.forEach(p => {
+        scrollParents.forEach((p) => {
           p.removeEventListener(SCROLL_EVENT, checkScrollBarVisible);
         });
         window.removeEventListener(RESIZE_EVENT, checkScrollBarVisible);
@@ -170,7 +170,7 @@ const StickyScrollBar: React.ForwardRefRenderFunction<unknown, StickyScrollBarPr
 
   React.useEffect(() => {
     if (!scrollState.isHiddenScrollBar) {
-      setScrollState(state => {
+      setScrollState((state) => {
         const bodyNode = scrollBodyRef.current;
         if (!bodyNode) {
           return state;
@@ -181,7 +181,6 @@ const StickyScrollBar: React.ForwardRefRenderFunction<unknown, StickyScrollBarPr
         };
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scrollState.isHiddenScrollBar]);
 
   if (bodyScrollWidth <= bodyWidth || !scrollBarWidth || scrollState.isHiddenScrollBar) {

@@ -95,6 +95,10 @@ demo:
 
 <code src="./demos/editable.tsx" description="通过 `editable` 属性和 `column.editable` 配置实现可编辑单元格，支持校验规则、Popover 错误提示、自动滚动到错误行。">可编辑与校验</code>
 
+<code src="./demos/editable-row.tsx" description="行级编辑模式，点击编辑→修改→保存/取消，支持数据回退、计算列、行新增/删除。">行级编辑模式</code>
+
+<code src="./demos/batch-edit.tsx" description="勾选多行后批量编辑，支持三种规则：固定值填充、查找替换、序列生成。含分页+编辑、效果预览。">批量编辑 + 分页</code>
+
 ## API
 
 ### Table
@@ -213,3 +217,38 @@ demo:
 | offsetScroll  | 距离底部多少距离时触发吸底          | `number`            | `0`    |
 | offsetSummary | 距离顶部多少距离时触发 summary 吸顶 | `number`            | `0`    |
 | getContainer  | 获取吸顶容器                        | `() => HTMLElement` | -      |
+
+### EditableConfig
+
+可编辑列配置。
+
+| 参数 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| type | 编辑器类型 | `'input' \| 'number' \| 'select' \| 'custom'` | `'input'` |
+| options | Select 选项 | `{ label: ReactNode; value: any }[]` | - |
+| renderEditor | 自定义编辑器渲染函数 | `(value, record, index, onChange) => ReactNode` | - |
+| rules | 校验规则 | `EditableRule[]` | - |
+| onChange | 单元格值变化回调 | `(value, record, index) => void` | - |
+| onSave | 保存回调（失焦时触发） | `(value, record, index) => void` | - |
+
+### BatchEditModal
+
+批量编辑弹窗组件，配合 `rowSelection` 使用。
+
+| 参数            | 说明              | 类型                           | 默认值 |
+| --------------- | ----------------- | ------------------------------ | ------ |
+| open            | 是否打开          | `boolean`                      | -      |
+| columns         | 列配置            | `ColumnsType`                  | -      |
+| selectedRowKeys | 选中行的 key 集合 | `React.Key[]`                  | -      |
+| data            | 完整数据          | `any[]`                        | -      |
+| getRowKey       | 行 key 获取函数   | `(record, index) => React.Key` | -      |
+| onCancel        | 取消回调          | `() => void`                   | -      |
+| onApply         | 确认应用回调      | `(newData: any[]) => void`     | -      |
+
+#### 批量编辑规则类型
+
+| 类型       | 说明       | 适用字段      |
+| ---------- | ---------- | ------------- |
+| `value`    | 固定值填充 | 所有字段      |
+| `replace`  | 查找替换   | 所有字段      |
+| `sequence` | 序列生成   | 文本/数字字段 |

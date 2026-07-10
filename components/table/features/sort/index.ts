@@ -1,1 +1,1 @@
-export { default as useSorter, getSortData } from './useSorter';
+export { getSortData, default as useSorter } from './useSorter';

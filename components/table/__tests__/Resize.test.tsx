@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { Table } from '../index';
-import type { ColumnsType, ColumnType } from '../interface';
+import type { ColumnsType } from '../interface';
 
 // ============================================================
 // Helpers & Mocks
@@ -565,9 +565,9 @@ describe('Resize — Flex Distribution', () => {
     expect(widths[1]).toContain('width');
     expect(widths[2]).toContain('width');
     // Total should equal containerWidth
-    const w0 = parseInt(widths[0]!.match(/(\d+)px/)?.[1] || '0', 10);
-    const w1 = parseInt(widths[1]!.match(/(\d+)px/)?.[1] || '0', 10);
-    const w2 = parseInt(widths[2]!.match(/(\d+)px/)?.[1] || '0', 10);
+    const w0 = Number.parseInt(widths[0]!.match(/(\d+)px/)?.[1] || '0', 10);
+    const w1 = Number.parseInt(widths[1]!.match(/(\d+)px/)?.[1] || '0', 10);
+    const w2 = Number.parseInt(widths[2]!.match(/(\d+)px/)?.[1] || '0', 10);
     expect(w0 + w1 + w2).toBe(1000);
   });
 
@@ -597,7 +597,7 @@ describe('Resize — Flex Distribution', () => {
     const colgroup = container.querySelectorAll('colgroup col');
     const widths = Array.from(colgroup).map((col) => {
       const style = col.getAttribute('style') || '';
-      return parseInt(style.match(/(\d+)px/)?.[1] || '0', 10);
+      return Number.parseInt(style.match(/(\d+)px/)?.[1] || '0', 10);
     });
     expect(widths[0]).toBe(250); // Column A is fixed at 250
     expect(widths[0] + widths[1] + widths[2]).toBe(1000);
@@ -622,7 +622,7 @@ describe('Resize — Flex Distribution', () => {
     const colgroup = container.querySelectorAll('colgroup col');
     const widths = Array.from(colgroup).map((col) => {
       const style = col.getAttribute('style') || '';
-      return parseInt(style.match(/(\d+)px/)?.[1] || '0', 10);
+      return Number.parseInt(style.match(/(\d+)px/)?.[1] || '0', 10);
     });
     expect(widths[0]).toBe(250);
     expect(widths[1]).toBe(170);

@@ -13,7 +13,8 @@ import Button from 'antd/es/button';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import Checkbox from 'antd/es/checkbox';
 import { ConfigContext } from 'antd/es/config-provider';
-import Dropdown, { DropdownProps } from 'antd/es/dropdown';
+import type { DropdownProps } from 'antd/es/dropdown';
+import Dropdown from 'antd/es/dropdown';
 import Empty from 'antd/es/empty';
 import type { MenuProps } from 'antd/es/menu';
 import Menu from 'antd/es/menu';
@@ -202,17 +203,10 @@ const FilterDropdown = <RecordType extends AnyObject = AnyObject>(
     deprecatedList.forEach(([deprecatedName, newName]) => {
       warning.deprecated(!(deprecatedName in column), deprecatedName, newName);
     });
-    warning.deprecated(
-      !('filterCheckall' in locale),
-      'filterCheckall',
-      'locale.filterCheckAll',
-    );
+    warning.deprecated(!('filterCheckall' in locale), 'filterCheckall', 'locale.filterCheckAll');
   }
 
-  const mergedVisible =
-    filterDropdownProps.open ??
-    filterDropdownOpen ??
-    visible;
+  const mergedVisible = filterDropdownProps.open ?? filterDropdownOpen ?? visible;
 
   const propFilteredKeys = filterState?.filteredKeys;
   const [getFilteredKeysSync, setFilteredKeysSync] = useSyncState(
@@ -432,11 +426,11 @@ const FilterDropdown = <RecordType extends AnyObject = AnyObject>(
                 filterTreeNode={
                   normalizedSearchValue
                     ? (node: any) => {
-                      if (isFunction(filterSearch)) {
-                        return filterSearch(searchValue, getFilterData(node));
+                        if (isFunction(filterSearch)) {
+                          return filterSearch(searchValue, getFilterData(node));
+                        }
+                        return searchValueMatched(normalizedSearchValue, node.title);
                       }
-                      return searchValueMatched(normalizedSearchValue, node.title);
-                    }
                     : undefined
                 }
               />

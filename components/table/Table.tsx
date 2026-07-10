@@ -1,40 +1,41 @@
 import * as React from 'react';
 import { EXPAND_COLUMN } from './constant';
-import type { Reference } from './interface';
+import type { Reference, RefTable } from './interface';
 
 import type { AnyObject } from '../_util/type';
+import type { ComponentType } from 'react';
 import Column from './features/columns/Column';
 import ColumnGroup from './features/columns/ColumnGroup';
 import {
-    SELECTION_ALL,
-    SELECTION_COLUMN,
-    SELECTION_INVERT,
-    SELECTION_NONE,
+  SELECTION_ALL,
+  SELECTION_COLUMN,
+  SELECTION_INVERT,
+  SELECTION_NONE,
 } from './features/selection/useSelection';
-import type { RefTable } from './interface';
+
 import type { TableProps } from './InternalTable';
 import InternalTable from './InternalTable';
-import './style'
+import './style';
 
 const Table = <RecordType extends AnyObject = AnyObject>(
-    props: TableProps<RecordType>,
-    ref: React.Ref<Reference>,
+  props: TableProps<RecordType>,
+  ref: React.Ref<Reference>,
 ) => {
-    const renderTimesRef = React.useRef<number>(0);
-    renderTimesRef.current += 1;
-    return <InternalTable<RecordType> {...props} ref={ref} _renderTimes={renderTimesRef.current} />;
+  const renderTimesRef = React.useRef<number>(0);
+  renderTimesRef.current += 1;
+  return <InternalTable<RecordType> {...props} ref={ref} _renderTimes={renderTimesRef.current} />;
 };
 
 const ForwardTable = React.forwardRef(Table) as unknown as RefTable & {
-    displayName?: string;
-    SELECTION_COLUMN: typeof SELECTION_COLUMN;
-    EXPAND_COLUMN: typeof EXPAND_COLUMN;
-    SELECTION_ALL: typeof SELECTION_ALL;
-    SELECTION_INVERT: typeof SELECTION_INVERT;
-    SELECTION_NONE: typeof SELECTION_NONE;
-    Column: typeof Column;
-    ColumnGroup: typeof ColumnGroup;
-    Summary: any;
+  displayName?: string;
+  SELECTION_COLUMN: typeof SELECTION_COLUMN;
+  EXPAND_COLUMN: typeof EXPAND_COLUMN;
+  SELECTION_ALL: typeof SELECTION_ALL;
+  SELECTION_INVERT: typeof SELECTION_INVERT;
+  SELECTION_NONE: typeof SELECTION_NONE;
+  Column: typeof Column;
+  ColumnGroup: typeof ColumnGroup;
+  Summary: ComponentType<unknown>;
 };
 
 ForwardTable.SELECTION_COLUMN = SELECTION_COLUMN;
@@ -47,16 +48,16 @@ ForwardTable.ColumnGroup = ColumnGroup;
 
 // Summary will be set from core
 try {
-    const { default: Summary } = require('./components/Footer/Summary');
-    if (Summary) {
-        ForwardTable.Summary = Summary;
-    }
+  const { default: Summary } = require('./components/Footer/Summary');
+  if (Summary) {
+    ForwardTable.Summary = Summary;
+  }
 } catch {
-    // Summary not available
+  // Summary not available
 }
 
 if (process.env.NODE_ENV !== 'production') {
-    ForwardTable.displayName = 'Table';
+  ForwardTable.displayName = 'Table';
 }
 
 export default ForwardTable;

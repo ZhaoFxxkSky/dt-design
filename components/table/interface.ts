@@ -95,9 +95,21 @@ export type VirtualScrollConfig = ScrollConfig & {
   align?: Exclude<ScrollLogicalPosition, 'center'>;
 };
 
+export type EditableErrors = Map<string, string[]>;
+
+export interface EditableValidateResult {
+  valid: boolean;
+  firstError?: { rowIndex: number; dataIndex: string | number; message: string };
+  errors: EditableErrors;
+}
+
 export type Reference = {
   nativeElement: HTMLDivElement;
   scrollTo: (config: ScrollConfig) => void;
+  /** 校验全部可编辑单元格，返回校验结果 */
+  validate: () => EditableValidateResult;
+  /** 重置所有校验错误 */
+  resetErrors: () => void;
 };
 
 // ==================== Row =====================
@@ -149,25 +161,27 @@ export type ScopeType = ColScopeType | RowScopeType;
 
 // ===================== Editable Types =====================
 
-export type EditorType = 'input' | 'select' | 'custom';
+export type EditorType = 'input' | 'textarea' | 'number' | 'select' | 'switch' | 'custom';
 
-export interface EditableRule {
+export interface EditableRule<RecordType = AnyObject> {
   required?: boolean;
   message?: string;
   pattern?: RegExp;
-  validator?: (value: any, record: any) => string | undefined | Promise<string | undefined>;
+  validator?: (value: any, record: RecordType) => string | undefined | Promise<string | undefined>;
 }
 
-export interface EditableConfig<RecordType = any> {
+export interface EditableConfig<RecordType = AnyObject> {
   type?: EditorType;
   options?: { label: React.ReactNode; value: any }[];
+  /** 透传给底层 antd 组件的额外 props（如 min/max/step/rows 等） */
+  props?: Record<string, any>;
   renderEditor?: (
     value: any,
     record: RecordType,
     index: number,
     onChange: (value: any) => void,
   ) => React.ReactNode;
-  rules?: EditableRule[];
+  rules?: EditableRule<RecordType>[];
   onChange?: (value: any, record: RecordType, index: number) => void;
   onSave?: (value: any, record: RecordType, index: number) => void;
 }

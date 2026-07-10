@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Table } from '@dtjoy/dt-design';
 import type { ColumnsType } from '@dtjoy/dt-design';
-import { Switch, Space } from 'antd';
+import { Space, Switch } from 'antd';
 
 interface DataType {
   key: string;
@@ -36,11 +36,7 @@ export default () => {
           unCheckedChildren="完成"
         />
       </Space>
-      <Table<DataType>
-        columns={columns}
-        dataSource={data}
-        loading={loading}
-      />
+      <Table<DataType> columns={columns} dataSource={data} loading={loading} />
     </>
   );
 };

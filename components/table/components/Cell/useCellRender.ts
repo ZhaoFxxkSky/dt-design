@@ -44,7 +44,7 @@ export default function useCellRender<RecordType>(
 
       // Customize render node
       let returnChildNode = value;
-      let returnCellProps: CellType<RecordType> | undefined = undefined;
+      let returnCellProps: CellType<RecordType> | undefined;
 
       if (render) {
         const renderData = render(value, record, renderIndex);

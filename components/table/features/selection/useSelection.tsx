@@ -2,11 +2,35 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import { INTERNAL_COL_DEFINE } from '../../shared/utils/legacyUtil';
-import type { FixedType } from '../../interface';
+import type {
+  ColumnsType,
+  ColumnType,
+  ExpandType,
+  FixedType,
+  GetPopupContainer,
+  GetRowKey,
+  Key,
+  RowSelectMethod,
+  SelectionItem,
+  TableLocale,
+  TableRowSelection,
+  TransformColumns,
+} from '../../interface';
 import { conductCheck } from 'rc-tree/lib/utils/conductUtil';
 import { convertDataToEntities } from 'rc-tree/lib/utils/treeUtil';
 import type { DataNode } from 'rc-tree/lib/interface';
 import { useControlledState } from '../../../_util/rcUtil';
+import { clsx } from 'clsx';
+
+import { useMultipleSelect } from '../../../_util/hooks/useMultipleSelect';
+import { isFunction, isPlainObject } from '../../../_util/is';
+import type { AnyObject } from '../../../_util/type';
+import { devUseWarning } from '../../../_util/warning';
+import type { CheckboxProps } from 'antd/es/checkbox';
+import Checkbox from 'antd/es/checkbox';
+import Dropdown from 'antd/es/dropdown';
+import type { RadioProps } from 'antd/es/radio';
+import Radio from 'antd/es/radio';
 
 function arrAdd<T>(list: T[], value: T): T[] {
   const clone = list.slice();
@@ -25,30 +49,6 @@ function arrDel<T>(list: T[], value: T): T[] {
   }
   return clone;
 }
-import { clsx } from 'clsx';
-
-import { useMultipleSelect } from '../../../_util/hooks/useMultipleSelect';
-import { isFunction, isPlainObject } from '../../../_util/is';
-import type { AnyObject } from '../../../_util/type';
-import { devUseWarning } from '../../../_util/warning';
-import type { CheckboxProps } from 'antd/es/checkbox';
-import Checkbox from 'antd/es/checkbox';
-import Dropdown from 'antd/es/dropdown';
-import type { RadioProps } from 'antd/es/radio';
-import Radio from 'antd/es/radio';
-import type {
-  ColumnsType,
-  ColumnType,
-  ExpandType,
-  GetPopupContainer,
-  GetRowKey,
-  Key,
-  RowSelectMethod,
-  SelectionItem,
-  TableLocale,
-  TableRowSelection,
-  TransformColumns,
-} from '../../interface';
 
 export const SELECTION_COLUMN = {} as const;
 export const SELECTION_ALL = 'SELECT_ALL' as const;

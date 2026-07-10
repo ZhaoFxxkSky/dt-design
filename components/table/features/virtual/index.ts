@@ -1,6 +1,6 @@
-export { default as useFlattenRecords, type FlattenData } from './useFlattenRecords';
+export { type FlattenData, default as useFlattenRecords } from './useFlattenRecords';
 export {
+  type Updater,
   useLayoutState,
   useTimeoutLock,
-  type Updater,
 } from './useFrame';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table } from '../index';
 import type { ColumnsType } from '../index';
-import { Space, Typography, Tag } from 'antd';
+import { Space, Tag, Typography } from 'antd';
 
 interface RecordType {
   key: string;

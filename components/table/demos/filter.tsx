@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Table } from '@dtjoy/dt-design';
 import type { ColumnsType } from '@dtjoy/dt-design';
-import { Tag, Space, Button } from 'antd';
+import { Button, Space, Tag } from 'antd';
 
 interface DataType {
   key: string;
@@ -73,14 +73,70 @@ const columns: ColumnsType<DataType> = [
 ];
 
 const data: DataType[] = [
-  { key: '1', name: '胡彦斌', age: 32, address: '西湖区湖底公园 1 号', department: '技术部', status: '在职' },
-  { key: '2', name: '胡彦祖', age: 28, address: '西湖区湖底公园 2 号', department: '产品部', status: '在职' },
-  { key: '3', name: '郑秀妍', age: 45, address: '南山区科技园 3 号', department: '设计部', status: '在职' },
-  { key: '4', name: '赵丽颖', age: 36, address: '朝阳区建国路 4 号', department: '市场部', status: '试用期' },
-  { key: '5', name: '孙七', age: 29, address: '海淀区中关村 5 号', department: '技术部', status: '在职' },
-  { key: '6', name: '周八', age: 33, address: '浦东新区张江 6 号', department: '运营部', status: '离职' },
-  { key: '7', name: '吴九', age: 41, address: '天河区珠江新城 7 号', department: '设计部', status: '在职' },
-  { key: '8', name: '郑十', age: 26, address: '武侯区天府大道 8 号', department: '产品部', status: '试用期' },
+  {
+    key: '1',
+    name: '胡彦斌',
+    age: 32,
+    address: '西湖区湖底公园 1 号',
+    department: '技术部',
+    status: '在职',
+  },
+  {
+    key: '2',
+    name: '胡彦祖',
+    age: 28,
+    address: '西湖区湖底公园 2 号',
+    department: '产品部',
+    status: '在职',
+  },
+  {
+    key: '3',
+    name: '郑秀妍',
+    age: 45,
+    address: '南山区科技园 3 号',
+    department: '设计部',
+    status: '在职',
+  },
+  {
+    key: '4',
+    name: '赵丽颖',
+    age: 36,
+    address: '朝阳区建国路 4 号',
+    department: '市场部',
+    status: '试用期',
+  },
+  {
+    key: '5',
+    name: '孙七',
+    age: 29,
+    address: '海淀区中关村 5 号',
+    department: '技术部',
+    status: '在职',
+  },
+  {
+    key: '6',
+    name: '周八',
+    age: 33,
+    address: '浦东新区张江 6 号',
+    department: '运营部',
+    status: '离职',
+  },
+  {
+    key: '7',
+    name: '吴九',
+    age: 41,
+    address: '天河区珠江新城 7 号',
+    department: '设计部',
+    status: '在职',
+  },
+  {
+    key: '8',
+    name: '郑十',
+    age: 26,
+    address: '武侯区天府大道 8 号',
+    department: '产品部',
+    status: '试用期',
+  },
 ];
 
 export default () => {
@@ -109,11 +165,7 @@ export default () => {
         <Tag color="blue">点击表头筛选图标</Tag>
         <Tag color="green">支持多列同时筛选</Tag>
       </Space>
-      <Table<DataType>
-        columns={mergedColumns}
-        dataSource={data}
-        onChange={handleChange as any}
-      />
+      <Table<DataType> columns={mergedColumns} dataSource={data} onChange={handleChange as any} />
     </>
   );
 };

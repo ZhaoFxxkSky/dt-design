@@ -40,7 +40,8 @@ import type { InternalTableProps } from '../InternalTable';
 import Body from './Body';
 import ColGroup from './ColGroup';
 import { INTERNAL_HOOKS } from '../constant';
-import TableContext, { makeImmutable, type ScrollInfoType } from '../shared/context/TableContext';
+import TableContext, { makeImmutable } from '../shared/context/TableContext';
+import type { ScrollInfoType } from '../shared/context/TableContext';
 import type { FixedHeaderProps } from './FixedHolder';
 import FixedHolder from './FixedHolder';
 import Footer from './Footer';
@@ -93,10 +94,8 @@ const EMPTY_SCROLL_TARGET = {};
 export type SemanticName = 'section' | 'title' | 'footer' | 'content';
 export type ComponentsSemantic = 'wrapper' | 'cell' | 'row';
 
-export interface TableProps<RecordType = any> extends Omit<
-  LegacyExpandableProps<RecordType>,
-  'showExpandColumn'
-> {
+export interface TableProps<RecordType = any>
+  extends Omit<LegacyExpandableProps<RecordType>, 'showExpandColumn'> {
   prefixCls?: string;
   className?: string;
   style?: React.CSSProperties;
@@ -266,7 +265,7 @@ const Table = <RecordType extends DefaultRecordType>(
       'onRowContextMenu',
       'onRowMouseEnter',
       'onRowMouseLeave',
-    ].forEach(name => {
+    ].forEach((name) => {
       warning(props[name] === undefined, `\`${name}\` is removed, please use \`onRow\` instead.`);
     });
 
@@ -353,7 +352,7 @@ const Table = <RecordType extends DefaultRecordType>(
   React.useImperativeHandle(ref, () => {
     return {
       nativeElement: fullTableRef.current,
-      scrollTo: config => {
+      scrollTo: (config) => {
         if (scrollBodyRef.current instanceof HTMLElement) {
           // Native scroll
           const { index, top, key, offset, align = 'nearest' } = config;
@@ -390,7 +389,7 @@ const Table = <RecordType extends DefaultRecordType>(
 
   // Convert map to number width
   const colsKeys = getColumnsKey(flattenColumns);
-  const pureColWidths = colsKeys.map(columnKey => colsWidths.get(columnKey));
+  const pureColWidths = colsKeys.map((columnKey) => colsWidths.get(columnKey));
   const colWidths = React.useMemo(() => pureColWidths, [pureColWidths.join('_')]);
   const stickyOffsets = useStickyOffsets(colWidths, flattenColumns);
   const fixHeader = scroll && validateValue(scroll.y);
@@ -441,7 +440,7 @@ const Table = <RecordType extends DefaultRecordType>(
   }
 
   const onColumnResize = React.useCallback((columnKey: React.Key, width: number) => {
-    updateColsWidths(widths => {
+    updateColsWidths((widths) => {
       if (widths.get(columnKey) !== width) {
         const newWidths = new Map(widths);
         newWidths.set(columnKey, width);
@@ -499,7 +498,7 @@ const Table = <RecordType extends DefaultRecordType>(
         const clientWidth = measureTarget.clientWidth;
 
         const absScrollStart = Math.abs(mergedScrollLeft);
-        setScrollInfo(ori => {
+        setScrollInfo((ori) => {
           const nextScrollInfo: ScrollInfoType = [absScrollStart, scrollWidth - clientWidth];
           return isEqual(ori, nextScrollInfo) ? ori : nextScrollInfo;
         });
@@ -591,7 +590,7 @@ const Table = <RecordType extends DefaultRecordType>(
   // ========================================================================
   // =================== Render: Func ===================
   const renderFixedHeaderTable = React.useCallback<FixedHeaderProps<RecordType>['children']>(
-    fixedHolderPassProps => (
+    (fixedHolderPassProps) => (
       <>
         <Header {...fixedHolderPassProps} />
         {fixFooter === 'top' && <Footer {...fixedHolderPassProps}>{summaryNode}</Footer>}
@@ -601,7 +600,7 @@ const Table = <RecordType extends DefaultRecordType>(
   );
 
   const renderFixedFooterTable = React.useCallback<FixedHeaderProps<RecordType>['children']>(
-    fixedHolderPassProps => <Footer {...fixedHolderPassProps}>{summaryNode}</Footer>,
+    (fixedHolderPassProps) => <Footer {...fixedHolderPassProps}>{summaryNode}</Footer>,
     [summaryNode],
   );
 
@@ -900,7 +899,7 @@ const Table = <RecordType extends DefaultRecordType>(
       onTriggerExpand,
       expandIconColumnIndex: expandableConfig.expandIconColumnIndex,
       indentSize: expandableConfig.indentSize,
-      allColumnsFixedLeft: flattenColumns.every(col => col.fixed === 'start'),
+      allColumnsFixedLeft: flattenColumns.every((col) => col.fixed === 'start'),
       emptyNode,
 
       // Column

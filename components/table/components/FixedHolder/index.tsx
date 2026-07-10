@@ -151,8 +151,8 @@ const FixedHolder = React.forwardRef<HTMLDivElement, FixedHeaderProps<any>>((pro
       //   direction === 'rtl' ? [...left.map(width => width + combinationScrollBarSize), 0] : left,
       // right:
       //   direction === 'rtl' ? right : [...right.map(width => width + combinationScrollBarSize), 0],
-      start: start,
-      end: [...end.map(width => width + combinationScrollBarSize), 0],
+      start,
+      end: [...end.map((width) => width + combinationScrollBarSize), 0],
       isSticky,
     };
   }, [combinationScrollBarSize, stickyOffsets, isSticky]);
@@ -163,7 +163,7 @@ const FixedHolder = React.forwardRef<HTMLDivElement, FixedHeaderProps<any>>((pro
     // use original ColGroup if no data or no calculated column width, otherwise use calculated column width
     // Return original colGroup if no data, or mergedColumnWidth is empty, or all widths are falsy
     const noWidth =
-      !mergedColumnWidth || !mergedColumnWidth.length || mergedColumnWidth.every(w => !w);
+      !mergedColumnWidth || !mergedColumnWidth.length || mergedColumnWidth.every((w) => !w);
     return noData || noWidth;
   }, [noData, mergedColumnWidth]);
 

@@ -30,7 +30,7 @@ function parseHeaderRows<RecordType>(
     rows[rowIndex] = rows[rowIndex] || [];
 
     let currentColIndex = colIndex;
-    const colSpans: number[] = columns.filter(Boolean).map(column => {
+    const colSpans: number[] = columns.filter(Boolean).map((column) => {
       const cell: CellType<RecordType> = {
         key: column.key,
         className: clsx(column.className, classNames.cell) || '',
@@ -77,9 +77,8 @@ function parseHeaderRows<RecordType>(
   // Handle `rowSpan`
   const rowCount = rows.length;
   for (let rowIndex = 0; rowIndex < rowCount; rowIndex += 1) {
-    rows[rowIndex].forEach(cell => {
+    rows[rowIndex].forEach((cell) => {
       if (!('rowSpan' in cell) && !cell.hasSubColumns) {
-        // eslint-disable-next-line no-param-reassign
         cell.rowSpan = rowCount - rowIndex;
       }
     });
@@ -95,7 +94,7 @@ export interface HeaderProps<RecordType> {
   onHeaderRow: GetComponentProps<readonly ColumnType<RecordType>[]>;
 }
 
-const Header = <RecordType extends any>(props: HeaderProps<RecordType>) => {
+const Header = <RecordType,>(props: HeaderProps<RecordType>) => {
   if (process.env.NODE_ENV !== 'production') {
     devRenderTimes(props);
   }

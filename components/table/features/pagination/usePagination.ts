@@ -33,25 +33,29 @@ function usePagination(
   onChange: (current: number, pageSize: number) => void,
   pagination?: TablePaginationConfig | false,
 ): readonly [TablePaginationConfig, (current?: number, pageSize?: number) => void] {
-  const { total: paginationTotal = 0, ...paginationObj } = isPlainObject(pagination)
-    ? pagination
-    : {};
+  // 从用户传入的 pagination 中分离出 current/pageSize（受控值）和其余配置
+  // current/pageSize 仅作为初始值，后续由 innerPagination 管理
+  // 这样 showSizeChanger 等功能才能正常工作
+  const {
+    total: paginationTotal = 0,
+    current: userCurrent,
+    pageSize: userPageSize,
+    ...restPaginationObj
+  } = isPlainObject(pagination) ? (pagination as any) : {};
 
   const [innerPagination, setInnerPagination] = useState<{ current?: number; pageSize?: number }>(
     () => ({
-      current: 'defaultCurrent' in paginationObj ? paginationObj.defaultCurrent : 1,
-      pageSize:
-        'defaultPageSize' in paginationObj ? paginationObj.defaultPageSize : DEFAULT_PAGE_SIZE,
+      current: userCurrent ?? restPaginationObj.defaultCurrent ?? 1,
+      pageSize: userPageSize ?? restPaginationObj.defaultPageSize ?? DEFAULT_PAGE_SIZE,
     }),
   );
 
-  const mergedPagination = mergeProps(
-    innerPagination as any,
-    paginationObj as any,
-    {
-      total: paginationTotal > 0 ? paginationTotal : total,
-    },
-  ) as any;
+  // merge 时：restPaginationObj（showSizeChanger, pageSizeOptions 等）在外层
+  // innerPagination（current, pageSize）覆盖 restPaginationObj 中的同名字段
+  // 这样 innerPagination 的 current/pageSize 不会被用户传入的值覆盖
+  const mergedPagination = mergeProps(restPaginationObj as any, innerPagination as any, {
+    total: paginationTotal > 0 ? paginationTotal : total,
+  }) as any;
 
   const maxPage = Math.ceil((paginationTotal || total) / mergedPagination.pageSize!);
   if (mergedPagination.current! > maxPage) {

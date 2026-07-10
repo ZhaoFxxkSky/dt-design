@@ -44,7 +44,7 @@ export default function useExpand<RecordType>(
     if (expandedRowRender) {
       return 'row';
     }
-    /* eslint-disable no-underscore-dangle */
+
     /**
      * Fix https://github.com/ant-design/ant-design/issues/21154
      * This is a workaround to not to break current behavior.
@@ -58,12 +58,12 @@ export default function useExpand<RecordType>(
         props.internalHooks === INTERNAL_HOOKS &&
         (props.expandable as any).__PARENT_RENDER_ICON__) ||
       mergedData.some(
-        record => record && typeof record === 'object' && record[mergedChildrenColumnName],
+        (record) => record && typeof record === 'object' && record[mergedChildrenColumnName],
       )
     ) {
       return 'nest';
     }
-    /* eslint-enable */
+
     return false;
   }, [!!expandedRowRender, mergedData]);
 

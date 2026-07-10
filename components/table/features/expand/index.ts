@@ -1,6 +1,6 @@
-export { default as useExpand } from './useExpand';
 export {
+  computedExpandedClassName,
   findAllChildrenKeys,
   renderExpandIcon,
-  computedExpandedClassName,
 } from './expandUtil';
+export { default as useExpand } from './useExpand';

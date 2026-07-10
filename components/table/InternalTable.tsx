@@ -5,6 +5,7 @@ import type {
   ColumnsType,
   ColumnTitleProps,
   ColumnType,
+  EditableValidateResult,
   ExpandableConfig,
   ExpandType,
   FilterValue,
@@ -65,7 +66,9 @@ import {
   parseEditableConfig,
   useEditable,
 } from './features/editable';
-import type { EditableValidateResult } from './features/editable';
+
+/** 稳定的空配置引用 */
+const EMPTY_EDITABLE_CONFIG = {};
 
 export type { ColumnsType, TablePaginationConfig };
 
@@ -151,7 +154,7 @@ export interface TableProps<RecordType = AnyObject>
   /** 是否全局开启可编辑 */
   editable?: boolean;
   /** 数据变化回调（可编辑模式） */
-  onEditableChange?: (data: any[]) => void;
+  onEditableChange?: (data: RecordType[]) => void;
   /** 校验回调 */
   onValidate?: (result: EditableValidateResult) => void;
 }
@@ -224,7 +227,9 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
 
   // ========================= Column Resize (hasResizableColumns check only) =========================
   const hasResizableColumns = React.useMemo(
-    () => resizable || mergedColumns.some((col: any) => col?.resizable === true),
+    () =>
+      resizable ||
+      mergedColumns.some((col) => ('resizable' in col ? col.resizable === true : false)),
     [resizable, mergedColumns],
   );
 
@@ -232,9 +237,12 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   const hasEditableColumns = React.useMemo(
     () =>
       editableEnabled ||
-      mergedColumns.some((col: any) => {
-        const ed = col?.editable;
-        return ed === true || (ed && typeof ed === 'object' && (ed as any).type);
+      mergedColumns.some((col) => {
+        const ed = ('editable' in col ? col.editable : undefined) as
+          | boolean
+          | { type?: string }
+          | undefined;
+        return ed === true || (ed && typeof ed === 'object' && ed.type);
       }),
     [editableEnabled, mergedColumns],
   );
@@ -406,15 +414,48 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
 
   const [getRecordByKey] = useLazyKVMap(rawData, childrenColumnName, getRowKey);
 
+  // 分页偏移量 ref — 用于将 page-local rowIndex 转换为 rawData 全局 index
+  // 修复 BUG: 分页时 EditableCell 收到的是 page-local index，但 useEditable 的
+  // onCellChange / validateCell 用此 index 匹配 rawData，导致跨页编辑写入错误行。
+  const pageOffsetRef = React.useRef(0);
+
+  // 分页控制 ref — validate 时用于自动跳转到错误行所在页
+  // useEditable 在 usePagination 之前调用，所以用 ref 传递
+  const resetPaginationRef = React.useRef<(current?: number, pageSize?: number) => void>(() => {});
+  const paginationInfoRef = React.useRef<{ current: number; pageSize: number; enabled: boolean }>({
+    current: 1,
+    pageSize: 10,
+    enabled: false,
+  });
+
   // ============================ Editable =============================
   const editableResult = useEditable({
-    columns: mergedColumns as any[],
-    data: rawData as any[],
-    onChange: onEditableChange,
+    columns: mergedColumns as ColumnsType,
+    data: rawData as AnyObject[],
+    onChange: onEditableChange as ((data: AnyObject[]) => void) | undefined,
     onValidate: onValidateProp,
-    getRowKey: getRowKey as any,
+    getRowKey: getRowKey as (record: AnyObject, index: number) => React.Key,
     scrollToRow: (idx: number) => {
-      tblRef.current?.scrollTo({ index: idx, align: 'center' });
+      const { current, pageSize, enabled } = paginationInfoRef.current;
+      if (enabled && pageSize > 0) {
+        const targetPage = Math.floor(idx / pageSize) + 1;
+        if (targetPage !== current) {
+          // 切换到错误行所在页
+          resetPaginationRef.current(targetPage, pageSize);
+          // 等待页面渲染后滚动到错误行（page-local index）
+          const localIdx = idx - (targetPage - 1) * pageSize;
+          setTimeout(() => {
+            tblRef.current?.scrollTo({ index: localIdx, align: 'center' });
+          }, 50);
+          return;
+        }
+        // 同页：直接滚动（使用 page-local index）
+        const localIdx = idx - (current - 1) * pageSize;
+        tblRef.current?.scrollTo({ index: localIdx, align: 'center' });
+      } else {
+        // 无分页：直接用全局 index 滚动
+        tblRef.current?.scrollTo({ index: idx, align: 'center' });
+      }
     },
     enabled: hasEditableColumns,
   });
@@ -422,30 +463,51 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   // 暴露 validate / resetErrors 到 ref
   editableMethodsRef.current = hasEditableColumns
     ? {
-        validate: () => editableResult.validateAll(rawData as any[]),
+        validate: () => editableResult.validateAll(rawData as AnyObject[]),
         resetErrors: editableResult.resetErrors,
       }
     : null;
 
   // 可编辑列 transform
+  // 错误状态通过 EditableContext 传递，不需要重建列 transform。
+  // 如果依赖 errors 会导致每次校验都重建整个列结构，引发全表重渲染，严重影响输入性能。
   const transformEditableColumns = React.useCallback(
     (cols: ColumnsType<RecordType>): ColumnsType<RecordType> => {
       if (!hasEditableColumns) return cols;
-      return cols.map((col: any) => {
-        const parsed = parseEditableConfig(col.editable, editableEnabled);
+      return cols.map((col) => {
+        // 列组（表头合并）：递归处理子列
+        if ('children' in col && col.children) {
+          return {
+            ...col,
+            children: transformEditableColumns(col.children),
+          } as ColumnsType<RecordType>[number];
+        }
+
+        const leafCol = col as ColumnType<RecordType>;
+        const parsed = parseEditableConfig(leafCol.editable, editableEnabled);
         if (!parsed.enabled) return col;
 
+        // 全局 editable 开启时，跳过没有 dataIndex 的列（如操作列），
+        // 避免将原始 render 的返回值（React 元素）当作 value 传给 EditableCell，
+        // 导致显示 [object Object]。
+        // 列级显式设置 editable 时仍然生效（用户明确要求编辑此列）。
+        if (!leafCol.editable && !leafCol.dataIndex && leafCol.dataIndex !== 0) {
+          return col;
+        }
+
         return {
-          ...col,
-          render: (value: any, record: any, index: number) => {
+          ...leafCol,
+          render: (value: unknown, record: RecordType, index: number) => {
+            // index 是 pageData 的局部索引，加上 pageOffset 后才是 rawData 全局索引
+            const globalRowIndex = index + pageOffsetRef.current;
             return (
               <EditableCell
-                dataIndex={col.dataIndex}
-                title={col.title}
-                rowIndex={index}
-                record={record}
+                dataIndex={leafCol.dataIndex!}
+                title={leafCol.title}
+                rowIndex={globalRowIndex}
+                record={record as AnyObject}
                 value={value}
-                editableConfig={parsed.config || {}}
+                editableConfig={parsed.config ?? EMPTY_EDITABLE_CONFIG}
                 prefixCls={prefixCls}
               />
             );
@@ -453,7 +515,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
         };
       });
     },
-    [hasEditableColumns, editableEnabled, prefixCls, editableResult.errorsVersion],
+    [hasEditableColumns, editableEnabled, prefixCls],
   );
 
   // ============================ Events =============================
@@ -584,6 +646,21 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     pagination === false ? {} : getPaginationParam(mergedPagination, pagination);
 
   changeEventInfo.resetPagination = resetPagination;
+
+  // 更新分页偏移量 ref — 在 transformEditableColumns 中使用
+  // 必须在 pageData 计算之前更新，因为 transformEditableColumns 在渲染期间被调用
+  pageOffsetRef.current =
+    pagination === false || !mergedPagination.pageSize
+      ? 0
+      : ((mergedPagination.current ?? 1) - 1) * (mergedPagination.pageSize ?? 10);
+
+  // 更新分页控制 ref — validate 时使用
+  paginationInfoRef.current = {
+    current: mergedPagination.current ?? 1,
+    pageSize: mergedPagination.pageSize ?? 10,
+    enabled: pagination !== false,
+  };
+  resetPaginationRef.current = resetPagination;
 
   // ============================= Data =============================
   const pageData = React.useMemo<RecordType[]>(() => {

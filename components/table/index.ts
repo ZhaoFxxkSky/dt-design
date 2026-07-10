@@ -1,81 +1,93 @@
 import './style';
 
-// Export the antd v5 1:1 compatible Table as default
-export { default as Table } from './Table';
-export type { TableProps, TablePaginationConfig } from './InternalTable';
-export type { ColumnProps } from './Column';
 export type { SizeType } from '../_util/type';
-
-// Re-export core rc-table for advanced usage
-export { genTable, DEFAULT_PREFIX } from './components/RcTable';
-export type { CompareProps } from './components/RcTable';
-
-export {
-  default as VirtualTable,
-  genVirtualTable,
-} from './components/VirtualTableBody';
-export type { VirtualTableProps } from './components/VirtualTableBody';
-
-export { default as Summary } from './components/Footer/Summary';
+export type { ColumnProps } from './Column';
 export { default as Column } from './Column';
 export { default as ColumnGroup } from './ColumnGroup';
 
-export { convertChildrenToColumns } from './features/columns';
-export { INTERNAL_COL_DEFINE } from './shared/utils/legacyUtil';
+export { default as Summary } from './components/Footer/Summary';
+// Re-export core rc-table for advanced usage
+export { DEFAULT_PREFIX, genTable } from './components/RcTable';
 
+export type { CompareProps } from './components/RcTable';
+export {
+  genVirtualTable,
+  default as VirtualTable,
+} from './components/VirtualTableBody';
+
+export type { VirtualTableProps } from './components/VirtualTableBody';
 export { EXPAND_COLUMN, INTERNAL_HOOKS } from './constant';
+export { convertChildrenToColumns } from './features/columns';
 
-export { default as TableContext } from './shared/context/TableContext';
-export { makeImmutable, responseImmutable } from './shared/context/TableContext';
-export type { TableContextProps, ScrollInfoType } from './shared/context/TableContext';
+// 批量编辑
+export { default as BatchEditModal } from './features/editable/BatchEditModal';
+export type {
+  BatchEditModalProps,
+  BatchEditMode,
+  BatchRule,
+  BatchRuleType,
+} from './features/editable/batchEditTypes';
 
+export { applyBatchRules } from './features/editable/batchEditUtils';
+
+export type { FixedInfo } from './features/fixed/fixUtil';
 // Column types
 export type {
   ColumnGroupType,
   ColumnsType,
   ColumnType,
   EditableConfig,
-  EditableRule,
-  EditorType,
   EditableError,
+  EditableErrors,
+  EditableRule,
+  EditableValidateResult,
+  EditorType,
 } from './interface';
-
 // Core-only types (not in antd wrapper)
 export type {
-  Key,
-  FixedType,
-  DefaultRecordType,
-  TableLayout,
-  ScrollConfig,
-  VirtualScrollConfig,
-  Reference,
-  RowClassName,
-  CellType,
-  RenderedCell,
-  Direction,
-  DataIndex,
+  AlignType,
   CellEllipsisType,
+  CellType,
   ColScopeType,
+  CustomizeComponent,
+  CustomizeScrollBody,
+  DataIndex,
+  DefaultRecordType,
+  Direction,
+  ExpandableConfig,
+  ExpandableType,
+  ExpandedRowRender,
+  FixedType,
+  GetComponent,
+  GetComponentProps,
+  GetRowKey,
+  Key,
+  LegacyExpandableProps,
+  OnCustomizeScroll,
+  PanelRender,
+  Reference,
+  RenderedCell,
+  RenderExpandIcon,
+  RenderExpandIconProps,
+  RowClassName,
   RowScopeType,
   ScopeType,
-  AlignType,
-  GetRowKey,
+  ScrollConfig,
   StickyOffsets,
-  GetComponentProps,
-  CustomizeComponent,
-  OnCustomizeScroll,
-  CustomizeScrollBody,
   TableComponents,
-  GetComponent,
-  ExpandableType,
-  LegacyExpandableProps,
-  ExpandedRowRender,
-  RenderExpandIconProps,
-  RenderExpandIcon,
-  ExpandableConfig,
-  PanelRender,
-  TriggerEventHandler,
+  TableLayout,
   TableSticky,
+  TriggerEventHandler,
+  VirtualScrollConfig,
 } from './interface';
 
-export type { FixedInfo } from './features/fixed/fixUtil';
+export type { TablePaginationConfig, TableProps } from './InternalTable';
+
+export { default as TableContext } from './shared/context/TableContext';
+
+export { makeImmutable, responseImmutable } from './shared/context/TableContext';
+
+export type { ScrollInfoType, TableContextProps } from './shared/context/TableContext';
+export { INTERNAL_COL_DEFINE } from './shared/utils/legacyUtil';
+// Export the antd v5 1:1 compatible Table as default
+export { default as Table } from './Table';

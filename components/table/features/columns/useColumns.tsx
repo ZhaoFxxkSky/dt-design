@@ -20,8 +20,8 @@ export function convertChildrenToColumns<RecordType>(
   children: React.ReactNode,
 ): ColumnsType<RecordType> {
   return toArray(children)
-    .filter(node => React.isValidElement<any>(node))
-    .map(node => {
+    .filter((node) => React.isValidElement<any>(node))
+    .map((node) => {
       const { key, props } = node as React.ReactElement<any>;
       const { children: nodeChildren, ...restProps } = props;
       const column = {
@@ -41,8 +41,8 @@ function filterHiddenColumns<RecordType>(
   columns: ColumnsType<RecordType>,
 ): ColumnsType<RecordType> {
   return columns
-    .filter(column => column && typeof column === 'object' && !column.hidden)
-    .map(column => {
+    .filter((column) => column && typeof column === 'object' && !column.hidden)
+    .map((column) => {
       const subColumns = (column as ColumnGroupType<RecordType>).children;
 
       if (subColumns && subColumns.length > 0) {
@@ -61,7 +61,7 @@ function flatColumns<RecordType>(
   parentKey = 'key',
 ): ColumnType<RecordType>[] {
   return columns
-    .filter(column => column && typeof column === 'object')
+    .filter((column) => column && typeof column === 'object')
     .reduce((list, column, index) => {
       const { fixed } = column;
       const parsedFixed =
@@ -72,7 +72,7 @@ function flatColumns<RecordType>(
       if (subColumns && subColumns.length > 0) {
         return [
           ...list,
-          ...flatColumns(subColumns, mergedKey).map(subColum => ({
+          ...flatColumns(subColumns, mergedKey).map((subColum) => ({
             ...subColum,
             fixed: subColum.fixed ?? parsedFixed,
           })),
@@ -172,7 +172,7 @@ function useColumns<RecordType>(
       // >>> Deduplicate additional expand column
       if (
         process.env.NODE_ENV !== 'production' &&
-        cloneColumns.filter(c => c === EXPAND_COLUMN).length > 1
+        cloneColumns.filter((c) => c === EXPAND_COLUMN).length > 1
       ) {
         warning(false, 'There exist more than one `EXPAND_COLUMN` in `columns`.');
       }
@@ -215,7 +215,7 @@ function useColumns<RecordType>(
           });
 
           if (expandRowByClick) {
-            return <span onClick={e => e.stopPropagation()}>{icon}</span>;
+            return <span onClick={(e) => e.stopPropagation()}>{icon}</span>;
           }
           return icon;
         },
@@ -237,8 +237,7 @@ function useColumns<RecordType>(
       warning(false, '`expandable` is not config but there exist `EXPAND_COLUMN` in `columns`.');
     }
 
-    return baseColumns.filter(col => col !== EXPAND_COLUMN);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return baseColumns.filter((col) => col !== EXPAND_COLUMN);
   }, [expandable, baseColumns, getRowKey, expandedKeys, expandIcon, direction, expandedRowOffset]);
 
   // ========================= Transform ========================
@@ -257,13 +256,12 @@ function useColumns<RecordType>(
       ];
     }
     return finalColumns;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transformColumns, withExpandColumns, direction]);
 
   // ========================== Flatten =========================
   const flattenColumns = React.useMemo(
     () => flatColumns(mergedColumns),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [mergedColumns, direction, scrollWidth],
   );
 

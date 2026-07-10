@@ -8,7 +8,7 @@ export interface MeasureCellProps {
   title?: React.ReactNode;
 }
 
-const MeasureCell: React.FC<MeasureCellProps> = props => {
+const MeasureCell: React.FC<MeasureCellProps> = (props) => {
   const { columnKey, onColumnResize, title } = props;
 
   const cellRef = React.useRef<HTMLTableCellElement>(null);
@@ -25,7 +25,7 @@ const MeasureCell: React.FC<MeasureCellProps> = props => {
         ref={cellRef}
         style={{ paddingTop: 0, paddingBottom: 0, borderTop: 0, borderBottom: 0, height: 0 }}
       >
-        <div style={{ height: 0, overflow: 'hidden', fontWeight: 'bold' }}>{title || '\xa0'}</div>
+        <div style={{ height: 0, overflow: 'hidden', fontWeight: 'bold' }}>{title || '\xA0'}</div>
       </td>
     </ResizeObserver>
   );
