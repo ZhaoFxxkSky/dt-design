@@ -571,7 +571,7 @@ describe('Resize — Flex Distribution', () => {
     expect(w0 + w1 + w2).toBe(1000);
   });
 
-  it('stops distributing remainder to a column after it is dragged', () => {
+  it('freezes all column widths after a drag (no flex redistribution)', () => {
     const onColumnResize = jest.fn();
     const cols: ColumnsType = [
       { title: 'A', dataIndex: 'a', key: 'a', width: 100, resizable: true, minWidth: 60 },
@@ -582,25 +582,30 @@ describe('Resize — Flex Distribution', () => {
       <Table dataSource={data} columns={cols} rowKey="key" resizable onColumnResize={onColumnResize} />,
     );
 
-    // Drag column A by 50px
-    simulateDrag(container, 50, 0);
-    expect(onColumnResize).toHaveBeenCalledWith('a', 250); // 200 + 50
-
-    // Now column A is "fixed" (in resizedKeys), remainder only goes to B and C
-    // Total base = 250 + 100 + 100 = 450, remainder = 1000 - 450 = 550
-    // flexTotal = 200 (only B and C are flex)
-    // ratio = 550 / 200 = 2.75
-    // First flex among remaining = B (index 0 in flexEntries): absorbs rounding
-    //   B = 100 + (550 - floor(100*2.75)) = 100 + (550 - 275) = 100 + 275 = 375
-    // C = 100 + floor(100*2.75) = 100 + 275 = 375
-    // Total = 250 + 375 + 375 = 1000 ✓
-    const colgroup = container.querySelectorAll('colgroup col');
-    const widths = Array.from(colgroup).map((col) => {
+    // Before drag: all columns are flex, total = containerWidth (1000)
+    // A = 334, B = 333, C = 333 (ratio-based distribution)
+    let colgroup = container.querySelectorAll('colgroup col');
+    let widths = Array.from(colgroup).map((col) => {
       const style = col.getAttribute('style') || '';
       return Number.parseInt(style.match(/(\d+)px/)?.[1] || '0', 10);
     });
-    expect(widths[0]).toBe(250); // Column A is fixed at 250
     expect(widths[0] + widths[1] + widths[2]).toBe(1000);
+
+    // Drag column A by 50px → latestWidth = 200 (offsetWidth) + 50 = 250
+    simulateDrag(container, 50, 0);
+    expect(onColumnResize).toHaveBeenCalledWith('a', 250);
+
+    // After drag: all columns are frozen at their pre-drag rendered widths
+    // A = 250 (user-dragged), B = 333 (frozen), C = 333 (frozen)
+    // Total = 250 + 333 + 333 = 916 ≠ 1000 (no flex redistribution)
+    colgroup = container.querySelectorAll('colgroup col');
+    widths = Array.from(colgroup).map((col) => {
+      const style = col.getAttribute('style') || '';
+      return Number.parseInt(style.match(/(\d+)px/)?.[1] || '0', 10);
+    });
+    expect(widths[0]).toBe(250); // Column A at user-dragged width
+    expect(widths[1]).toBe(333); // Column B frozen
+    expect(widths[2]).toBe(333); // Column C frozen
   });
 
   it('does not distribute remainder when no flex columns', () => {

@@ -1,5 +1,5 @@
 import type { ColumnsType, ColumnType, EditableConfig } from '../../interface';
-import type { AnyObject } from '../../_util/type';
+import type { AnyObject } from '../../../_util/type';
 import type * as React from 'react';
 import type { BatchRule, BatchRuleType } from './batchEditTypes';
 
@@ -105,7 +105,7 @@ export const applyBatchRules = <T extends AnyObject>(
   return rows.map((row, i) => {
     if (!selectedKeySet.has(getRowKey(row, i))) return row;
 
-    const next = { ...row };
+    const next: Record<string, unknown> = { ...row };
     rules.forEach((rule) => {
       const col = colMap.get(rule.fieldKey);
       if (!col) return;
@@ -160,7 +160,7 @@ export const applyBatchRules = <T extends AnyObject>(
       }
     });
     sequenceCounter += 1;
-    return next;
+    return next as T;
   });
 };
 

@@ -110,6 +110,8 @@ export type Reference = {
   validate: () => EditableValidateResult;
   /** 重置所有校验错误 */
   resetErrors: () => void;
+  /** 重置所有列宽为初始弹性分配（清除用户拖拽记录） */
+  resetColumnWidths: () => void;
 };
 
 // ==================== Row =====================

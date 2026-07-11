@@ -44,16 +44,7 @@ export interface EditableCellProps {
  *    getPopupContainer 返回表格滚动容器，确保 Popover 随表格滚动。
  */
 const EditableCellInner = React.memo<EditableCellProps>(
-  ({
-    dataIndex,
-    title,
-    rowIndex,
-    record,
-    value,
-    editableConfig,
-    prefixCls,
-    children: _children,
-  }) => {
+  ({ dataIndex, title, rowIndex, record, value, editableConfig, prefixCls }) => {
     const editCtx = React.useContext(EditableContext);
 
     // ---- 连续型 vs 离散型 ----

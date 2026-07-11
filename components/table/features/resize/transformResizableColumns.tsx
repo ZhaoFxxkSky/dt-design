@@ -42,9 +42,24 @@ function transformResizableColumns<RecordType = any>(
         </>
       );
 
+      // 注入 cell-resizable class，使 th 获得 overflow: visible
+      // （抵消 cell-ellipsis 的 overflow: hidden，防止 resize handle 被裁剪）
+      const resizableClassName = `${prefixCls}-cell-resizable`;
+      const originOnHeaderCell = leafCol.onHeaderCell;
+
       return {
         ...leafCol,
         title,
+        onHeaderCell: (column: ColumnType<RecordType>) => {
+          const cell = originOnHeaderCell?.(column) || {};
+          const cellClassName = cell.className;
+          return {
+            ...cell,
+            className: cellClassName
+              ? `${cellClassName} ${resizableClassName}`
+              : resizableClassName,
+          };
+        },
       };
     });
 

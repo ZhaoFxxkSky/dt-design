@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import { Alert, Button, Input, InputNumber, Modal, Radio, Select, Space } from 'antd';
-import type { ColumnType, EditableConfig } from '../../interface';
-import type { AnyObject } from '../../_util/type';
+import type { ColumnType, EditableConfig, EditorType } from '../../interface';
+import type { AnyObject } from '../../../_util/type';
 import type {
   BatchEditModalProps,
   BatchRule,
@@ -56,11 +56,11 @@ const getColumnByFieldKey = (columns: LeafColumn[], fieldKey: string): LeafColum
   return columns.find((c) => String(c.dataIndex ?? c.key) === fieldKey);
 };
 
-const getEditorType = (columns: LeafColumn[], fieldKey: string): string => {
+const getEditorType = (columns: LeafColumn[], fieldKey: string): EditorType => {
   const col = getColumnByFieldKey(columns, fieldKey);
   if (!col) return 'input';
   const ed = col.editable;
-  if (ed && typeof ed === 'object') return ed.type || 'input';
+  if (ed && typeof ed === 'object') return ed.type ?? 'input';
   return 'input';
 };
 

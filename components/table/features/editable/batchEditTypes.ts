@@ -1,5 +1,5 @@
 import type { ColumnsType } from '../../interface';
-import type { AnyObject } from '../../_util/type';
+import type { AnyObject } from '../../../_util/type';
 import type * as React from 'react';
 
 // ============================================================

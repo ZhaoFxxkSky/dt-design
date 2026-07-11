@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { AnyObject } from '../../_util/type';
+import type { AnyObject } from '../../../_util/type';
 
 /**
  * EditableContext 的类型定义。

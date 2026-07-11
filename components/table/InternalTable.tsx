@@ -381,6 +381,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     nativeElement: rootRef.current!,
     validate: () => editableMethodsRef.current?.validate() ?? { valid: true, errors: new Map() },
     resetErrors: () => editableMethodsRef.current?.resetErrors(),
+    resetColumnWidths: () => resizeResult.resetColumnWidths(),
   }));
 
   // ============================ RowKey ============================

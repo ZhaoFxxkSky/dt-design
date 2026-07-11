@@ -1,10 +1,16 @@
 import * as React from 'react';
-import type { ColumnsType, ColumnType, EditableConfig } from '../../interface';
-import type { AnyObject } from '../../_util/type';
+import type {
+  ColumnsType,
+  ColumnType,
+  EditableConfig,
+  EditableErrors,
+  EditableValidateResult,
+} from '../../interface';
+import type { AnyObject } from '../../../_util/type';
 import type { EditableContextValue } from './EditableContext';
 
 /** 错误集合类型 — 从 interface.ts 重新导出保持兼容 */
-export type { EditableErrors, EditableValidateResult } from '../../interface';
+export type { EditableErrors, EditableValidateResult };
 
 /** 重新导出，保持 index.ts 的 API 不变 */
 export type { EditableContextValue } from './EditableContext';
@@ -17,7 +23,7 @@ export interface UseEditableOptions {
   /** 值变化回调 */
   onChange?: (data: AnyObject[]) => void;
   /** 校验完成回调 */
-  onValidate?: (result: import('../../interface').EditableValidateResult) => void;
+  onValidate?: (result: EditableValidateResult) => void;
   /** 行 key 获取函数 */
   getRowKey?: (record: AnyObject, index: number) => React.Key;
   /** 滚动到行 */
@@ -186,10 +192,10 @@ function useEditable({ columns, data, onChange, onValidate, scrollToRow }: UseEd
 
   // 校验全部数据
   const validateAll = React.useCallback(
-    (validateData?: AnyObject[]): import('../../interface').EditableValidateResult => {
+    (validateData?: AnyObject[]): EditableValidateResult => {
       const rows = validateData ?? dataRef.current;
       const nextErrors = new Map<string, string[]>();
-      let firstError: import('../../interface').EditableValidateResult['firstError'];
+      let firstError: EditableValidateResult['firstError'];
 
       rows.forEach((row, rowIndex) => {
         flatColumns.forEach((col) => {
