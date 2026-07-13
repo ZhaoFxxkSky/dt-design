@@ -6,6 +6,6 @@ export function validateValue(val: any): boolean {
 
 export function validNumberValue(val: any): boolean {
   if (val == null) return false;
-  if (typeof val === 'number' && !isNaN(val)) return true;
+  if (typeof val === 'number' && !Number.isNaN(val)) return true;
   return false;
 }

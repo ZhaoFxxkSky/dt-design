@@ -203,7 +203,9 @@ describe('VirtualTable — Table integration', () => {
         virtual
         scroll={{ y: 200 }}
         pagination={false}
-        onRow={onRow}
+        // Test-only: jest.Mock returning a `data-*` attribute object is not
+        // statically assignable to GetComponentProps' HTMLAttributes return type
+        onRow={onRow as any}
       />,
     );
     expect(onRow).toHaveBeenCalled();

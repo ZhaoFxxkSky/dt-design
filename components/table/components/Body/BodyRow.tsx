@@ -16,8 +16,8 @@ export interface BodyRowProps<RecordType> {
   renderIndex: number;
   className?: string;
   style?: React.CSSProperties;
-  classNames: TableProps['classNames']['body'];
-  styles: TableProps['styles']['body'];
+  classNames: NonNullable<TableProps['classNames']>['body'];
+  styles: NonNullable<TableProps['styles']>['body'];
   rowComponent: CustomizeComponent;
   cellComponent: CustomizeComponent;
   scopeCellComponent: CustomizeComponent;
@@ -126,8 +126,8 @@ const BodyRow = <RecordType extends { children?: readonly RecordType[] }>(
   const {
     className,
     style,
-    classNames,
-    styles,
+    classNames = {},
+    styles = {},
     record,
     index,
     renderIndex,
@@ -223,7 +223,7 @@ const BodyRow = <RecordType extends { children?: readonly RecordType[] }>(
   );
 
   // ======================== Expand Row =========================
-  let expandRowNode: React.ReactElement<ExpandedRowProps>;
+  let expandRowNode: React.ReactElement<ExpandedRowProps> | undefined;
   if (rowSupportExpand && (expandedRef.current || expanded)) {
     const expandContent = expandedRowRender(record, index, indent + 1, expanded);
 

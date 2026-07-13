@@ -41,7 +41,7 @@ import Body from './Body';
 import ColGroup from './ColGroup';
 import { INTERNAL_HOOKS } from '../constant';
 import TableContext, { makeImmutable } from '../shared/context/TableContext';
-import type { ScrollInfoType } from '../shared/context/TableContext';
+import type { ScrollInfoType, TableContextProps } from '../shared/context/TableContext';
 import type { FixedHeaderProps } from './FixedHolder';
 import FixedHolder from './FixedHolder';
 import Footer from './Footer';
@@ -183,7 +183,7 @@ export interface TableProps<RecordType = any>
    * !!! DO NOT USE IN PRODUCTION ENVIRONMENT !!!
    */
   internalRefs?: {
-    body: React.MutableRefObject<HTMLDivElement>;
+    body: React.MutableRefObject<HTMLDivElement | null>;
   };
   /**
    * @private Internal usage, may remove by refactor.
@@ -266,7 +266,10 @@ const Table = <RecordType extends DefaultRecordType>(
       'onRowMouseEnter',
       'onRowMouseLeave',
     ].forEach((name) => {
-      warning(props[name] === undefined, `\`${name}\` is removed, please use \`onRow\` instead.`);
+      warning(
+        props[name as keyof typeof props] === undefined,
+        `\`${name}\` is removed, please use \`onRow\` instead.`,
+      );
     });
 
     warning(
@@ -331,10 +334,14 @@ const Table = <RecordType extends DefaultRecordType>(
       expandIcon: mergedExpandIcon,
       expandIconColumnIndex: expandableConfig.expandIconColumnIndex,
       direction,
-      scrollWidth: useInternalHooks && tailor && typeof scrollX === 'number' ? scrollX : null,
+      scrollWidth: useInternalHooks && tailor && typeof scrollX === 'number' ? scrollX : undefined,
       clientWidth: componentWidth,
     },
-    useInternalHooks ? transformColumns : null,
+    // `useColumns` guards the call with `if (transformColumns)`, so `null`
+    // ("no transform") is a valid runtime value here.
+    (useInternalHooks ? transformColumns : null) as (
+      columns: ColumnsType<RecordType>,
+    ) => ColumnsType<RecordType>,
   );
   const mergedScrollX = flattenScrollX ?? scrollX;
 
@@ -361,7 +368,8 @@ const Table = <RecordType extends DefaultRecordType>(
             // In top mode, offset is ignored
             scrollBodyRef.current?.scrollTo({ top });
           } else {
-            const mergedKey = key ?? getRowKey(mergedData[index]);
+            const mergedKey =
+              key ?? (index !== undefined ? getRowKey(mergedData[index]) : undefined);
             const targetElement = scrollBodyRef.current.querySelector(
               `[data-row-key="${mergedKey}"]`,
             );
@@ -378,7 +386,10 @@ const Table = <RecordType extends DefaultRecordType>(
           (scrollBodyRef.current as any).scrollTo(config);
         }
       },
-    };
+      // `validate` / `resetErrors` / `resetColumnWidths` are provided by the
+      // `InternalTable` wrapper, which spreads this handle and overrides them
+      // (see InternalTable.tsx). `nativeElement` is attached after mount.
+    } as Reference;
   });
 
   // ====================== Scroll ======================
@@ -390,9 +401,11 @@ const Table = <RecordType extends DefaultRecordType>(
   // Convert map to number width
   const colsKeys = getColumnsKey(flattenColumns);
   const pureColWidths = colsKeys.map((columnKey) => colsWidths.get(columnKey));
-  const colWidths = React.useMemo(() => pureColWidths, [pureColWidths.join('_')]);
+  // `Map.get` may yield `undefined` for unmeasured columns; all consumers
+  // (`useStickyOffsets`, `FixedHolder`, `ColGroup`) tolerate that at runtime.
+  const colWidths = React.useMemo(() => pureColWidths as number[], [pureColWidths.join('_')]);
   const stickyOffsets = useStickyOffsets(colWidths, flattenColumns);
-  const fixHeader = scroll && validateValue(scroll.y);
+  const fixHeader = !!scroll && validateValue(scroll.y);
   const horizonScroll = (scroll && validateValue(mergedScrollX)) || Boolean(expandableConfig.fixed);
   const fixColumn = horizonScroll && flattenColumns.some(({ fixed }) => fixed);
 
@@ -403,7 +416,7 @@ const Table = <RecordType extends DefaultRecordType>(
   }>(null);
 
   const { isSticky, offsetHeader, offsetSummary, offsetScroll, stickyClassName, container } =
-    useSticky(sticky, prefixCls);
+    useSticky(sticky ?? false, prefixCls);
 
   // Footer (Fix footer must fixed header)
   const summaryNode = React.useMemo(() => summary?.(mergedData), [summary, mergedData]);
@@ -414,9 +427,9 @@ const Table = <RecordType extends DefaultRecordType>(
     (summaryNode.props as SummaryProps).fixed;
 
   // Scroll
-  let scrollXStyle: React.CSSProperties;
-  let scrollYStyle: React.CSSProperties;
-  let scrollTableStyle: React.CSSProperties;
+  let scrollXStyle: React.CSSProperties = {};
+  let scrollYStyle: React.CSSProperties = {};
+  let scrollTableStyle: React.CSSProperties = {};
 
   if (fixHeader) {
     scrollYStyle = {
@@ -450,9 +463,12 @@ const Table = <RecordType extends DefaultRecordType>(
     });
   }, []);
 
-  const [setScrollTarget, getScrollTarget] = useTimeoutLock(null);
+  const [setScrollTarget, getScrollTarget] = useTimeoutLock<object | null>(null);
 
-  function forceScroll(scrollLeft: number, target: HTMLDivElement | ((left: number) => void)) {
+  function forceScroll(
+    scrollLeft: number,
+    target: HTMLDivElement | ((left: number) => void) | null | undefined,
+  ) {
     if (!target) {
       return;
     }
@@ -474,9 +490,9 @@ const Table = <RecordType extends DefaultRecordType>(
   const [scrollInfo, setScrollInfo] = React.useState<ScrollInfoType>([0, 0]);
 
   const onInternalScroll = useEvent(
-    ({ currentTarget, scrollLeft }: { currentTarget: HTMLElement; scrollLeft?: number }) => {
+    ({ currentTarget, scrollLeft }: { currentTarget?: HTMLElement; scrollLeft?: number }) => {
       const mergedScrollLeft =
-        typeof scrollLeft === 'number' ? scrollLeft : currentTarget.scrollLeft;
+        typeof scrollLeft === 'number' ? scrollLeft : (currentTarget?.scrollLeft ?? 0);
 
       const compareTarget = currentTarget || EMPTY_SCROLL_TARGET;
       if (!getScrollTarget() || getScrollTarget() === compareTarget) {
@@ -573,7 +589,7 @@ const Table = <RecordType extends DefaultRecordType>(
       if (scrollBodyRef.current instanceof Element) {
         setScrollbarSize(getTargetScrollBarSize(scrollBodyRef.current).width);
       } else {
-        setScrollbarSize(getTargetScrollBarSize(scrollBodyContainerRef.current).width);
+        setScrollbarSize(getTargetScrollBarSize(scrollBodyContainerRef.current!).width);
       }
     }
   }, []);
@@ -631,7 +647,9 @@ const Table = <RecordType extends DefaultRecordType>(
     colWidths,
     columCount: flattenColumns.length,
     stickyOffsets,
-    onHeaderRow,
+    // `HeaderRow` guards `onHeaderRow` with a truthiness check, so `undefined`
+    // is a valid runtime value here.
+    onHeaderRow: onHeaderRow as GetComponentProps<readonly ColumnType<RecordType>[]>,
     fixHeader,
     scroll,
   };
@@ -654,7 +672,9 @@ const Table = <RecordType extends DefaultRecordType>(
   );
 
   const bodyColGroup = (
-    <ColGroup colWidths={flattenColumns.map(({ width }) => width)} columns={flattenColumns} />
+    // A column without `width` renders an unset `<col>` width; `ColGroup`
+    // treats falsy widths as "no width", so the value is safe at runtime.
+    <ColGroup colWidths={flattenColumns.map(({ width }) => width!)} columns={flattenColumns} />
   );
 
   const captionElement =
@@ -685,7 +705,7 @@ const Table = <RecordType extends DefaultRecordType>(
 
         if (process.env.NODE_ENV !== 'production') {
           warning(
-            props.columns.length === 0,
+            props.columns?.length === 0,
             'When use `components.body` with render props. Each column should have a fixed `width` value.',
           );
         }
@@ -728,7 +748,9 @@ const Table = <RecordType extends DefaultRecordType>(
       maxContentScroll: horizonScroll && mergedScrollX === 'max-content',
       ...headerProps,
       ...columnContext,
-      direction,
+      // `FixedHolder` only compares `direction === 'rtl'`, so the `'ltr'`
+      // fallback behaves exactly like `undefined`.
+      direction: direction ?? 'ltr',
       stickyClassName,
       scrollX: mergedScrollX,
       tableLayout: mergedTableLayout,
@@ -773,7 +795,9 @@ const Table = <RecordType extends DefaultRecordType>(
             scrollBodyRef={scrollBodyRef}
             onScroll={onInternalScroll}
             container={container}
-            direction={direction}
+            // Only compared against `'rtl'` inside `StickyScrollBar`, so the
+            // `'ltr'` fallback behaves exactly like `undefined`.
+            direction={direction ?? 'ltr'}
           />
         )}
       </>
@@ -805,7 +829,7 @@ const Table = <RecordType extends DefaultRecordType>(
     );
   }
 
-  const tableStyle = {
+  const tableStyle: React.CSSProperties & Record<string, unknown> = {
     ...style,
   };
 
@@ -836,7 +860,10 @@ const Table = <RecordType extends DefaultRecordType>(
       {...dataProps}
     >
       {title && (
-        <Panel className={clsx(`${prefixCls}-title`, classNames?.title)} style={styles?.title}>
+        <Panel
+          className={clsx(`${prefixCls}-title`, classNames?.title)}
+          style={styles?.title ?? {}}
+        >
           {title(mergedData)}
         </Panel>
       )}
@@ -848,7 +875,10 @@ const Table = <RecordType extends DefaultRecordType>(
         {groupTableNode}
       </div>
       {footer && (
-        <Panel className={clsx(`${prefixCls}-footer`, classNames?.footer)} style={styles?.footer}>
+        <Panel
+          className={clsx(`${prefixCls}-footer`, classNames?.footer)}
+          style={styles?.footer ?? {}}
+        >
           {footer(mergedData)}
         </Panel>
       )}
@@ -981,7 +1011,14 @@ const Table = <RecordType extends DefaultRecordType>(
     ],
   );
 
-  return <TableContext.Provider value={TableContextValue}>{fullTable}</TableContext.Provider>;
+  return (
+    // Several fields (e.g. `scrollX`, `direction`, `indentSize`) can be
+    // `undefined` at runtime and all context consumers already guard them;
+    // the context type (declared outside this file) marks them required.
+    <TableContext.Provider value={TableContextValue as TableContextProps<RecordType>}>
+      {fullTable}
+    </TableContext.Provider>
+  );
 };
 
 export type ForwardGenericTable = (<RecordType extends DefaultRecordType = any>(

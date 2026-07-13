@@ -16,8 +16,8 @@ import type { TableProps } from '../RcTable';
 
 function parseHeaderRows<RecordType>(
   rootColumns: ColumnsType<RecordType>,
-  classNames: TableProps['classNames']['header'],
-  styles: TableProps['styles']['header'],
+  classNames: NonNullable<NonNullable<TableProps['classNames']>['header']>,
+  styles: NonNullable<NonNullable<TableProps['styles']>['header']>,
 ): CellType<RecordType>[][] {
   const rows: CellType<RecordType>[][] = [];
 
@@ -35,7 +35,7 @@ function parseHeaderRows<RecordType>(
         key: column.key,
         className: clsx(column.className, classNames.cell) || '',
         style: styles.cell,
-        children: column.title,
+        children: column.title as React.ReactNode,
         column,
         colStart: currentColIndex,
       };
@@ -52,7 +52,7 @@ function parseHeaderRows<RecordType>(
       }
 
       if ('colSpan' in column) {
-        ({ colSpan } = column);
+        ({ colSpan } = column as { colSpan: number });
       }
 
       if ('rowSpan' in column) {
@@ -60,7 +60,7 @@ function parseHeaderRows<RecordType>(
       }
 
       cell.colSpan = colSpan;
-      cell.colEnd = cell.colStart + colSpan - 1;
+      cell.colEnd = currentColIndex + colSpan - 1;
       rows[rowIndex].push(cell);
 
       currentColIndex += colSpan;

@@ -24,22 +24,27 @@ const MeasureRow: React.FC<MeasureRowProps> = ({
   const { measureRowRender } = useContext(TableContext, ['measureRowRender']);
 
   const measureRow = (
-    <tr className={`${prefixCls}-measure-row`} style={{ height: 0, visibility: 'hidden' }} ref={ref}>
+    <tr
+      className={`${prefixCls}-measure-row`}
+      style={{ height: 0, visibility: 'hidden' }}
+      ref={ref}
+    >
       <ResizeObserver.Collection
-        onBatchResize={infoList => {
-          if (isVisible(ref.current)) {
+        onBatchResize={(infoList) => {
+          if (ref.current && isVisible(ref.current)) {
             infoList.forEach(({ data: columnKey, size }) => {
               onColumnResize(columnKey, size.offsetWidth);
             });
           }
         }}
       >
-        {columnsKey.map(columnKey => {
-          const column = columns.find(col => col.key === columnKey);
+        {columnsKey.map((columnKey) => {
+          const column = columns.find((col) => col.key === columnKey);
           const rawTitle = column?.title;
+          // `title` can be a render function per `ColumnTitle`; `MeasureCell` only renders ReactNode
           const titleForMeasure = React.isValidElement<React.RefAttributes<any>>(rawTitle)
             ? React.cloneElement(rawTitle, { ref: null })
-            : rawTitle;
+            : (rawTitle as React.ReactNode);
           return (
             <MeasureCell
               key={columnKey}

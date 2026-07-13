@@ -1,7 +1,7 @@
-import { Button, Segmented, Space, Switch, Typography } from "antd";
-import type { TableProps } from "@dtjoy/dt-design";
-import { Table } from "@dtjoy/dt-design";
-import React from "react";
+import { Button, Segmented, Space, Switch, Typography } from 'antd';
+import type { TableProps } from '@dtjoy/dt-design';
+import { Table } from '@dtjoy/dt-design';
+import React from 'react';
 
 interface RecordType {
   id: number;
@@ -14,24 +14,24 @@ interface RecordType {
 }
 
 // 双层合并表头配置（两行表头，含表头跨列合并）
-const fixedColumns: TableProps<RecordType>["columns"] = [
+const fixedColumns: TableProps<RecordType>['columns'] = [
   // 第一组基础信息 合并表头
   {
-    title: "基础人员信息", // 第一层表头
+    title: '基础人员信息', // 第一层表头
     width: 340,
 
     children: [
-      { title: "ID", dataIndex: "id", width: 100 },
-      { title: "FirstName", dataIndex: "firstName", width: 120 },
-      { title: "LastName", dataIndex: "lastName", width: 120, fixed: "start" },
+      { title: 'ID', dataIndex: 'id', width: 100 },
+      { title: 'FirstName', dataIndex: 'firstName', width: 120 },
+      { title: 'LastName', dataIndex: 'lastName', width: 120, fixed: 'start' },
     ],
   },
   {
-    title: "分组&年龄",
+    title: '分组&年龄',
     width: 220,
     children: [
       {
-        title: "分组",
+        title: '分组',
         width: 120,
         render: (_, record) => `Group ${Math.floor(record.id / 4)}`,
         onCell: (record) => ({
@@ -39,8 +39,8 @@ const fixedColumns: TableProps<RecordType>["columns"] = [
         }),
       },
       {
-        title: "年龄",
-        dataIndex: "age",
+        title: '年龄',
+        dataIndex: 'age',
         width: 100,
         onCell: (record) => ({
           colSpan: record.id % 4 === 0 ? 2 : 1,
@@ -50,27 +50,27 @@ const fixedColumns: TableProps<RecordType>["columns"] = [
   },
   // 地址大分组，表头跨3列合并
   {
-    title: "详细地址信息", // 第二层合并表头，跨3个子列
+    title: '详细地址信息', // 第二层合并表头，跨3个子列
     children: [
       {
-        title: "地址1",
-        dataIndex: "address1",
+        title: '地址1',
+        dataIndex: 'address1',
         onCell: (record) => ({
           colSpan: record.id % 4 === 0 ? 0 : 1,
         }),
       },
-      { title: "地址2", dataIndex: "address2" },
-      { title: "地址3", dataIndex: "address3" },
+      { title: '地址2', dataIndex: 'address2' },
+      { title: '地址3', dataIndex: 'address3' },
     ],
   },
   // 操作列固定右侧
   {
-    title: "操作区域",
+    title: '操作区域',
     width: 150,
-    fixed: "end",
+    fixed: 'end',
     children: [
       {
-        title: "操作",
+        title: '操作',
         width: 150,
         render: () => (
           <Space>
@@ -84,13 +84,13 @@ const fixedColumns: TableProps<RecordType>["columns"] = [
 ];
 
 // 简易单层列（关闭固定列时使用）
-const columns: TableProps<RecordType>["columns"] = [
+const columns: TableProps<RecordType>['columns'] = [
   {
-    title: "基础信息",
+    title: '基础信息',
     children: [
-      { title: "ID", dataIndex: "id", width: 100 },
-      { title: "FirstName", dataIndex: "firstName", width: 120 },
-      { title: "LastName", dataIndex: "lastName" },
+      { title: 'ID', dataIndex: 'id', width: 100 },
+      { title: 'FirstName', dataIndex: 'firstName', width: 120 },
+      { title: 'LastName', dataIndex: 'lastName' },
     ],
   },
 ];
@@ -113,7 +113,7 @@ const App: React.FC = () => {
   const [empty, setEmpty] = React.useState(false);
   const [count, setCount] = React.useState(10000);
 
-  const tblRef: Parameters<typeof Table>[0]["ref"] = React.useRef(null);
+  const tblRef: Parameters<typeof Table>[0]['ref'] = React.useRef(null);
 
   const data = React.useMemo<RecordType[]>(() => getData(count), [count]);
 
@@ -127,7 +127,7 @@ const App: React.FC = () => {
     // 开启展开行时移除内容单元格合并逻辑，避免冲突
     return fixedColumns.map((col) => {
       const newCol = { ...col };
-      if (newCol.children) {
+      if ('children' in newCol) {
         newCol.children = newCol.children.map((child) => ({
           ...child,
           onCell: undefined,
@@ -137,20 +137,18 @@ const App: React.FC = () => {
     });
   }, [expanded, fixed]);
 
-  const expandableProps = React.useMemo<TableProps<RecordType>["expandable"]>(() => {
+  const expandableProps = React.useMemo<TableProps<RecordType>['expandable']>(() => {
     if (!expanded) return undefined;
     return {
       columnWidth: 48,
-      expandedRowRender: (record) => (
-        <p style={{ margin: 0 }}>🎉 Expanded {record.address1}</p>
-      ),
+      expandedRowRender: (record) => <p style={{ margin: 0 }}>🎉 Expanded {record.address1}</p>,
       rowExpandable: (record) => record.id % 2 === 0,
     };
   }, [expanded]);
 
   return (
     <div style={{ padding: 64 }}>
-      <Space direction="vertical" style={{ width: "100%" }}>
+      <Space direction="vertical" style={{ width: '100%' }}>
         <Space wrap>
           <Switch
             checked={bordered}
@@ -178,18 +176,16 @@ const App: React.FC = () => {
           />
           <Segmented
             value={count}
-            onChange={setCount}
+            onChange={(val) => setCount(val as number)}
             options={[
-              { label: "无数据", value: 0 },
-              { label: "少量4条", value: 4 },
-              { label: "大量10000条虚拟滚动", value: 10000 },
+              { label: '无数据', value: 0 },
+              { label: '少量4条', value: 4 },
+              { label: '大量10000条虚拟滚动', value: 10000 },
             ]}
           />
 
           {data.length >= 999 && (
-            <Button onClick={() => tblRef.current?.scrollTo({ index: 999 })}>
-              滚动到第999行
-            </Button>
+            <Button onClick={() => tblRef.current?.scrollTo({ index: 999 })}>滚动到第999行</Button>
           )}
         </Space>
 
@@ -202,7 +198,7 @@ const App: React.FC = () => {
           dataSource={empty ? [] : data}
           pagination={false}
           ref={tblRef}
-          rowSelection={expanded ? undefined : { type: "radio", columnWidth: 48 }}
+          rowSelection={expanded ? undefined : { type: 'radio', columnWidth: 48 }}
           expandable={expandableProps}
         />
       </Space>

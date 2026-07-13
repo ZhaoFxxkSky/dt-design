@@ -62,7 +62,7 @@ function flatColumns<RecordType>(
 ): ColumnType<RecordType>[] {
   return columns
     .filter((column) => column && typeof column === 'object')
-    .reduce((list, column, index) => {
+    .reduce<ColumnType<RecordType>[]>((list, column, index) => {
       const { fixed } = column;
       const parsedFixed =
         fixed === true || fixed === 'left' ? 'start' : fixed === 'right' ? 'end' : fixed;
@@ -121,7 +121,7 @@ function useColumns<RecordType>(
     columnTitle?: React.ReactNode;
     getRowKey: GetRowKey<RecordType>;
     onTriggerExpand: TriggerEventHandler<RecordType>;
-    expandIcon?: RenderExpandIcon<RecordType>;
+    expandIcon: RenderExpandIcon<RecordType>;
     rowExpandable?: (record: RecordType) => boolean;
     expandIconColumnIndex?: number;
     direction?: Direction;
@@ -129,7 +129,7 @@ function useColumns<RecordType>(
     columnWidth?: number | string;
     clientWidth: number;
     fixed?: FixedType;
-    scrollWidth?: number;
+    scrollWidth?: number | null;
     expandedRowOffset?: number;
   },
   transformColumns: (columns: ColumnsType<RecordType>) => ColumnsType<RecordType>,
@@ -150,7 +150,7 @@ function useColumns<RecordType>(
       let cloneColumns = baseColumns.slice();
 
       // >>> Warning if use `expandIconColumnIndex`
-      if (process.env.NODE_ENV !== 'production' && expandIconColumnIndex >= 0) {
+      if (process.env.NODE_ENV !== 'production' && (expandIconColumnIndex ?? -1) >= 0) {
         warning(
           false,
           '`expandIconColumnIndex` is deprecated. Please use `Table.EXPAND_COLUMN` in `columns` instead.',
@@ -188,7 +188,8 @@ function useColumns<RecordType>(
       if (fixed) {
         fixedColumn = fixed;
       } else {
-        fixedColumn = prevColumn ? prevColumn.fixed : null;
+        // Keep the runtime value of `prevColumn.fixed` untouched (it may be `undefined`)
+        fixedColumn = prevColumn ? (prevColumn.fixed as FixedType | null) : null;
       }
 
       // >>> Create expandable column
@@ -198,16 +199,18 @@ function useColumns<RecordType>(
           columnType: 'EXPAND_COLUMN',
         },
         title: columnTitle,
-        fixed: fixedColumn,
+        fixed: fixedColumn as FixedType | undefined,
         className: `${prefixCls}-row-expand-icon-cell`,
         width: columnWidth,
-        render: (_, record, index) => {
+        render: (_: unknown, record: RecordType, index: number) => {
           const rowKey = getRowKey(record, index);
           const expanded = expandedKeys.has(rowKey);
           const recordExpandable = rowExpandable ? rowExpandable(record) : true;
 
           const icon = expandIcon({
-            prefixCls,
+            // `prefixCls` is optional in the options but always provided by the caller;
+            // pass the value through as-is.
+            prefixCls: prefixCls as string,
             expanded,
             expandable: recordExpandable,
             record,
@@ -268,7 +271,9 @@ function useColumns<RecordType>(
   // ========================= FillWidth ========================
   const [filledColumns, realScrollWidth] = useWidthColumns(
     flattenColumns,
-    scrollWidth,
+    // `useWidthColumns` treats falsy values uniformly and returns `scrollWidth`
+    // verbatim, so pass the value through as-is.
+    scrollWidth as number,
     clientWidth,
   );
 

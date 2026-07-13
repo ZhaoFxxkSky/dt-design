@@ -74,7 +74,7 @@ const Grid = React.forwardRef<GridRef, GridProps>((props, ref) => {
     return flattenColumns.map(({ width, minWidth, key }) => {
       const finalWidth = Math.max((width as number) || 0, (minWidth as number) || 0);
       total += finalWidth;
-      return [key, finalWidth, total];
+      return [key as React.Key, finalWidth, total];
     });
   }, [flattenColumns]);
 
@@ -95,7 +95,7 @@ const Grid = React.forwardRef<GridRef, GridProps>((props, ref) => {
       scrollTo: (config: VirtualScrollConfig) => {
         const { align, offset, ...restConfig } = config;
 
-        const virtualAlign = ALIGN_MAP[align] ?? (offset ? 'top' : 'auto');
+        const virtualAlign = (align && ALIGN_MAP[align]) ?? (offset ? 'top' : 'auto');
 
         listRef.current?.scrollTo({
           ...restConfig,

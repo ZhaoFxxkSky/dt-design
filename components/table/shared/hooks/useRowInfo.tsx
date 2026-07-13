@@ -37,7 +37,7 @@ export default function useRowInfo<RecordType>(
   expandable: boolean;
   rowProps: React.HTMLAttributes<any> & React.TdHTMLAttributes<any>;
 } {
-  const context: TableContextProps = useContext(TableContext, [
+  const context = useContext(TableContext, [
     'prefixCls',
     'fixedInfoList',
     'flattenColumns',
@@ -77,7 +77,11 @@ export default function useRowInfo<RecordType>(
 
   const expanded = expandedKeys && expandedKeys.has(rowKey);
 
-  const hasNestChildren = childrenColumnName && record && record[childrenColumnName];
+  // Declared as `boolean` in the return type; historically the raw children
+  // value (a truthy array) flows through, so keep the runtime value as-is.
+  const hasNestChildren = (childrenColumnName &&
+    record &&
+    (record as Record<PropertyKey, unknown>)[childrenColumnName]) as boolean;
 
   const onInternalTriggerExpand = useEvent(onTriggerExpand);
 
@@ -94,7 +98,7 @@ export default function useRowInfo<RecordType>(
   };
 
   // ====================== RowClassName ======================
-  let computeRowClassName: string;
+  let computeRowClassName: string | undefined;
   if (typeof rowClassName === 'string') {
     computeRowClassName = rowClassName;
   } else if (typeof rowClassName === 'function') {

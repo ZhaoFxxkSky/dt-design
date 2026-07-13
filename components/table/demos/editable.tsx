@@ -13,7 +13,7 @@ import {
   Typography,
 } from 'antd';
 import { DeleteOutlined, PlusOutlined, ReloadOutlined, SaveOutlined } from '@ant-design/icons';
-import { Table } from '../index';
+import { Summary, Table } from '../index';
 import type { ColumnGroupType, ColumnsType, EditableConfig, Reference } from '../index';
 
 const { Text } = Typography;
@@ -455,7 +455,7 @@ export default function Demo() {
       width: 150,
       editable: {
         renderEditor: (
-          value: unknown,
+          _value: unknown,
           _record: unknown,
           _idx: number,
           onChange: (v: unknown) => void,
@@ -477,7 +477,7 @@ export default function Demo() {
       width: 150,
       editable: {
         renderEditor: (
-          value: unknown,
+          _value: unknown,
           _record: unknown,
           _idx: number,
           onChange: (v: unknown) => void,
@@ -717,19 +717,19 @@ export default function Demo() {
         summary={(pageData) => {
           const total = pageData.reduce((sum, r) => sum + (r.salary || 0), 0);
           return (
-            <Table.Summary fixed>
-              <Table.Summary.Row>
-                <Table.Summary.Cell index={0} colSpan={9}>
+            <Summary fixed>
+              <Summary.Row>
+                <Summary.Cell index={0} colSpan={9}>
                   <Text strong>合计</Text>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={9}>
+                </Summary.Cell>
+                <Summary.Cell index={9}>
                   <Text strong style={{ color: '#1890ff' }}>
                     ¥{total.toLocaleString()}
                   </Text>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={10} colSpan={5} />
-              </Table.Summary.Row>
-            </Table.Summary>
+                </Summary.Cell>
+                <Summary.Cell index={10} colSpan={5} />
+              </Summary.Row>
+            </Summary>
           );
         }}
       />

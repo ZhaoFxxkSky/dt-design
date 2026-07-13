@@ -11,7 +11,7 @@ export function useLayoutState<State>(
   const stateRef = useRef(defaultState);
   const [, forceUpdate] = useState({});
 
-  const lastPromiseRef = useRef<Promise<void>>(null);
+  const lastPromiseRef = useRef<Promise<void> | null>(null);
   const updateBatchRef = useRef<Updater<State>[]>([]);
 
   function setFrameState(updater: Updater<State>) {
@@ -55,7 +55,7 @@ export function useTimeoutLock<State>(
   defaultState?: State,
 ): [(state: State) => void, () => State | null] {
   const frameRef = useRef<State | null>(defaultState || null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   function cleanUp() {
     clearTimeout(timeoutRef.current);

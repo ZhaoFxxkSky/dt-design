@@ -4,6 +4,11 @@ import { INTERNAL_COL_DEFINE } from '../shared/utils/legacyUtil';
 import { useContext } from '../../_util/context';
 import TableContext from '../shared/context/TableContext';
 
+/** Column injected with internal col props by internal features (e.g. expandable, selection) */
+type InternalColDefineColumn<RecordType> = ColumnType<RecordType> & {
+  [INTERNAL_COL_DEFINE]?: Record<string, unknown>;
+};
+
 export interface ColGroupProps<RecordType> {
   colWidths: readonly (number | string)[];
   columns?: readonly ColumnType<RecordType>[];
@@ -16,7 +21,7 @@ const ColGroup = <RecordType,>(props: ColGroupProps<RecordType>) => {
   const { tableLayout } = useContext(TableContext, ['tableLayout']);
 
   const cols: React.ReactElement<any>[] = [];
-  const len = columCount || columns.length;
+  const len = columCount || columns?.length || 0;
 
   // Only insert col with width & additional props
   // Skip if rest col do not have any useful info
@@ -24,10 +29,10 @@ const ColGroup = <RecordType,>(props: ColGroupProps<RecordType>) => {
   for (let i = len - 1; i >= 0; i -= 1) {
     const width = colWidths[i];
     const column = columns && columns[i];
-    let additionalProps: Record<string, unknown>;
-    let minWidth: number;
+    let additionalProps: Record<string, unknown> | undefined;
+    let minWidth: number | undefined;
     if (column) {
-      additionalProps = column[INTERNAL_COL_DEFINE];
+      additionalProps = (column as InternalColDefineColumn<RecordType>)[INTERNAL_COL_DEFINE];
 
       // fixed will cause layout problems
       if (tableLayout === 'auto') {

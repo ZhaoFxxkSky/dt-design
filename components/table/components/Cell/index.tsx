@@ -9,14 +9,13 @@ import type {
   ColumnType,
   CustomizeComponent,
   DataIndex,
-  DefaultRecordType,
   ScopeType,
 } from '../../interface';
 import useCellRender from './useCellRender';
 import useHoverState from './useHoverState';
 import useEvent from '../../../_util/hooks/useEvent';
 
-export interface CellProps<RecordType extends DefaultRecordType> {
+export interface CellProps<RecordType> {
   prefixCls?: string;
   className?: string;
   style?: React.CSSProperties;
@@ -63,8 +62,9 @@ const getTitleFromCellRenderChildren = ({
   rowType,
   children,
 }: Pick<CellProps<any>, 'ellipsis' | 'rowType' | 'children'>) => {
-  let title: string;
-  const ellipsisConfig: CellEllipsisType = ellipsis === true ? { showTitle: true } : ellipsis;
+  let title: string | undefined;
+  const ellipsisConfig: CellEllipsisType | undefined =
+    ellipsis === true ? { showTitle: true } : ellipsis;
   if (ellipsisConfig && (ellipsisConfig.showTitle || rowType === 'header')) {
     if (typeof children === 'string' || typeof children === 'number') {
       title = children.toString();
@@ -84,7 +84,6 @@ const Cell = <RecordType,>(props: CellProps<RecordType>) => {
   }
 
   const {
-    component: Component,
     children,
     ellipsis,
     scope,
@@ -126,6 +125,9 @@ const Cell = <RecordType,>(props: CellProps<RecordType>) => {
     isSticky,
   } = props;
 
+  // `component` is optional in props but is always provided by call sites when rendering
+  const Component = props.component as CustomizeComponent;
+
   const cellPrefixCls = `${prefixCls}-cell`;
 
   const { allColumnsFixedLeft, rowHoverable } = useContext(TableContext, [
@@ -135,16 +137,19 @@ const Cell = <RecordType,>(props: CellProps<RecordType>) => {
 
   // ====================== Value =======================
   const [childNode, legacyCellProps] = useCellRender(
-    record,
+    record as RecordType,
     dataIndex,
-    renderIndex,
+    renderIndex as number,
     children,
     render,
     shouldCellUpdate,
   );
 
   // ====================== Fixed =======================
-  const fixedStyle: React.CSSProperties = {};
+  const fixedStyle: React.CSSProperties & {
+    '--z-offset'?: number;
+    '--z-offset-reverse'?: number;
+  } = {};
   const isFixStart = typeof fixStart === 'number' && !allColumnsFixedLeft;
   const isFixEnd = typeof fixEnd === 'number' && !allColumnsFixedLeft;
 
@@ -156,15 +161,9 @@ const Cell = <RecordType,>(props: CellProps<RecordType>) => {
     const [absScroll, scrollWidth] = scrollInfo;
 
     const showStartShadow =
-      isFixStart &&
-      fixedStartShadow &&
-      absScroll - (offsetFixedStartShadow || 0) >=
-      1;
+      isFixStart && fixedStartShadow && absScroll - (offsetFixedStartShadow || 0) >= 1;
     const showEndShadow =
-      isFixEnd &&
-      fixedEndShadow &&
-      scrollWidth - absScroll - (offsetFixedEndShadow || 0) >
-      1;
+      isFixEnd && fixedEndShadow && scrollWidth - absScroll - (offsetFixedEndShadow || 0) > 1;
 
     return [showStartShadow, showEndShadow];
   });
@@ -185,10 +184,10 @@ const Cell = <RecordType,>(props: CellProps<RecordType>) => {
   const mergedRowSpan = legacyCellProps?.rowSpan ?? additionalProps.rowSpan ?? rowSpan ?? 1;
 
   // ====================== Hover =======================
-  const [hovering, onHover] = useHoverState(index, mergedRowSpan);
+  const [hovering, onHover] = useHoverState(index as number, mergedRowSpan);
 
   const onMouseEnter: React.MouseEventHandler<HTMLTableCellElement> = useEvent((event) => {
-    if (record) {
+    if (record && index !== undefined) {
       onHover(index, index + mergedRowSpan - 1);
     }
 

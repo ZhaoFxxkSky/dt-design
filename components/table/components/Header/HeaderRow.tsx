@@ -22,8 +22,8 @@ export interface RowProps<RecordType> {
   cellComponent: CustomizeComponent;
   onHeaderRow: GetComponentProps<readonly ColumnType<RecordType>[]>;
   index: number;
-  classNames: TableProps['classNames']['header'];
-  styles: TableProps['styles']['header'];
+  classNames: NonNullable<NonNullable<TableProps['classNames']>['header']>;
+  styles: NonNullable<NonNullable<TableProps['styles']>['header']>;
 }
 
 const HeaderRow = <RecordType,>(props: RowProps<RecordType>) => {
@@ -40,15 +40,14 @@ const HeaderRow = <RecordType,>(props: RowProps<RecordType>) => {
   } = props;
   const { prefixCls } = useContext(TableContext, ['prefixCls']);
 
+  const columns = cells.map((cell) => cell.column as ColumnType<RecordType>);
+
   let rowProps: React.HTMLAttributes<HTMLElement> = {};
   if (onHeaderRow) {
-    rowProps = onHeaderRow(
-      cells.map((cell) => cell.column),
-      index,
-    );
+    rowProps = onHeaderRow(columns, index);
   }
 
-  const columnsKey = getColumnsKey(cells.map((cell) => cell.column));
+  const columnsKey = getColumnsKey(columns);
 
   return (
     <RowComponent
@@ -58,7 +57,7 @@ const HeaderRow = <RecordType,>(props: RowProps<RecordType>) => {
     >
       {cells.map((cell: CellType<RecordType>, cellIndex) => {
         const { column, colStart, colEnd, colSpan } = cell;
-        const fixedInfo = getCellFixedInfo(colStart, colEnd, flattenColumns, stickyOffsets);
+        const fixedInfo = getCellFixedInfo(colStart!, colEnd!, flattenColumns, stickyOffsets);
 
         const additionalProps: React.HTMLAttributes<HTMLElement> =
           column?.onHeaderCell?.(column) || {};
@@ -66,9 +65,9 @@ const HeaderRow = <RecordType,>(props: RowProps<RecordType>) => {
         return (
           <Cell
             {...cell}
-            scope={column.title ? (colSpan > 1 ? 'colgroup' : 'col') : null}
-            ellipsis={column.ellipsis}
-            align={column.align}
+            scope={column?.title ? ((colSpan ?? 0) > 1 ? 'colgroup' : 'col') : undefined}
+            ellipsis={column?.ellipsis}
+            align={column?.align}
             component={CellComponent}
             prefixCls={prefixCls}
             key={columnsKey[cellIndex]}

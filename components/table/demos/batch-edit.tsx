@@ -459,7 +459,7 @@ export default function Demo() {
         columns={columns as ColumnsType}
         selectedRowKeys={selectedRowKeys}
         data={data}
-        getRowKey={(r: { key: string }) => r.key}
+        getRowKey={(r): React.Key => r.key}
         onCancel={() => setBatchEditOpen(false)}
         onApply={handleBatchApply}
       />

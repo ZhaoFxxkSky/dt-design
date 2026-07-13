@@ -7,7 +7,7 @@ const defaultContainer = canUseDom() ? window : null;
 
 /** Sticky header hooks */
 export default function useSticky(
-  sticky: boolean | TableSticky,
+  sticky: boolean | TableSticky | undefined,
   prefixCls: string,
 ): {
   isSticky: boolean;
@@ -35,7 +35,9 @@ export default function useSticky(
       offsetHeader,
       offsetSummary,
       offsetScroll,
-      container,
+      // `container` is only `null` during SSR (no DOM), where sticky
+      // rendering never happens; the declared contract stays non-null.
+      container: container as Window | HTMLElement,
     };
   }, [isSticky, offsetScroll, offsetHeader, offsetSummary, prefixCls, container]);
 }

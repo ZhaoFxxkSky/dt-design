@@ -39,8 +39,8 @@ export function getCellFixedInfo(
   const startColumn = columns[colStart] || {};
   const endColumn = columns[colEnd] || {};
 
-  let fixStart: number = null;
-  let fixEnd: number = null;
+  let fixStart: number | null = null;
+  let fixEnd: number | null = null;
 
   if (isFixedStart(startColumn) && isFixedStart(endColumn)) {
     fixStart = stickyOffsets.start[colStart];
@@ -89,13 +89,15 @@ export function getCellFixedInfo(
   }
 
   return {
-    fixStart,
-    fixEnd,
+    // `null` marks a non-fixed column at runtime (kept for compatibility);
+    // the exported `FixedInfo` contract types it as `number | false`.
+    fixStart: fixStart as number | false,
+    fixEnd: fixEnd as number | false,
     fixedStartShadow,
     fixedEndShadow,
     offsetFixedStartShadow,
     offsetFixedEndShadow,
-    isSticky: stickyOffsets.isSticky,
+    isSticky: stickyOffsets.isSticky ?? false,
     zIndex,
     zIndexReverse,
   };

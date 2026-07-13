@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { Table } from '../index';
+import { Summary, Table } from '../index';
 import type { ColumnsType } from '../index';
 
 // ============================================================
@@ -957,7 +957,9 @@ describe('TableFeatures — Summary', () => {
     );
 
     expect(summaryFn).toHaveBeenCalled();
-    const summaryData = summaryFn.mock.calls[0][0];
+    // jest.fn without declared params types calls as `[]`; the summary callback
+    // is invoked with the data array at runtime
+    const [summaryData] = summaryFn.mock.calls[0] as unknown as [unknown[]];
     expect(summaryData.length).toBe(5);
   });
 
@@ -968,13 +970,13 @@ describe('TableFeatures — Summary', () => {
         columns={basicColumns}
         rowKey="key"
         summary={() => (
-          <Table.Summary fixed>
-            <Table.Summary.Row>
-              <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
-              <Table.Summary.Cell index={1}>5 rows</Table.Summary.Cell>
-              <Table.Summary.Cell index={2}>—</Table.Summary.Cell>
-            </Table.Summary.Row>
-          </Table.Summary>
+          <Summary fixed>
+            <Summary.Row>
+              <Summary.Cell index={0}>Total</Summary.Cell>
+              <Summary.Cell index={1}>5 rows</Summary.Cell>
+              <Summary.Cell index={2}>—</Summary.Cell>
+            </Summary.Row>
+          </Summary>
         )}
       />,
     );

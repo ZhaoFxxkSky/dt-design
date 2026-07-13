@@ -142,8 +142,9 @@ const SwitchEditor: React.FC<BuiltinEditorProps> = ({
     <Switch
       checked={!!value}
       onChange={onChange}
-      onFocus={onFocus}
-      onBlur={onBlur}
+      // `onFocus`/`onBlur` are forwarded by Switch at runtime but missing from
+      // `SwitchProps`; pass them via spread (spread props skip excess checks).
+      {...{ onFocus, onBlur }}
       {...config.props}
     />
   );

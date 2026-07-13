@@ -195,7 +195,7 @@ export interface EditableError {
 }
 
 interface ColumnSharedType<RecordType> {
-  title?: React.ReactNode;
+  title?: ColumnTitle<RecordType>;
   key?: Key;
   className?: string;
   hidden?: boolean;

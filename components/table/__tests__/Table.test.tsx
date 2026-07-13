@@ -448,7 +448,7 @@ describe('Table — Empty data', () => {
   it('renders default empty text', () => {
     render(<Table dataSource={[]} columns={columns as any} rowKey="key" />);
     // Default empty text comes from ConfigProvider renderEmpty or fallback
-    expect(container => container.querySelector('.ant-table-placeholder')).toBeTruthy();
+    expect((container: HTMLElement) => container.querySelector('.ant-table-placeholder')).toBeTruthy();
   });
 
   it('renders emptyText as ReactNode', () => {

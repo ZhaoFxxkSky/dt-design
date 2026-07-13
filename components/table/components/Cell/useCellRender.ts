@@ -11,12 +11,12 @@ import { useImmutableMark } from '../../shared/context/TableContext';
 function isRenderCell<RecordType>(
   data: React.ReactNode | RenderedCell<RecordType>,
 ): data is RenderedCell<RecordType> {
-  return data && typeof data === 'object' && !Array.isArray(data) && !React.isValidElement(data);
+  return !!data && typeof data === 'object' && !Array.isArray(data) && !React.isValidElement(data);
 }
 
 export default function useCellRender<RecordType>(
   record: RecordType,
-  dataIndex: DataIndex<RecordType>,
+  dataIndex: DataIndex<RecordType> | undefined,
   renderIndex: number,
   children?: React.ReactNode,
   render?: ColumnType<RecordType>['render'],
@@ -27,7 +27,7 @@ export default function useCellRender<RecordType>(
   const mark = useImmutableMark();
 
   // ======================== Render ========================
-  const retData = useMemo<[React.ReactNode, CellType<RecordType>] | [React.ReactNode]>(
+  const retData = useMemo<[React.ReactNode, CellType<RecordType> | undefined] | [React.ReactNode]>(
     () => {
       if (validateValue(children)) {
         return [children];

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { Table } from '../index';
+import { Summary, Table } from '../index';
 import type { ColumnsType, Reference } from '../index';
 
 // ============================================================
@@ -359,7 +359,7 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current?.validate();
+    const result = ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBe(1);
   });
@@ -388,7 +388,7 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current?.validate();
+    const result = ref.current!.validate();
     expect(result.valid).toBe(false);
   });
 
@@ -416,7 +416,7 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current?.validate();
+    const result = ref.current!.validate();
     expect(result.valid).toBe(false);
   });
 
@@ -444,7 +444,7 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current?.validate();
+    const result = ref.current!.validate();
     expect(result.valid).toBe(true);
     expect(result.errors.size).toBe(0);
   });
@@ -477,7 +477,7 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current?.validate();
+    const result = ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBe(1);
   });
@@ -514,7 +514,7 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current?.validate();
+    const result = ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBe(1);
   });
@@ -553,7 +553,7 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current?.validate();
+    const result = ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBe(2); // row 1 (empty) + row 2 (too short)
   });
@@ -586,11 +586,11 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current?.validate();
+    const result = ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.firstError).toBeDefined();
-    expect(result.firstError.rowIndex).toBe(1);
-    expect(result.firstError.message).toBe('Name is required');
+    expect(result.firstError!.rowIndex).toBe(1);
+    expect(result.firstError!.message).toBe('Name is required');
   });
 
   it('onValidate callback is called on validate', () => {
@@ -619,7 +619,7 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    ref.current?.validate();
+    ref.current!.validate();
     expect(onValidate).toHaveBeenCalled();
     expect(onValidate.mock.calls[0][0].valid).toBe(false);
   });
@@ -649,7 +649,7 @@ describe('Editable — Validation', () => {
     );
 
     // Empty data should be valid (no rows to validate)
-    const result = ref.current?.validate();
+    const result = ref.current!.validate();
     expect(result.valid).toBe(true);
     expect(result.errors.size).toBe(0);
   });
@@ -755,7 +755,7 @@ describe('Editable — Reset Errors', () => {
     );
 
     // First validate to create errors
-    const result = ref.current?.validate();
+    const result = ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBe(1);
 
@@ -763,7 +763,7 @@ describe('Editable — Reset Errors', () => {
     ref.current?.resetErrors();
 
     // Validate again — errors should be fresh
-    const result2 = ref.current?.validate();
+    const result2 = ref.current!.validate();
     expect(result2).toBeDefined();
     // Still invalid because data hasn't changed, but errors Map is fresh
     expect(result2.valid).toBe(false);
@@ -920,7 +920,8 @@ describe('Editable — Multi-Row Editing', () => {
           rowKey="key"
           editable
           onEditableChange={(newData) => {
-            setData(newData);
+            // onEditableChange is typed as AnyObject[]; cast back to the local row type
+            setData(newData as typeof testData);
             onEditableChange(newData);
           }}
         />
@@ -1019,7 +1020,7 @@ describe('Editable — Edge Cases', () => {
     expect(editableCells.length).toBe(0);
 
     // Validate on empty data
-    const result = ref.current?.validate();
+    const result = ref.current!.validate();
     expect(result.valid).toBe(true);
     expect(result.errors.size).toBe(0);
   });
@@ -1226,7 +1227,7 @@ describe('Editable — Multiple Editable Columns', () => {
       />,
     );
 
-    const result = ref.current?.validate();
+    const result = ref.current!.validate();
     // Row 2 has 3 errors: empty name, undefined age, bad email (required + pattern)
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBeGreaterThanOrEqual(3);
@@ -1479,7 +1480,7 @@ describe('Editable — Column Group Header', () => {
       />,
     );
 
-    const result = ref.current?.validate();
+    const result = ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBe(1);
   });
@@ -1547,14 +1548,14 @@ describe('Editable — Summary Row', () => {
         rowKey="key"
         editable
         summary={() => (
-          <Table.Summary fixed>
-            <Table.Summary.Row>
-              <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
-              <Table.Summary.Cell index={1}>
+          <Summary fixed>
+            <Summary.Row>
+              <Summary.Cell index={0}>Total</Summary.Cell>
+              <Summary.Cell index={1}>
                 {testData.reduce((s, r) => s + r.age, 0)}
-              </Table.Summary.Cell>
-            </Table.Summary.Row>
-          </Table.Summary>
+              </Summary.Cell>
+            </Summary.Row>
+          </Summary>
         )}
       />,
     );
@@ -1613,7 +1614,8 @@ describe('Editable — Pagination Fix', () => {
           rowKey="key"
           editable
           onEditableChange={(newData) => {
-            setData(newData);
+            // onEditableChange is typed as AnyObject[]; cast back to the local row type
+            setData(newData as typeof largeData);
             onEditableChange(newData);
           }}
           pagination={{ pageSize: 5, current: 2 }}
@@ -1702,7 +1704,7 @@ describe('Editable — Pagination Fix', () => {
     );
 
     // validate should check ALL rows, not just current page
-    const result = ref.current?.validate();
+    const result = ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBe(5); // 5 empty names on page 3
   });
@@ -1740,7 +1742,7 @@ describe('Editable — Pagination Fix', () => {
       />,
     );
 
-    const result = ref.current?.validate();
+    const result = ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.firstError?.rowIndex).toBe(0);
     // After validate, the pagination should have switched to page 1

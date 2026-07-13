@@ -6,6 +6,8 @@ import useColumns from '../features/columns/useColumns';
 
 // ============================================================
 // useColumns
+// Note: tests pass `undefined as any` for the second (transformColumns) argument —
+// the hook tolerates it at runtime, but the type declares it as required.
 // ============================================================
 describe('useColumns', () => {
   it('returns flatten columns', () => {
@@ -13,7 +15,7 @@ describe('useColumns', () => {
       { title: 'A', dataIndex: 'a', key: 'a' },
       { title: 'B', dataIndex: 'b', key: 'b' },
     ];
-    const { result } = renderHook(() => useColumns({ columns } as any, undefined));
+    const { result } = renderHook(() => useColumns({ columns } as any, undefined as any));
     expect(result.current[1]).toHaveLength(2);
     expect((result.current[1] as any)[0].dataIndex).toBe('a');
   });
@@ -29,7 +31,7 @@ describe('useColumns', () => {
       },
       { title: 'C', dataIndex: 'c', key: 'c' },
     ];
-    const { result } = renderHook(() => useColumns({ columns } as any, undefined));
+    const { result } = renderHook(() => useColumns({ columns } as any, undefined as any));
     expect(result.current[1]).toHaveLength(3);
   });
 
@@ -39,14 +41,14 @@ describe('useColumns', () => {
       { title: 'Hidden', dataIndex: 'b', key: 'b', hidden: true },
       { title: 'C', dataIndex: 'c', key: 'c' },
     ];
-    const { result } = renderHook(() => useColumns({ columns } as any, undefined));
+    const { result } = renderHook(() => useColumns({ columns } as any, undefined as any));
     expect(result.current[1]).toHaveLength(2);
     expect((result.current[1] as any)[0].key).toBe('a');
     expect((result.current[1] as any)[1].key).toBe('c');
   });
 
   it('returns empty array when columns is undefined', () => {
-    const { result } = renderHook(() => useColumns({} as any, undefined));
+    const { result } = renderHook(() => useColumns({} as any, undefined as any));
     // When columns is undefined/empty, the hook provides a placeholder column
     expect(result.current[0]).toBeDefined();
     expect(result.current[1]).toBeDefined();
@@ -57,7 +59,7 @@ describe('useColumns', () => {
       { title: 'A', dataIndex: 'a', key: 'a' },
       { title: 'B', dataIndex: 'b', key: 'b' },
     ];
-    const { result } = renderHook(() => useColumns({ columns } as any, undefined));
+    const { result } = renderHook(() => useColumns({ columns } as any, undefined as any));
     // result.current[0] is mergedColumns (processed copy, not same reference)
     expect(result.current[0]).toHaveLength(2);
     expect((result.current[0] as any)[0].dataIndex).toBe('a');
@@ -94,7 +96,7 @@ describe('useColumns', () => {
       },
       { title: 'Top', dataIndex: 'd', key: 'd' },
     ];
-    const { result } = renderHook(() => useColumns({ columns } as any, undefined));
+    const { result } = renderHook(() => useColumns({ columns } as any, undefined as any));
     expect(result.current[1]).toHaveLength(4);
     expect((result.current[1] as any)[0].key).toBe('a');
     expect((result.current[1] as any)[3].key).toBe('d');
@@ -111,7 +113,7 @@ describe('useColumns', () => {
         ],
       },
     ];
-    const { result } = renderHook(() => useColumns({ columns } as any, undefined));
+    const { result } = renderHook(() => useColumns({ columns } as any, undefined as any));
     expect(result.current[1]).toHaveLength(2);
     expect((result.current[1] as any)[0].key).toBe('a');
     expect((result.current[1] as any)[1].key).toBe('c');
@@ -120,7 +122,7 @@ describe('useColumns', () => {
   it('is memoized (same columns produce stable result)', () => {
     const columns = [{ title: 'A', dataIndex: 'a', key: 'a' }];
     const { result, rerender } = renderHook(() =>
-      useColumns({ columns } as any, undefined),
+      useColumns({ columns } as any, undefined as any),
     );
     const first = result.current;
     rerender();
@@ -134,7 +136,7 @@ describe('useColumns', () => {
     const columns2 = [{ title: 'B', dataIndex: 'b', key: 'b' }];
 
     const { result, rerender } = renderHook(
-      ({ cols }) => useColumns({ columns: cols } as any, undefined),
+      ({ cols }) => useColumns({ columns: cols } as any, undefined as any),
       { initialProps: { cols: columns1 } },
     );
     const first = result.current;
@@ -143,7 +145,7 @@ describe('useColumns', () => {
   });
 
   it('handles empty columns array', () => {
-    const { result } = renderHook(() => useColumns({ columns: [] } as any, undefined));
+    const { result } = renderHook(() => useColumns({ columns: [] } as any, undefined as any));
     // Empty columns produces a placeholder column
     expect(result.current[0]).toBeDefined();
     expect(result.current[1]).toBeDefined();
@@ -164,7 +166,7 @@ describe('useColumns', () => {
         ],
       },
     ];
-    const { result } = renderHook(() => useColumns({ columns } as any, undefined));
+    const { result } = renderHook(() => useColumns({ columns } as any, undefined as any));
     expect(result.current[1]).toHaveLength(2);
   });
 });

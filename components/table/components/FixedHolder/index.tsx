@@ -85,7 +85,7 @@ const FixedHolder = React.forwardRef<HTMLDivElement, FixedHeaderProps<any>>((pro
   // Pass wheel to scroll event
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
-  const setScrollRef = React.useCallback((element: HTMLElement) => {
+  const setScrollRef = React.useCallback((element: HTMLDivElement) => {
     fillRef(ref, element);
     fillRef(scrollRef, element);
   }, []);
@@ -125,7 +125,7 @@ const FixedHolder = React.forwardRef<HTMLDivElement, FixedHeaderProps<any>>((pro
   // Add scrollbar column
   const lastColumn = flattenColumns[flattenColumns.length - 1];
   const ScrollBarColumn: ColumnType<unknown> & { scrollbar: true } = {
-    fixed: lastColumn ? lastColumn.fixed : null,
+    fixed: lastColumn?.fixed,
     scrollbar: true,
     onHeaderCell: () => ({
       className: `${prefixCls}-cell-scrollbar`,
@@ -175,9 +175,7 @@ const FixedHolder = React.forwardRef<HTMLDivElement, FixedHeaderProps<any>>((pro
         ...style,
       }}
       ref={setScrollRef}
-      className={clsx(className, {
-        [stickyClassName]: !!stickyClassName,
-      })}
+      className={clsx(className, stickyClassName)}
     >
       <TableComponent
         style={{
@@ -191,7 +189,7 @@ const FixedHolder = React.forwardRef<HTMLDivElement, FixedHeaderProps<any>>((pro
           colGroup
         ) : (
           <ColGroup
-            colWidths={[...mergedColumnWidth, combinationScrollBarSize]}
+            colWidths={[...(mergedColumnWidth || []), combinationScrollBarSize]}
             columCount={columCount + 1}
             columns={flattenColumnsWithScrollbar}
           />

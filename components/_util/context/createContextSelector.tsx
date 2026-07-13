@@ -1,8 +1,10 @@
 /**
  * Local shim for `@rc-component/context` - context.tsx
  *
- * Direct copy from @rc-component/context source.
- * Replaced `@rc-component/util` imports with `rc-util` subpath imports.
+ * Based on @rc-component/context source. Replaced `@rc-component/util`
+ * imports with `rc-util` subpath imports. The keys-array `useContext`
+ * overload was retyped to return a precise `Pick` of the selected keys
+ * (instead of `Partial<ContextProps>`) so consumers get non-optional fields.
  */
 import isEqual from 'rc-util/es/isEqual';
 import useEvent from 'rc-util/es/hooks/useEvent';
@@ -50,7 +52,7 @@ export function createContext<ContextProps>(
 
     useLayoutEffect(() => {
       unstable_batchedUpdates(() => {
-        context.listeners.forEach(listener => {
+        context.listeners.forEach((listener) => {
           listener(value);
         });
       });
@@ -72,10 +74,10 @@ export function useContext<ContextProps, SelectorValue>(
 ): SelectorValue;
 
 /** e.g. useSelect(userContext, ['name', 'age']) => user { name, age } */
-export function useContext<ContextProps, SelectorValue extends Partial<ContextProps>>(
+export function useContext<ContextProps, Keys extends keyof ContextProps>(
   holder: SelectorContext<ContextProps>,
-  selector: (keyof ContextProps)[],
-): SelectorValue;
+  selector: Keys[],
+): { [K in Keys]: ContextProps[K] };
 
 /** e.g. useSelect(userContext, 'name') => user.name */
 export function useContext<ContextProps, PropName extends keyof ContextProps>(
@@ -90,7 +92,7 @@ export function useContext<ContextProps, SelectorValue>(
   const eventSelector = useEvent<Selector<ContextProps, SelectorValue>>(
     typeof selector === 'function'
       ? selector
-      : ctx => {
+      : (ctx) => {
           if (selector === undefined) {
             return ctx as any;
           }
@@ -100,7 +102,7 @@ export function useContext<ContextProps, SelectorValue>(
           }
 
           const obj = {} as SelectorValue;
-          selector.forEach(key => {
+          selector.forEach((key) => {
             (obj as any)[key] = (ctx as any)[key];
           });
           return obj;

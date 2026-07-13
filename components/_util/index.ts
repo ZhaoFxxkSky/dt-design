@@ -12,11 +12,11 @@ export function toTooltipProps(tooltip: LabelTooltipType): TooltipProps | null {
   };
 }
 
-export * from './is';
-export * from './validate';
-export * from './scrollbar';
-export * from './rcUtil';
-export * from './type';
-export * from './warning';
-export * from './scrollTo';
 export * from './getScroll';
+export * from './is';
+export * from './rcUtil';
+export * from './scrollbar';
+export * from './scrollTo';
+export * from './type';
+export * from './validate';
+export * from './warning';

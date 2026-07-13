@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Table } from '@dtjoy/dt-design';
-import type { ColumnsType } from '@dtjoy/dt-design';
+import type { AlignType, ColumnsType } from '@dtjoy/dt-design';
 import {
   Button,
   Input,
@@ -14,6 +14,24 @@ import {
   Typography,
 } from 'antd';
 import { DownloadOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
+
+// Summary 是运行时挂载到 Table 上的静态属性，生产源码中声明为
+// ComponentType<unknown>；此处按其实际实现（components/Footer/Summary）
+// 补齐精确类型，以便严格模式校验通过。
+const Summary = Table.Summary as React.FC<
+  React.PropsWithChildren<{ fixed?: boolean | 'top' | 'bottom' }>
+> & {
+  Row: React.FC<React.PropsWithChildren<{ className?: string; style?: React.CSSProperties }>>;
+  Cell: React.FC<
+    React.PropsWithChildren<{
+      className?: string;
+      index: number;
+      colSpan?: number;
+      rowSpan?: number;
+      align?: AlignType;
+    }>
+  >;
+};
 
 interface DataType {
   key: string;
@@ -357,24 +375,24 @@ export default () => {
               ? Math.round(data.reduce((sum, item) => sum + item.progress, 0) / data.length)
               : 0;
           return (
-            <Table.Summary fixed>
-              <Table.Summary.Row>
-                <Table.Summary.Cell index={0}>合计</Table.Summary.Cell>
-                <Table.Summary.Cell index={1} />
-                <Table.Summary.Cell index={2} />
-                <Table.Summary.Cell index={3} />
-                <Table.Summary.Cell index={4} />
-                <Table.Summary.Cell index={5} align="right">
+            <Summary fixed>
+              <Summary.Row>
+                <Summary.Cell index={0}>合计</Summary.Cell>
+                <Summary.Cell index={1} />
+                <Summary.Cell index={2} />
+                <Summary.Cell index={3} />
+                <Summary.Cell index={4} />
+                <Summary.Cell index={5} align="right">
                   <strong>¥{totalSalary.toLocaleString()}</strong>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={6}>
+                </Summary.Cell>
+                <Summary.Cell index={6}>
                   <Progress percent={avgProgress} size="small" />
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={7} colSpan={5}>
+                </Summary.Cell>
+                <Summary.Cell index={7} colSpan={5}>
                   共 {data.length} 人 · 平均项目进度 {avgProgress}%
-                </Table.Summary.Cell>
-              </Table.Summary.Row>
-            </Table.Summary>
+                </Summary.Cell>
+              </Summary.Row>
+            </Summary>
           );
         }}
       />

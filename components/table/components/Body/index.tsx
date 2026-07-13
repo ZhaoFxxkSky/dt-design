@@ -7,6 +7,7 @@ import TableContext, { responseImmutable } from '../../shared/context/TableConte
 import useFlattenRecords from '../../features/virtual/useFlattenRecords';
 import devRenderTimes from '../../shared/hooks/useRenderTimes';
 import { getColumnsKey } from '../../shared/utils/valueUtil';
+import type { DefaultRecordType } from '../../interface';
 import BodyRow from './BodyRow';
 import ExpandedRow from './ExpandedRow';
 import MeasureRow from './MeasureRow';
@@ -16,7 +17,7 @@ export interface BodyProps<RecordType> {
   measureColumnWidth: boolean;
 }
 
-const Body = <RecordType,>(props: BodyProps<RecordType>) => {
+const Body = <RecordType extends DefaultRecordType>(props: BodyProps<RecordType>) => {
   if (process.env.NODE_ENV !== 'production') {
     devRenderTimes(props);
   }
@@ -61,7 +62,7 @@ const Body = <RecordType,>(props: BodyProps<RecordType>) => {
     getRowKey,
   );
 
-  const rowKeys = React.useMemo(() => flattenData.map(item => item.rowKey), [flattenData]);
+  const rowKeys = React.useMemo(() => flattenData.map((item) => item.rowKey), [flattenData]);
 
   // =================== Performance ====================
   const perfRef = React.useRef<PerfRecord>({ renderWithProps: false });

@@ -1,7 +1,8 @@
 import { getDOM } from 'rc-util/es/Dom/findDOMNode';
 
 export function getOffset(node: HTMLElement | Window) {
-  const element = getDOM(node);
+  // All call sites pass a mounted element (never `window` or `null`).
+  const element = getDOM(node)!;
   const box = element.getBoundingClientRect();
   const docElem = document.documentElement;
 

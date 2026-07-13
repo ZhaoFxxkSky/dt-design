@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
 import Cell from '../components/Cell';
+import type { CellProps } from '../components/Cell';
 import ColGroup from '../components/ColGroup';
 import Header from '../components/Header/Header';
 import FixedHolder from '../components/FixedHolder';
@@ -30,7 +31,7 @@ const mockContext = {
   scrollInfo: [0, 0] as [number, number],
   scrollbarSize: 0,
   isSticky: false,
-  getComponent: ((path: string[], defaultComp?: any) => defaultComp || 'td') as any,
+  getComponent: ((_path: string[], defaultComp?: any) => defaultComp || 'td') as any,
   classNames: {},
   styles: {},
   hoverStartRow: -1,
@@ -129,11 +130,14 @@ describe('Cell', () => {
         <tbody>
           <tr>
             <Cell
-              record={{ a: 'hello' }}
-              index={0}
-              column={mockContext.flattenColumns[0]}
-              dataIndex="a"
-              component="td"
+              // Test-only: `column` is an internal prop not on the public CellProps type
+              {...({
+                record: { a: 'hello' },
+                index: 0,
+                column: mockContext.flattenColumns[0],
+                dataIndex: 'a',
+                component: 'td',
+              } as CellProps<{ a: string }> & { column: unknown })}
             />
           </tr>
         </tbody>
@@ -248,7 +252,17 @@ describe('Cell', () => {
       <table>
         <tbody>
           <tr>
-            <Cell record={{ a: 'x' }} index={0} column={column} dataIndex="a" colSpan={4} component="td" />
+            <Cell
+              // Test-only: `column` is an internal prop not on the public CellProps type
+              {...({
+                record: { a: 'x' },
+                index: 0,
+                column,
+                dataIndex: 'a',
+                colSpan: 4,
+                component: 'td',
+              } as CellProps<{ a: string }> & { column: unknown })}
+            />
           </tr>
         </tbody>
       </table>,
@@ -263,7 +277,16 @@ describe('Cell', () => {
       <table>
         <tbody>
           <tr>
-            <Cell record={{ a: 'x' }} index={0} column={column} dataIndex="a" component="td" />
+            <Cell
+              // Test-only: `column` is an internal prop not on the public CellProps type
+              {...({
+                record: { a: 'x' },
+                index: 0,
+                column,
+                dataIndex: 'a',
+                component: 'td',
+              } as CellProps<{ a: string }> & { column: unknown })}
+            />
           </tr>
         </tbody>
       </table>,
@@ -395,10 +418,14 @@ describe('Header', () => {
   it('renders thead with column titles', () => {
     const { container } = renderWithCtx(
       <Header
-        prefixCls="ant-table"
-        columns={mockContext.columns}
-        flattenColumns={mockContext.flattenColumns}
-        stickyOffsets={{ start: [0, 0], end: [0, 0], widths: [100, 200] }}
+        // Test-only internal access: `prefixCls` comes from context in production and
+        // `onHeaderRow` is optional at runtime though required by the type
+        {...({
+          prefixCls: 'ant-table',
+          columns: mockContext.columns,
+          flattenColumns: mockContext.flattenColumns,
+          stickyOffsets: { start: [0, 0], end: [0, 0], widths: [100, 200] },
+        } as any)}
       />,
     );
     const ths = container.querySelectorAll('th');
@@ -410,10 +437,14 @@ describe('Header', () => {
   it('renders single row for flat columns', () => {
     const { container } = renderWithCtx(
       <Header
-        prefixCls="ant-table"
-        columns={mockContext.columns}
-        flattenColumns={mockContext.flattenColumns}
-        stickyOffsets={{ start: [0, 0], end: [0, 0], widths: [100, 200] }}
+        // Test-only internal access: `prefixCls` comes from context in production and
+        // `onHeaderRow` is optional at runtime though required by the type
+        {...({
+          prefixCls: 'ant-table',
+          columns: mockContext.columns,
+          flattenColumns: mockContext.flattenColumns,
+          stickyOffsets: { start: [0, 0], end: [0, 0], widths: [100, 200] },
+        } as any)}
       />,
     );
     expect(container.querySelectorAll('thead > tr')).toHaveLength(1);
@@ -438,10 +469,14 @@ describe('Header', () => {
     ];
     const { container } = renderWithCtx(
       <Header
-        prefixCls="ant-table"
-        columns={groupedColumns as any}
-        flattenColumns={flattenColumns as any}
-        stickyOffsets={{ start: [0, 0, 0], end: [0, 0, 0], widths: [100, 100, 100] }}
+        // Test-only internal access: `prefixCls` comes from context in production and
+        // `onHeaderRow` is optional at runtime though required by the type
+        {...({
+          prefixCls: 'ant-table',
+          columns: groupedColumns as any,
+          flattenColumns: flattenColumns as any,
+          stickyOffsets: { start: [0, 0, 0], end: [0, 0, 0], widths: [100, 100, 100] },
+        } as any)}
       />,
     );
     const rows = container.querySelectorAll('thead > tr');
@@ -452,11 +487,14 @@ describe('Header', () => {
     const onHeaderRow = jest.fn(() => ({ 'data-custom': 'yes', className: 'custom-header-row' }));
     const { container } = renderWithCtx(
       <Header
-        prefixCls="ant-table"
-        columns={mockContext.columns}
-        flattenColumns={mockContext.flattenColumns}
-        stickyOffsets={{ start: [0, 0], end: [0, 0], widths: [100, 200] }}
-        onHeaderRow={onHeaderRow}
+        // Test-only internal access: `prefixCls` comes from context in production
+        {...({
+          prefixCls: 'ant-table',
+          columns: mockContext.columns,
+          flattenColumns: mockContext.flattenColumns,
+          stickyOffsets: { start: [0, 0], end: [0, 0], widths: [100, 200] },
+          onHeaderRow,
+        } as any)}
       />,
     );
     expect(onHeaderRow).toHaveBeenCalled();
@@ -468,10 +506,14 @@ describe('Header', () => {
   it('applies prefixCls-cell class to th', () => {
     const { container } = renderWithCtx(
       <Header
-        prefixCls="ant-table"
-        columns={mockContext.columns}
-        flattenColumns={mockContext.flattenColumns}
-        stickyOffsets={{ start: [0, 0], end: [0, 0], widths: [100, 200] }}
+        // Test-only internal access: `prefixCls` comes from context in production and
+        // `onHeaderRow` is optional at runtime though required by the type
+        {...({
+          prefixCls: 'ant-table',
+          columns: mockContext.columns,
+          flattenColumns: mockContext.flattenColumns,
+          stickyOffsets: { start: [0, 0], end: [0, 0], widths: [100, 200] },
+        } as any)}
       />,
     );
     const ths = container.querySelectorAll('th');
@@ -484,10 +526,14 @@ describe('Header', () => {
     const columns = [{ key: 'a', title: 'A', width: 100, onHeaderCell: () => ({ style: { width: '50%' } }) }] as any;
     const { container } = renderWithCtx(
       <Header
-        prefixCls="ant-table"
-        columns={columns}
-        flattenColumns={columns}
-        stickyOffsets={{ start: [0], end: [0], widths: [100] }}
+        // Test-only internal access: `prefixCls` comes from context in production and
+        // `onHeaderRow` is optional at runtime though required by the type
+        {...({
+          prefixCls: 'ant-table',
+          columns,
+          flattenColumns: columns,
+          stickyOffsets: { start: [0], end: [0], widths: [100] },
+        } as any)}
       />,
     );
     const th = container.querySelector('th');
@@ -498,10 +544,14 @@ describe('Header', () => {
     const columns = [{ key: 'a', title: 'Dynamic Title' }] as any;
     const { container } = renderWithCtx(
       <Header
-        prefixCls="ant-table"
-        columns={columns}
-        flattenColumns={columns}
-        stickyOffsets={{ start: [0], end: [0], widths: [100] }}
+        // Test-only internal access: `prefixCls` comes from context in production and
+        // `onHeaderRow` is optional at runtime though required by the type
+        {...({
+          prefixCls: 'ant-table',
+          columns,
+          flattenColumns: columns,
+          stickyOffsets: { start: [0], end: [0], widths: [100] },
+        } as any)}
       />,
     );
     expect(container.querySelector('th')).toHaveTextContent('Dynamic Title');
@@ -515,19 +565,23 @@ describe('FixedHolder', () => {
   it('renders children inside table', () => {
     const { container } = renderWithCtx(
       <FixedHolder
-        prefixCls="ant-table"
-        className="ant-table-header"
-        colWidths={[100, 200]}
-        columCount={2}
-        flattenColumns={mockContext.flattenColumns}
-        columns={mockContext.columns}
-        stickyOffsets={{ start: [0, 0], end: [0, 0], widths: [100, 200] }}
-        direction="ltr"
-        noData={false}
-        maxContentScroll={false}
-        fixHeader
-        scrollX={true}
-        onScroll={() => {}}
+        // Test-only internal access: `prefixCls` comes from context in production and
+        // `onHeaderRow` is optional at runtime though required by the type
+        {...({
+          prefixCls: 'ant-table',
+          className: 'ant-table-header',
+          colWidths: [100, 200],
+          columCount: 2,
+          flattenColumns: mockContext.flattenColumns,
+          columns: mockContext.columns,
+          stickyOffsets: { start: [0, 0], end: [0, 0], widths: [100, 200] },
+          direction: 'ltr',
+          noData: false,
+          maxContentScroll: false,
+          fixHeader: true,
+          scrollX: true,
+          onScroll: () => {},
+        } as any)}
       >
         {() => (
           <thead>
@@ -546,19 +600,23 @@ describe('FixedHolder', () => {
   it('applies custom className', () => {
     const { container } = renderWithCtx(
       <FixedHolder
-        prefixCls="ant-table"
-        className="custom-holder"
-        colWidths={[100]}
-        columCount={1}
-        flattenColumns={[mockContext.flattenColumns[0]]}
-        columns={[mockContext.columns[0]]}
-        stickyOffsets={{ start: [0], end: [0], widths: [100] }}
-        direction="ltr"
-        noData={false}
-        maxContentScroll={false}
-        fixHeader
-        scrollX={true}
-        onScroll={() => {}}
+        // Test-only internal access: `prefixCls` comes from context in production and
+        // `onHeaderRow` is optional at runtime though required by the type
+        {...({
+          prefixCls: 'ant-table',
+          className: 'custom-holder',
+          colWidths: [100],
+          columCount: 1,
+          flattenColumns: [mockContext.flattenColumns[0]],
+          columns: [mockContext.columns[0]],
+          stickyOffsets: { start: [0], end: [0], widths: [100] },
+          direction: 'ltr',
+          noData: false,
+          maxContentScroll: false,
+          fixHeader: true,
+          scrollX: true,
+          onScroll: () => {},
+        } as any)}
       >
         {() => <tbody />}
       </FixedHolder>,
@@ -569,19 +627,23 @@ describe('FixedHolder', () => {
   it('renders ColGroup inside table', () => {
     const { container } = renderWithCtx(
       <FixedHolder
-        prefixCls="ant-table"
-        className="ant-table-header"
-        colWidths={[100, 200]}
-        columCount={2}
-        flattenColumns={mockContext.flattenColumns}
-        columns={mockContext.columns}
-        stickyOffsets={{ start: [0, 0], end: [0, 0], widths: [100, 200] }}
-        direction="ltr"
-        noData={false}
-        maxContentScroll={false}
-        fixHeader
-        scrollX={true}
-        onScroll={() => {}}
+        // Test-only internal access: `prefixCls` comes from context in production and
+        // `onHeaderRow` is optional at runtime though required by the type
+        {...({
+          prefixCls: 'ant-table',
+          className: 'ant-table-header',
+          colWidths: [100, 200],
+          columCount: 2,
+          flattenColumns: mockContext.flattenColumns,
+          columns: mockContext.columns,
+          stickyOffsets: { start: [0, 0], end: [0, 0], widths: [100, 200] },
+          direction: 'ltr',
+          noData: false,
+          maxContentScroll: false,
+          fixHeader: true,
+          scrollX: true,
+          onScroll: () => {},
+        } as any)}
       >
         {() => <tbody />}
       </FixedHolder>,
@@ -593,20 +655,24 @@ describe('FixedHolder', () => {
   it('applies custom style', () => {
     const { container } = renderWithCtx(
       <FixedHolder
-        prefixCls="ant-table"
-        className="ant-table-header"
-        style={{ backgroundColor: 'red' }}
-        colWidths={[100]}
-        columCount={1}
-        flattenColumns={[mockContext.flattenColumns[0]]}
-        columns={[mockContext.columns[0]]}
-        stickyOffsets={{ start: [0], end: [0], widths: [100] }}
-        direction="ltr"
-        noData={false}
-        maxContentScroll={false}
-        fixHeader
-        scrollX={true}
-        onScroll={() => {}}
+        // Test-only internal access: `prefixCls` comes from context in production and
+        // `onHeaderRow` is optional at runtime though required by the type
+        {...({
+          prefixCls: 'ant-table',
+          className: 'ant-table-header',
+          style: { backgroundColor: 'red' },
+          colWidths: [100],
+          columCount: 1,
+          flattenColumns: [mockContext.flattenColumns[0]],
+          columns: [mockContext.columns[0]],
+          stickyOffsets: { start: [0], end: [0], widths: [100] },
+          direction: 'ltr',
+          noData: false,
+          maxContentScroll: false,
+          fixHeader: true,
+          scrollX: true,
+          onScroll: () => {},
+        } as any)}
       >
         {() => <tbody />}
       </FixedHolder>,

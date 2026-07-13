@@ -58,7 +58,10 @@ export default function useExpand<RecordType>(
         props.internalHooks === INTERNAL_HOOKS &&
         (props.expandable as any).__PARENT_RENDER_ICON__) ||
       mergedData.some(
-        (record) => record && typeof record === 'object' && record[mergedChildrenColumnName],
+        (record) =>
+          record &&
+          typeof record === 'object' &&
+          (record as Record<PropertyKey, unknown>)[mergedChildrenColumnName],
       )
     ) {
       return 'nest';
@@ -110,7 +113,7 @@ export default function useExpand<RecordType>(
     process.env.NODE_ENV !== 'production' &&
     expandedRowRender &&
     mergedData.some((record: RecordType) => {
-      return Array.isArray(record?.[mergedChildrenColumnName]);
+      return Array.isArray((record as Record<PropertyKey, unknown>)?.[mergedChildrenColumnName]);
     })
   ) {
     warning(false, '`expandedRowRender` should not use with nested Table');

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import type {
   ColumnsType,
+  ColumnTitle,
   ColumnType,
   EditableConfig,
   EditableErrors,
@@ -114,7 +115,7 @@ function useEditable({ columns, data, onChange, onValidate, scrollToRow }: UseEd
       value: any,
       record: AnyObject,
       config: EditableConfig,
-      colTitle?: React.ReactNode,
+      colTitle?: ColumnTitle,
       dataIndex?: string | number,
     ): Promise<string[]> => {
       const messages: string[] = [];
@@ -215,14 +216,14 @@ function useEditable({ columns, data, onChange, onValidate, scrollToRow }: UseEd
                   value === '' ||
                   (Array.isArray(value) && value.length === 0);
                 if (isEmpty) {
-                  messages.push(rule.message || `${col.title || dataIndex} 必填`);
+                  messages.push(rule.message || `${String(col.title || dataIndex)} 必填`);
                   continue;
                 }
               }
 
               if (rule.pattern && value != null && value !== '') {
                 if (!rule.pattern.test(String(value))) {
-                  messages.push(rule.message || `${col.title || dataIndex} 格式不正确`);
+                  messages.push(rule.message || `${String(col.title || dataIndex)} 格式不正确`);
                   continue;
                 }
               }
@@ -235,10 +236,16 @@ function useEditable({ columns, data, onChange, onValidate, scrollToRow }: UseEd
           }
 
           if (messages.length > 0) {
-            const key = errorKey(rowIndex, dataIndex);
+            const key = errorKey(rowIndex, String(dataIndex));
             nextErrors.set(key, messages);
             if (!firstError) {
-              firstError = { rowIndex, dataIndex, message: messages[0] };
+              firstError = {
+                rowIndex,
+                // `firstError.dataIndex` is contracted as `string | number`;
+                // pass the column's `dataIndex` through as-is.
+                dataIndex: dataIndex as string | number,
+                message: messages[0],
+              };
             }
           }
         });

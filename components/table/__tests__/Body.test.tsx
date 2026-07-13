@@ -33,7 +33,7 @@ function makeContext(overrides: Record<string, any> = {}) {
     scrollInfo: [0, 0] as [number, number],
     scrollbarSize: 0,
     isSticky: false,
-    getComponent: ((path: string[], defaultComp?: any) => defaultComp || 'td') as any,
+    getComponent: ((_path: string[], defaultComp?: any) => defaultComp || 'td') as any,
     classNames: {},
     styles: {},
     hoverStartRow: -1,

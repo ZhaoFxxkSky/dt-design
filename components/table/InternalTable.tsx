@@ -503,8 +503,10 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
             const globalRowIndex = index + pageOffsetRef.current;
             return (
               <EditableCell
-                dataIndex={leafCol.dataIndex!}
-                title={leafCol.title}
+                // `EditableCell` contracts `dataIndex`/`title` as plain render values;
+                // pass the column config through as-is.
+                dataIndex={leafCol.dataIndex as string | number}
+                title={leafCol.title as React.ReactNode}
                 rowIndex={globalRowIndex}
                 record={record as AnyObject}
                 value={value}

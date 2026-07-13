@@ -42,7 +42,9 @@ const StickyScrollBar: React.ForwardRefRenderFunction<unknown, StickyScrollBarPr
 
   React.useEffect(
     () => () => {
-      raf.cancel(rafRef.current);
+      if (rafRef.current) {
+        raf.cancel(rafRef.current);
+      }
     },
     [],
   );
@@ -88,7 +90,9 @@ const StickyScrollBar: React.ForwardRefRenderFunction<unknown, StickyScrollBarPr
   };
 
   const checkScrollBarVisible = () => {
-    raf.cancel(rafRef.current);
+    if (rafRef.current) {
+      raf.cancel(rafRef.current);
+    }
 
     rafRef.current = raf(() => {
       if (!scrollBodyRef.current) {

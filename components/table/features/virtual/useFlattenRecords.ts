@@ -22,12 +22,16 @@ function fillRecords<T>(
 
   const expanded = expandedKeys?.has(key);
 
-  if (record && Array.isArray(record[childrenColumnName]) && expanded) {
+  const children = record
+    ? (record as Record<PropertyKey, unknown>)[childrenColumnName]
+    : undefined;
+
+  if (Array.isArray(children) && expanded) {
     // expanded state, flat record
-    for (let i = 0; i < record[childrenColumnName].length; i += 1) {
+    for (let i = 0; i < children.length; i += 1) {
       fillRecords(
         list,
-        record[childrenColumnName][i],
+        children[i] as T,
         indent + 1,
         childrenColumnName,
         expandedKeys,

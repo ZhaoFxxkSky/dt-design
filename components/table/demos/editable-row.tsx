@@ -8,7 +8,7 @@ import {
   PlusOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
-import { Table } from '../index';
+import { Summary, Table } from '../index';
 import type { ColumnsType, EditableConfig, Reference } from '../index';
 
 const { Text } = Typography;
@@ -438,23 +438,23 @@ export default function Demo() {
           const total = pageData.reduce((sum, r) => sum + calcRowTotal(r), 0);
           const items = pageData.reduce((sum, r) => sum + (r.quantity || 0), 0);
           return (
-            <Table.Summary fixed>
-              <Table.Summary.Row>
-                <Table.Summary.Cell index={0} colSpan={3}>
+            <Summary fixed>
+              <Summary.Row>
+                <Summary.Cell index={0} colSpan={3}>
                   <Text strong>合计</Text>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={3} align="right">
+                </Summary.Cell>
+                <Summary.Cell index={3} align="right">
                   <Text strong>{items}</Text>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={4} colSpan={2} />
-                <Table.Summary.Cell index={5} align="right">
+                </Summary.Cell>
+                <Summary.Cell index={4} colSpan={2} />
+                <Summary.Cell index={5} align="right">
                   <Text strong style={{ color: '#cf1322', fontSize: 14 }}>
                     ¥{total.toFixed(2)}
                   </Text>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={6} colSpan={5} />
-              </Table.Summary.Row>
-            </Table.Summary>
+                </Summary.Cell>
+                <Summary.Cell index={6} colSpan={5} />
+              </Summary.Row>
+            </Summary>
           );
         }}
       />

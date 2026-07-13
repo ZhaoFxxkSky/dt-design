@@ -5,7 +5,12 @@ import warning from 'rc-util/es/warning';
 import * as React from 'react';
 import { INTERNAL_HOOKS } from '../../constant';
 import { makeImmutable } from '../../shared/context/TableContext';
-import type { CustomizeScrollBody, GetComponent, Reference } from '../../interface';
+import type {
+  CustomizeScrollBody,
+  DefaultRecordType,
+  GetComponent,
+  Reference,
+} from '../../interface';
 import Table, { DEFAULT_PREFIX } from '../RcTable';
 import type { CompareProps, TableProps } from '../RcTable';
 import Grid from './BodyGrid';
@@ -21,7 +26,7 @@ export interface VirtualTableProps<RecordType> extends Omit<TableProps<RecordTyp
   scroll: { x?: number; y?: number };
 }
 
-const VirtualTable = <RecordType,>(
+const VirtualTable = <RecordType extends DefaultRecordType>(
   props: VirtualTableProps<RecordType>,
   ref: React.Ref<Reference>,
 ) => {
@@ -29,10 +34,10 @@ const VirtualTable = <RecordType,>(
     data,
     columns,
     scroll,
-    sticky,
+    sticky = false,
     prefixCls = DEFAULT_PREFIX,
     className,
-    listItemHeight,
+    listItemHeight = 24,
     components,
     onScroll,
   } = props;
@@ -62,7 +67,7 @@ const VirtualTable = <RecordType,>(
   );
 
   // Memo this
-  const onInternalScroll = useEvent(onScroll);
+  const onInternalScroll = useEvent<React.UIEventHandler<HTMLDivElement>>(onScroll ?? (() => {}));
 
   // ========================= Context ==========================
   const context = React.useMemo(
