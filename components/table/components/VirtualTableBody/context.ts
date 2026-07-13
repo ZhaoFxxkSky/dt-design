@@ -9,10 +9,10 @@ export interface StaticContextProps {
   onScroll?: React.UIEventHandler<HTMLDivElement>;
 }
 
-export const StaticContext = createContext<StaticContextProps>(null);
+export const StaticContext = createContext<StaticContextProps>();
 
 export interface GridContextProps {
   columnsOffset: number[];
 }
 
-export const GridContext = createContext<GridContextProps>(null);
+export const GridContext = createContext<GridContextProps>();

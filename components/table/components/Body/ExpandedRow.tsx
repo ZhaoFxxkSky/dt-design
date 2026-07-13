@@ -59,7 +59,7 @@ const ExpandedRow: React.FC<ExpandedRowProps> = props => {
   }
 
   return (
-    <Component className={className} style={{ display: expanded ? null : 'none' }}>
+    <Component className={className} style={{ display: expanded ? undefined : 'none' }}>
       <Cell component={cellComponent} prefixCls={prefixCls} colSpan={colSpan}>
         {contentNode}
       </Cell>

@@ -156,14 +156,14 @@ const Cell = <RecordType,>(props: CellProps<RecordType>) => {
     const [absScroll, scrollWidth] = scrollInfo;
 
     const showStartShadow =
-      (isFixStart && fixedStartShadow && absScroll) -
-        // For precision, we not show shadow by default which has better user experience.
-        (offsetFixedStartShadow as number) >=
+      isFixStart &&
+      fixedStartShadow &&
+      absScroll - (offsetFixedStartShadow || 0) >=
       1;
     const showEndShadow =
-      (isFixEnd && fixedEndShadow && scrollWidth - absScroll) -
-        // Same as above
-        (offsetFixedEndShadow as number) >
+      isFixEnd &&
+      fixedEndShadow &&
+      scrollWidth - absScroll - (offsetFixedEndShadow || 0) >
       1;
 
     return [showStartShadow, showEndShadow];
@@ -287,8 +287,8 @@ const Cell = <RecordType,>(props: CellProps<RecordType>) => {
       onMouseEnter={rowHoverable ? onMouseEnter : undefined}
       onMouseLeave={rowHoverable ? onMouseLeave : undefined}
       //Span
-      colSpan={mergedColSpan !== 1 ? mergedColSpan : null}
-      rowSpan={mergedRowSpan !== 1 ? mergedRowSpan : null}
+      colSpan={mergedColSpan !== 1 ? mergedColSpan : undefined}
+      rowSpan={mergedRowSpan !== 1 ? mergedRowSpan : undefined}
     >
       {appendNode}
       {mergedChildNode}
