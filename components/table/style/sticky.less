@@ -1,0 +1,45 @@
+@import './variables.less';
+
+// ============================================================
+// === sticky.ts: genStickyStyle ===
+// ============================================================
+.@{table-prefix-cls}-wrapper {
+  .@{table-prefix-cls}-sticky {
+    &-holder {
+      position: sticky;
+      z-index: calc(var(--columns-count) * 2 + @table-z-index-fixed + 1);
+      background: @table-color-bg-container;
+    }
+
+    &-scroll {
+      position: sticky;
+      bottom: 0;
+      z-index: calc(var(--columns-count) * 2 + @table-z-index-fixed + 1);
+      display: flex;
+      align-items: center;
+      height: @table-scroll-thumb-size !important;
+      background: @table-scroll-bg;
+      border-top: @table-border;
+      opacity: @table-opacity-loading;
+
+      &:hover {
+        transform-origin: center bottom;
+      }
+
+      // fake scrollbar style of sticky
+      &-bar {
+        position: absolute;
+        bottom: 0;
+        height: @table-scroll-thumb-size;
+        background-color: @table-scroll-thumb-bg;
+        border-radius: @table-sticky-scrollbar-border-radius;
+        transition: all @table-motion-duration-slow, transform 0s;
+
+        &:hover,
+        &-active {
+          background-color: @table-scroll-thumb-bg-hover;
+        }
+      }
+    }
+  }
+}

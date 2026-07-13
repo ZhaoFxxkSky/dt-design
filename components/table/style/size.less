@@ -1,0 +1,54 @@
+@import './variables.less';
+
+// ============================================================
+// === size.ts: genSizeStyle ===
+// ============================================================
+.@{table-prefix-cls}-wrapper {
+  // ---- middle (antd uses 'medium' class name) ----
+  .@{table-prefix-cls}.@{table-prefix-cls}-middle {
+    font-size: @table-font-size-middle;
+
+    .@{table-prefix-cls}-title,
+    .@{table-prefix-cls}-footer,
+    .@{table-prefix-cls}-cell,
+    .@{table-prefix-cls}-thead > tr > th,
+    .@{table-prefix-cls}-tbody > tr > th,
+    .@{table-prefix-cls}-tbody > tr > td,
+    tfoot > tr > th,
+    tfoot > tr > td {
+      padding: @table-padding-vertical-middle @table-padding-horizontal-middle;
+    }
+
+    .@{table-prefix-cls}-filter-trigger {
+      margin-inline-end: calc(-@table-padding-horizontal-middle / 2);
+    }
+
+    .@{table-prefix-cls}-expanded-row-fixed {
+      margin: -@table-padding-vertical-middle -@table-padding-horizontal-middle;
+    }
+  }
+
+  // ---- small ----
+  .@{table-prefix-cls}.@{table-prefix-cls}-small {
+    font-size: @table-font-size-small;
+
+    .@{table-prefix-cls}-title,
+    .@{table-prefix-cls}-footer,
+    .@{table-prefix-cls}-cell,
+    .@{table-prefix-cls}-thead > tr > th,
+    .@{table-prefix-cls}-tbody > tr > th,
+    .@{table-prefix-cls}-tbody > tr > td,
+    tfoot > tr > th,
+    tfoot > tr > td {
+      padding: @table-padding-vertical-small @table-padding-horizontal-small;
+    }
+
+    .@{table-prefix-cls}-filter-trigger {
+      margin-inline-end: calc(-@table-padding-horizontal-small / 2);
+    }
+
+    .@{table-prefix-cls}-expanded-row-fixed {
+      margin: -@table-padding-vertical-small -@table-padding-horizontal-small;
+    }
+  }
+}

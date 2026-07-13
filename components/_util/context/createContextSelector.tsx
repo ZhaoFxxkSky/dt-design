@@ -1,0 +1,140 @@
+/**
+ * Local shim for `@rc-component/context` - context.tsx
+ *
+ * Based on @rc-component/context source. Replaced `@rc-component/util`
+ * imports with `rc-util` subpath imports. The keys-array `useContext`
+ * overload was retyped to return a precise `Pick` of the selected keys
+ * (instead of `Partial<ContextProps>`) so consumers get non-optional fields.
+ */
+import isEqual from 'rc-util/es/isEqual';
+import useEvent from 'rc-util/es/hooks/useEvent';
+import useLayoutEffect from 'rc-util/es/hooks/useLayoutEffect';
+import * as React from 'react';
+import { unstable_batchedUpdates } from 'react-dom';
+
+export type Selector<ContextProps, SelectorValue = ContextProps> = (
+  value: ContextProps,
+) => SelectorValue;
+
+export type Trigger<ContextProps> = (value: ContextProps) => void;
+
+export type Listeners<ContextProps> = Set<Trigger<ContextProps>>;
+
+export interface Context<ContextProps> {
+  getValue: () => ContextProps;
+  listeners: Listeners<ContextProps>;
+}
+
+export interface ContextSelectorProviderProps<T> {
+  value: T;
+  children?: React.ReactNode;
+}
+
+export interface SelectorContext<ContextProps> {
+  Context: React.Context<Context<ContextProps>>;
+  Provider: React.ComponentType<ContextSelectorProviderProps<ContextProps>>;
+  defaultValue?: ContextProps;
+}
+
+export function createContext<ContextProps>(
+  defaultValue?: ContextProps,
+): SelectorContext<ContextProps> {
+  const Context = React.createContext<Context<ContextProps>>(undefined as any);
+
+  const Provider = ({ value, children }: ContextSelectorProviderProps<ContextProps>) => {
+    const valueRef = React.useRef(value);
+    valueRef.current = value;
+
+    const [context] = React.useState<Context<ContextProps>>(() => ({
+      getValue: () => valueRef.current,
+      listeners: new Set(),
+    }));
+
+    useLayoutEffect(() => {
+      unstable_batchedUpdates(() => {
+        context.listeners.forEach((listener) => {
+          listener(value);
+        });
+      });
+    }, [value]);
+
+    return <Context.Provider value={context}>{children}</Context.Provider>;
+  };
+
+  return { Context, Provider, defaultValue };
+}
+
+/** e.g. useSelect(userContext) => user */
+export function useContext<ContextProps>(holder: SelectorContext<ContextProps>): ContextProps;
+
+/** e.g. useSelect(userContext, user => user.name) => user.name */
+export function useContext<ContextProps, SelectorValue>(
+  holder: SelectorContext<ContextProps>,
+  selector: Selector<ContextProps, SelectorValue>,
+): SelectorValue;
+
+/** e.g. useSelect(userContext, ['name', 'age']) => user { name, age } */
+export function useContext<ContextProps, Keys extends keyof ContextProps>(
+  holder: SelectorContext<ContextProps>,
+  selector: Keys[],
+): { [K in Keys]: ContextProps[K] };
+
+/** e.g. useSelect(userContext, 'name') => user.name */
+export function useContext<ContextProps, PropName extends keyof ContextProps>(
+  holder: SelectorContext<ContextProps>,
+  selector: PropName,
+): ContextProps[PropName];
+
+export function useContext<ContextProps, SelectorValue>(
+  holder: SelectorContext<ContextProps>,
+  selector?: Selector<ContextProps, any> | (keyof ContextProps)[] | keyof ContextProps,
+) {
+  const eventSelector = useEvent<Selector<ContextProps, SelectorValue>>(
+    typeof selector === 'function'
+      ? selector
+      : (ctx) => {
+          if (selector === undefined) {
+            return ctx as any;
+          }
+
+          if (!Array.isArray(selector)) {
+            return (ctx as any)[selector];
+          }
+
+          const obj = {} as SelectorValue;
+          selector.forEach((key) => {
+            (obj as any)[key] = (ctx as any)[key];
+          });
+          return obj;
+        },
+  );
+  const context = React.useContext(holder?.Context);
+  const { listeners, getValue } = context || {};
+
+  const valueRef = React.useRef<SelectorValue | undefined>(undefined);
+  valueRef.current = eventSelector(
+    (context ? getValue() : (holder?.defaultValue as ContextProps)) as ContextProps,
+  );
+  const [, forceUpdate] = React.useState({});
+
+  useLayoutEffect(() => {
+    if (!context) {
+      return;
+    }
+
+    function trigger(nextValue: ContextProps) {
+      const nextSelectorValue = eventSelector(nextValue);
+      if (!isEqual(valueRef.current, nextSelectorValue, true)) {
+        forceUpdate({});
+      }
+    }
+
+    listeners!.add(trigger);
+
+    return () => {
+      listeners!.delete(trigger);
+    };
+  }, [context]);
+
+  return valueRef.current;
+}

@@ -1,0 +1,123 @@
+@import './variables.less';
+
+// ============================================================
+// === expand.ts: genExpandStyle ===
+// ============================================================
+.@{table-prefix-cls}-wrapper {
+  .@{table-prefix-cls}-expand-icon-col {
+    width: @table-expand-column-width;
+  }
+
+  .@{table-prefix-cls}-row-expand-icon-cell {
+    text-align: center;
+
+    .@{table-prefix-cls}-row-expand-icon {
+      display: inline-flex;
+      float: none;
+      vertical-align: sub;
+    }
+  }
+
+  .@{table-prefix-cls}-row-indent {
+    float: left;
+    height: 1px;
+  }
+
+  // operationUnit + expand icon overrides
+  .@{table-prefix-cls}-row-expand-icon {
+    // expand icon specific
+    position: relative;
+    float: left;
+    width: @table-expand-icon-size;
+    height: @table-expand-icon-size;
+    padding: 0;
+    // operationUnit
+    color: @table-color-link;
+    color: inherit;
+    line-height: @table-expand-icon-size;
+    text-decoration: none;
+    background: none;
+    background: @table-expand-icon-bg;
+    border: 0;
+    border: @table-border;
+    border-radius: @table-border-radius;
+    outline: none;
+    transform: scale(@table-expand-icon-scale);
+    cursor: pointer;
+    transition: all @table-motion-duration-slow;
+    user-select: none;
+
+    &:focus,
+    &:hover,
+    &:active {
+      border-color: currentcolor;
+    }
+
+    &::before,
+    &::after {
+      position: absolute;
+      background: currentcolor;
+      transition: transform @table-motion-duration-slow ease-out;
+      content: '';
+    }
+
+    // horizontal line
+    &::before {
+      top: @table-expand-icon-half-inner;
+      height: @table-line-width;
+      inset-inline-end: @table-expand-icon-line-offset;
+      inset-inline-start: @table-expand-icon-line-offset;
+    }
+
+    // vertical line
+    &::after {
+      top: @table-expand-icon-line-offset;
+      bottom: @table-expand-icon-line-offset;
+      width: @table-line-width;
+      transform: rotate(90deg);
+      inset-inline-start: @table-expand-icon-half-inner;
+    }
+
+    // Motion effect
+    &-collapsed::before {
+      transform: rotate(-180deg);
+    }
+
+    &-collapsed::after {
+      transform: rotate(0deg);
+    }
+
+    // spaced (no icon)
+    &-spaced {
+      &::before,
+      &::after {
+        display: none;
+        content: none;
+      }
+      background: transparent;
+      border: 0;
+      visibility: hidden;
+    }
+  }
+
+  .@{table-prefix-cls}-row-indent + .@{table-prefix-cls}-row-expand-icon {
+    margin-top: @table-expand-icon-margin-top;
+    margin-inline-end: @table-padding-xs;
+  }
+
+  tr.@{table-prefix-cls}-expanded-row {
+    &,
+    &:hover {
+      > th,
+      > td {
+        background: @table-expanded-row-bg;
+      }
+    }
+  }
+
+  .@{table-prefix-cls}-expanded-row-fixed {
+    position: relative;
+    margin: -@table-padding-vertical -@table-padding-horizontal;
+    padding: @table-padding-vertical @table-padding-horizontal;
+  }
+}

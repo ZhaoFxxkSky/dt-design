@@ -1,0 +1,64 @@
+@import './variables.less';
+
+// ============================================================
+// === radius.ts: genRadiusStyle ===
+// ============================================================
+.@{table-prefix-cls}-wrapper {
+  .@{table-prefix-cls} {
+    .@{table-prefix-cls}-title,
+    .@{table-prefix-cls}-header {
+      border-radius: @table-radius @table-radius 0 0;
+    }
+
+    .@{table-prefix-cls}-title + .@{table-prefix-cls}-container {
+      border-start-start-radius: 0;
+      border-start-end-radius: 0;
+
+      .@{table-prefix-cls}-header,
+      table {
+        border-radius: 0;
+      }
+
+      table > thead > tr:first-child {
+        th:first-child,
+        th:last-child,
+        td:first-child,
+        td:last-child {
+          border-radius: 0;
+        }
+      }
+    }
+
+    .@{table-prefix-cls}-container {
+      border-start-start-radius: @table-radius;
+      border-start-end-radius: @table-radius;
+
+      &::before {
+        border-start-start-radius: @table-radius;
+      }
+
+      &::after {
+        border-start-end-radius: @table-radius;
+      }
+
+      > .@{table-prefix-cls}-content {
+        border-start-start-radius: @table-radius;
+        border-start-end-radius: @table-radius;
+      }
+
+      table > thead > tr:first-child {
+        > *:first-child {
+          border-start-start-radius: @table-radius;
+        }
+
+        > *:last-child {
+          border-start-end-radius: @table-radius;
+        }
+      }
+    }
+
+    .@{table-prefix-cls}-footer {
+      border-radius: 0 0 @table-radius @table-radius;
+    }
+  }
+}

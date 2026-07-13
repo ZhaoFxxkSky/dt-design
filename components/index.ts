@@ -13,12 +13,43 @@ export { default as Splitter } from './splitter';
 export * from './splitter';
 export { default as StatusTag } from './statusTag';
 export * from './statusTag';
-// export { default as Table } from './table';
-// export type {
-//   ColumnGroupType as TableColumnGroupType,
-//   ColumnProps as TableColumnProps,
-//   ColumnsType as TableColumnsType,
-//   ColumnType as TableColumnType,
-//   TablePaginationConfig,
-//   TableProps,
-// } from './table';
+export { Table } from './table';
+export type {
+  AlignType,
+  CellType,
+  ColumnGroupType,
+  ColumnsType,
+  ColumnType,
+  CustomizeComponent,
+  CustomizeScrollBody,
+  DataIndex,
+  Direction,
+  ExpandableConfig,
+  ExpandableType,
+  FixedInfo,
+  FixedType,
+  GetComponent,
+  GetComponentProps,
+  GetRowKey,
+  OnCustomizeScroll,
+  PanelRender,
+  Reference,
+  RenderedCell,
+  RenderExpandIcon,
+  RowClassName,
+  ScrollConfig,
+  SizeType,
+  StickyOffsets,
+  ColumnGroupType as TableColumnGroupType,
+  ColumnsType as TableColumnsType,
+  ColumnType as TableColumnType,
+  TableComponents,
+  ExpandableConfig as TableExpandableConfig,
+  TableLayout,
+  TablePaginationConfig,
+  TableProps,
+  Reference as TableReference,
+  TableSticky,
+  TriggerEventHandler,
+  VirtualScrollConfig,
+} from './table';

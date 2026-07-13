@@ -1,0 +1,50 @@
+@import './variables.less';
+
+// ============================================================
+// === Editable Cell ===
+// ============================================================
+
+.@{table-prefix-cls}-editable-cell {
+  width: 100%;
+  position: relative;
+}
+
+.@{table-prefix-cls}-editable-cell-error {
+  .ant-input,
+  .ant-input-number,
+  .ant-select-selector,
+  .ant-picker {
+    border-color: #ff4d4f;
+  }
+}
+
+// Popover 挂载到表格滚动容器内，随表格滚动
+.@{table-prefix-cls}-editable-error-popover {
+  .ant-popover-inner {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12),
+      0 9px 28px 8px rgba(0, 0, 0, 0.05);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .ant-popover-inner-content {
+    padding: 0;
+  }
+}
+
+.@{table-prefix-cls}-editable-error-content {
+  padding: 9px 14px;
+  min-width: 100px;
+}
+
+.@{table-prefix-cls}-editable-error-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #ff4d4f;
+  font-weight: 500;
+  white-space: nowrap;
+}

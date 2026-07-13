@@ -9,3 +9,24 @@ node_modules
 
 /coverage
 /docs/superpowers/
+
+# IDE / editor
+.idea/
+.vscode/
+.history/
+
+# Build / dist
+/dist
+
+# Logs / local env
+*.log
+.env.local
+
+# AI / scratch / temp files
+scratch/
+.kilo/
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej

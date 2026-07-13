@@ -8,7 +8,7 @@ import './style';
 
 import { isPresetSize } from '../_util/gapSize';
 import { useOrientation } from '../_util/hooks';
-import isNonNullable from '../_util/isNonNullable';
+import { isNonNullable } from '../_util/is';
 import type { FlexProps } from './interface';
 import createFlexClassNames from './utils';
 

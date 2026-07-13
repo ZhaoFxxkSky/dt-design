@@ -14,6 +14,7 @@ export default antfu(
       '**/lib/**',
       '**/.dumi/tmp/**',
       '**/.dumi/tmp-production/**',
+      '**/.kilo/**',
       '**/*.snap',
       '**/*.md',
       '.dumi/scripts/clarity.js',
@@ -49,6 +50,7 @@ export default antfu(
       'react/no-children-only': 'off',
       'react/no-unstable-default-props': 'off',
       'react/no-create-ref': 'off', // TODO: remove this
+      'react/no-implicit-key': 'off', // requires type-aware parserOptions not currently configured
       'perfectionist/sort-imports': 'off',
       'regexp/strict': 'off',
       /* turn off React 19 only rules */
@@ -137,6 +139,13 @@ export default antfu(
     files: ['components/locale/*.ts', 'components/form/demo/*.tsx'],
     rules: {
       'no-template-curly-in-string': 'off',
+    },
+  },
+  {
+    // table uses modern browser APIs for resize / virtual scroll
+    files: ['components/table/**/*'],
+    settings: {
+      polyfills: ['ResizeObserver', 'requestAnimationFrame'],
     },
   },
 );

@@ -72,3 +72,5 @@ export type GetContextProp<
   T extends React.Context<any>,
   PropName extends keyof GetContextProps<T>,
 > = NonNullable<GetContextProps<T>[PropName]>;
+
+export type SizeType = 'small' | 'middle' | 'large' | undefined;

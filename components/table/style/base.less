@@ -1,0 +1,164 @@
+@import './variables.less';
+
+// ============================================================
+// === index.ts: genTableStyle ===
+// ============================================================
+.@{table-prefix-cls}-wrapper {
+  clear: both;
+  max-width: 100%;
+
+  --rc-virtual-list-scrollbar-bg: @table-scroll-bg;
+  --@{table-prefix-cls}-row-height: unit(@table-row-height, px);
+
+  &.@{table-prefix-cls}-middle {
+    --@{table-prefix-cls}-row-height: unit(@table-row-height-middle, px);
+  }
+
+  &.@{table-prefix-cls}-small {
+    --@{table-prefix-cls}-row-height: unit(@table-row-height-small, px);
+  }
+
+  // clearFix
+  &::before {
+    display: table;
+    content: '';
+  }
+
+  &::after {
+    display: table;
+    clear: both;
+    content: '';
+  }
+
+  // .dt-table (resetComponent)
+  .@{table-prefix-cls} {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: @table-color-text;
+    font-size: @table-font-size;
+    font-family: inherit;
+    line-height: 1.57142857;
+    list-style: none;
+
+    background: @table-bg;
+    border-radius: @table-radius @table-radius 0 0;
+    scrollbar-color: @table-scroll-thumb-bg @table-scroll-bg;
+  }
+
+  // table element
+  table {
+    width: 100%;
+    text-align: start;
+    border-radius: @table-radius @table-radius 0 0;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  // ============================= Cell ==============================
+  .@{table-prefix-cls}-cell,
+  .@{table-prefix-cls}-thead > tr > th,
+  .@{table-prefix-cls}-tbody > tr > th,
+  .@{table-prefix-cls}-tbody > tr > td,
+  tfoot > tr > th,
+  tfoot > tr > td {
+    position: relative;
+    padding: @table-padding-vertical @table-padding-horizontal;
+    overflow-wrap: break-word;
+  }
+
+  // ============================ Title =============================
+  .@{table-prefix-cls}-title {
+    padding: @table-padding-vertical @table-padding-horizontal;
+  }
+
+  // ============================ Header ============================
+  .@{table-prefix-cls}-thead {
+    > tr > th,
+    > tr > td {
+      position: relative;
+      color: @table-header-text-color;
+      font-weight: @table-font-weight-strong;
+      text-align: start;
+      background: @table-header-bg;
+      border-bottom: @table-border;
+      transition: background-color @table-motion-duration-mid ease;
+
+      &[colspan]:not([colspan='1']) {
+        text-align: center;
+      }
+
+      // 分割线 (除最后一列外)
+      &:not(:last-child):not(.@{table-prefix-cls}-selection-column):not(.@{table-prefix-cls}-row-expand-icon-cell):not([colspan])::before {
+        position: absolute;
+        top: 50%;
+        inset-inline-end: 0;
+        width: 1px;
+        height: 1.6em;
+        background-color: @table-header-cell-split-color;
+        transform: translateY(-50%);
+        transition: background-color @table-motion-duration-mid;
+        content: '';
+      }
+    }
+
+    > tr:not(:last-child) > th[colspan] {
+      border-bottom: 0;
+    }
+  }
+
+  // ============================ Body ============================
+  .@{table-prefix-cls}-tbody {
+    > tr {
+      > th,
+      > td {
+        border-bottom: @table-border;
+        transition: background-color @table-motion-duration-mid,
+          border-color @table-motion-duration-mid;
+      }
+
+      > th {
+        position: relative;
+        color: @table-header-text-color;
+        font-weight: @table-font-weight-strong;
+        text-align: start;
+        background: @table-header-bg;
+        border-bottom: @table-border;
+        transition: background-color @table-motion-duration-mid ease;
+      }
+
+      // measure cell styles
+      > .@{table-prefix-cls}-measure-cell {
+        padding-block: 0 !important;
+        border-block: 0 !important;
+
+        .@{table-prefix-cls}-measure-cell-content {
+          height: 0;
+          overflow: hidden;
+          pointer-events: none;
+        }
+      }
+    }
+  }
+
+  // ============================ Footer ============================
+  .@{table-prefix-cls}-footer {
+    padding: @table-padding-vertical @table-padding-horizontal;
+    color: @table-footer-text-color;
+    background: @table-footer-bg;
+  }
+
+  // Header / Body scroll wrappers
+  .@{table-prefix-cls}-header {
+    overflow: hidden;
+    background: @table-header-bg;
+  }
+
+  .@{table-prefix-cls}-body {
+    overflow: auto;
+  }
+
+  .@{table-prefix-cls}-content {
+    overflow: auto;
+  }
+}
