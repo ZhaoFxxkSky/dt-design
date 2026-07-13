@@ -24,6 +24,7 @@ node_modules
 
 # AI / scratch / temp files
 scratch/
+.kilo/
 *.tmp
 *.temp
 *.bak

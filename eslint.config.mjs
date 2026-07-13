@@ -14,6 +14,7 @@ export default antfu(
       '**/lib/**',
       '**/.dumi/tmp/**',
       '**/.dumi/tmp-production/**',
+      '**/.kilo/**',
       '**/*.snap',
       '**/*.md',
       '.dumi/scripts/clarity.js',
