@@ -1,9 +1,4 @@
-
-shellEmulator: true
-
-trustPolicy: no-downgrade
-
-
+# eslint-disable pnpm/yaml-enforce-settings
 allowBuilds:
   '@parcel/watcher': true
   '@swc/core': true
