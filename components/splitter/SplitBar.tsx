@@ -187,6 +187,8 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
     <div
       className={splitBarPrefixCls}
       role="separator"
+      // Splitter bar is keyboard-focusable for ARIA slider/splitter interaction
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={resizable ? 0 : -1}
       aria-valuenow={getValidNumber(ariaNow)}
       aria-valuemin={getValidNumber(ariaMin)}

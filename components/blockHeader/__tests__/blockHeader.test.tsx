@@ -29,7 +29,7 @@ const props4: IBlockHeaderProps = {
   tooltip: 'hover 展示',
   description: '说明文字',
 };
-const prefixCls = 'dt-block-header';
+const prefixCls = 'ant-block-header';
 
 describe('test BlockHeader render', () => {
   afterEach(() => {
@@ -65,7 +65,7 @@ describe('test BlockHeader render', () => {
   });
   it('should not render collapsed content normally', () => {
     render(
-      <BlockHeader title="测试">
+      <BlockHeader title="测试" expandable={false}>
         <div>Hello World!</div>
       </BlockHeader>,
     );
@@ -81,7 +81,7 @@ describe('test BlockHeader render', () => {
     const container = document.getElementsByClassName(`${prefixCls}__content`)[0];
     expect(container).toHaveStyle({ height: '200px' });
     expect(container).toHaveClass(
-      'dt-block-header__content dt-block-header__content--active custom__content',
+      'ant-block-header__content ant-block-header__content--active custom__content',
     );
   });
   it('should render BlockHeader with different props', () => {
@@ -97,14 +97,14 @@ describe('test BlockHeader render', () => {
     const props = { title: '测试1', background: false };
     const { container } = render(<BlockHeader {...props} />);
     const wrap = container.firstChild;
-    expect(wrap!.firstChild).not.toHaveClass(`dt-block-header__title--background`);
+    expect(wrap!.firstChild).not.toHaveClass(`ant-block-header__title--background`);
   });
   it('should render BlockHeader className when size is small', () => {
     const { container, getByText } = render(<BlockHeader {...props2} />);
     const wrap = container.firstChild!;
     expect(wrap).toHaveClass(`${prefixCls} test__className`);
     expect(wrap.firstChild).toHaveClass(
-      `dt-block-header__title dt-block-header__title--small dt-block-header__title--background`,
+      `ant-block-header__title ant-block-header__title--small ant-block-header__title--background`,
     );
     expect(getByText('标题2')).toHaveClass('title__text');
     expect(getByText('说明文字')).toHaveClass('title__description');
@@ -113,9 +113,9 @@ describe('test BlockHeader render', () => {
 
   it('should render BlockHeader tooltip success', () => {
     const { container } = render(<BlockHeader {...props3} />);
-    const wrap = container.firstChild!;
-    const tooltipWrap = wrap.firstChild!.firstChild!.lastChild;
-    expect(tooltipWrap!.firstChild).toHaveAttribute('data-mock-icon', 'QuestionOutlined');
+    const icon = container.querySelector('.anticon-question-circle');
+    expect(icon).toBeInTheDocument();
+    expect(icon).toHaveAttribute('aria-label', 'question-circle');
   });
 
   it('should render BlockHeader description success', () => {
@@ -137,13 +137,13 @@ describe('test BlockHeader render', () => {
 
   it('should render BlockHeader correct margin-bottom', () => {
     const { container: haveStyle } = render(<BlockHeader title="分类级别" addonBefore="" />);
-    expect(haveStyle.querySelector('.dt-block-header')).toHaveAttribute('style');
+    expect(haveStyle.querySelector('.ant-block-header')).toHaveAttribute('style');
     const { container: defaultBottom } = render(<BlockHeader title="分类级别" addonBefore="" />);
-    expect(defaultBottom.querySelector('.dt-block-header')).toHaveStyle({ marginBottom: 16 });
+    expect(defaultBottom.querySelector('.ant-block-header')).toHaveStyle({ marginBottom: 16 });
     const { container: customizeBottom } = render(
       <BlockHeader title="分类级别" addonBefore="" spaceBottom={10} />,
     );
-    expect(customizeBottom.querySelector('.dt-block-header')).toHaveStyle({
+    expect(customizeBottom.querySelector('.ant-block-header')).toHaveStyle({
       marginBottom: 10,
     });
   });

@@ -1,6 +1,8 @@
 {
   "name": "@dtjoy/dt-design",
+  "type": "commonjs",
   "version": "1.0.2",
+  "packageManager": "pnpm@11.4.0+sha512.f0febc7e37552ab485494a914241b338e0b3580b93d54ce31f00933015880863129038a1b4ae4e414a0ee63ac35bf21197e990172c4a68256450b5636310968f",
   "description": "react-component",
   "author": {
     "name": "夕颜",
@@ -28,14 +30,19 @@
     "esm",
     "lib"
   ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "start": "npm run dev",
     "dev": "dumi dev",
     "build": "father build",
+    "build:dts": "tsc -p tsconfig.build.json",
     "build:watch": "father dev",
     "format": "biome format --write .",
     "lint:script": "eslint . --cache",
     "lint:biome": "biome lint",
+    "lint:pkg": "publint",
     "biome": "biome check --write",
     "test": "jest",
     "docs:build": "dumi build",
@@ -46,7 +53,7 @@
     "lint:css-fix": "stylelint \"components/**/*.{css,less,scss}\" \".dumi/**/*.{css,less,scss}\" --fix",
     "lint:css": "stylelint \"components/**/*.{css,less,scss}\" \".dumi/**/*.{css,less,scss}\"",
     "lint:es": "eslint \"components/**/*.{js,jsx,ts,tsx}\" \".dumi/**/*.{js,jsx,ts,tsx}\"",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build && npm run build:dts",
     "deploy": "npm run docs:build && gh-pages -d docs-dist",
     "release": "./scripts/release.sh",
     "tsc": "tsc --noEmit",
@@ -119,6 +126,7 @@
     "ko-lint-config": "2.2.21",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
+    "publint": "^0.3.21",
     "rc-motion": "2.6.2",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
@@ -150,6 +158,5 @@
     "*.{md,yml}": [
       "prettier --ignore-unknown --write"
     ]
-  },
-  "packageManager": "pnpm@11.4.0+sha512.f0febc7e37552ab485494a914241b338e0b3580b93d54ce31f00933015880863129038a1b4ae4e414a0ee63ac35bf21197e990172c4a68256450b5636310968f"
+  }
 }

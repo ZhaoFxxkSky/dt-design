@@ -47,8 +47,14 @@ jobs:
       - name: Lint code
         run: pnpm lint
 
+      - name: Run tests
+        run: pnpm test
+
       - name: Run Build
         run: pnpm build
-#      单元测试有问题 后续在开放
-#      - name: Run tests
-#        run: pnpm test
+
+      - name: Generate type declarations
+        run: pnpm build:dts
+
+      - name: Lint package
+        run: pnpm lint:pkg

@@ -19,14 +19,15 @@ describe('Button', () => {
 
   it('renders icon correctly', () => {
     const { container } = render(<Button icon={<UploadOutlined />} />);
-    expect(container.querySelector('.dt-button__icon')).toBeInTheDocument();
-    expect(container.querySelector('.dt-button__text')).not.toBeInTheDocument();
+    expect(container.querySelector('.anticon')).toBeInTheDocument();
+    expect(container.querySelector('.ant-btn-icon-only')).toBeInTheDocument();
+    expect(container.textContent).toBe('');
   });
 
   it('renders icon and text correctly', () => {
     const { getByText, container } = render(<Button icon={<UploadOutlined />}>Search</Button>);
     expect(getByText('Search')).toBeInTheDocument();
-    expect(container.querySelector('.dt-button__icon')).toBeInTheDocument();
+    expect(container.querySelector('.anticon')).toBeInTheDocument();
   });
 
   it('applies custom className', () => {
@@ -50,7 +51,7 @@ describe('Button', () => {
         Test
       </Button>,
     );
-    expect(container.querySelector('.dt-button__icon--small')).toBeInTheDocument();
-    expect(container.querySelector('.dt-button__text--small')).toBeInTheDocument();
+    expect(container.firstChild).toHaveClass('ant-btn-sm');
+    expect(container.querySelector('.anticon')).toBeInTheDocument();
   });
 });

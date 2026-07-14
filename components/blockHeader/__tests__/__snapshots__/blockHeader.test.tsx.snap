@@ -6,11 +6,11 @@ exports[`test BlockHeader render should render BlockHeader success render 1`] = 
   "baseElement": <body>
     <div>
       <div
-        class="dt-block-header"
+        class="ant-block-header"
         style="margin-bottom: 16px;"
       >
         <div
-          class="dt-block-header__title dt-block-header__title--middle dt-block-header__title--background"
+          class="ant-block-header__title ant-block-header__title--middle ant-block-header__title--background"
         >
           <div
             class="title__box"
@@ -29,16 +29,28 @@ exports[`test BlockHeader render should render BlockHeader success render 1`] = 
             </div>
           </div>
         </div>
+        <div
+          class="ant-splitter-wrapper"
+          style="overflow: hidden; height: 0px; opacity: 1; transition-duration: 0ms;"
+        >
+          <div
+            style="overflow: hidden;"
+          >
+            <div
+              class="ant-block-header__content ant-block-header__content--active"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </body>,
   "container": <div>
     <div
-      class="dt-block-header"
+      class="ant-block-header"
       style="margin-bottom: 16px;"
     >
       <div
-        class="dt-block-header__title dt-block-header__title--middle dt-block-header__title--background"
+        class="ant-block-header__title ant-block-header__title--middle ant-block-header__title--background"
       >
         <div
           class="title__box"
@@ -55,6 +67,18 @@ exports[`test BlockHeader render should render BlockHeader success render 1`] = 
           >
             标题1
           </div>
+        </div>
+      </div>
+      <div
+        class="ant-splitter-wrapper"
+        style="overflow: hidden; height: 0px; opacity: 1; transition-duration: 0ms;"
+      >
+        <div
+          style="overflow: hidden;"
+        >
+          <div
+            class="ant-block-header__content ant-block-header__content--active"
+          />
         </div>
       </div>
     </div>

@@ -1,0 +1,108 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22.13.x
+          registry-url: 'https://registry.npmjs.org'
+
+      # pnpm 版本不在这里指定，自动读取 package.json 的 packageManager 字段
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint code
+        run: pnpm lint
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Build package
+        run: pnpm build
+
+      - name: Generate type declarations
+        run: pnpm build:dts
+
+      - name: Lint package
+        run: pnpm lint:pkg
+
+      # npm Trusted Publishing / provenance 需要 npm >= 11.5.1
+      - name: Upgrade npm
+        run: npm install -g npm@latest
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          TAG_NAME="${GITHUB_REF_NAME}"
+          if [[ "$TAG_NAME" == *"-"* ]]; then
+            DIST_TAG=$(echo "$TAG_NAME" | sed -E 's/^v[0-9]+\.[0-9]+\.[0-9]+-([a-zA-Z]+).*/\1/')
+            echo "Publishing prerelease with dist-tag: $DIST_TAG"
+            npm publish --provenance --access public --tag "$DIST_TAG"
+          else
+            echo "Publishing stable release"
+            npm publish --provenance --access public
+          fi
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          awk -v v="$VERSION" '
+            $0 ~ "^## \\[" v "\\]" || $0 ~ "^## " v " " {flag=1; next}
+            /^## \[/ {flag=0}
+            flag
+          ' CHANGELOG.md > RELEASE_NOTES.md
+
+          PRERELEASE_FLAG=""
+          if [[ "${GITHUB_REF_NAME}" == *"-"* ]]; then
+            PRERELEASE_FLAG="--prerelease"
+          fi
+
+          if [ -s RELEASE_NOTES.md ]; then
+            gh release create "${GITHUB_REF_NAME}" \
+              --title "${GITHUB_REF_NAME}" \
+              --notes-file RELEASE_NOTES.md \
+              $PRERELEASE_FLAG
+          else
+            gh release create "${GITHUB_REF_NAME}" \
+              --title "${GITHUB_REF_NAME}" \
+              --generate-notes \
+              $PRERELEASE_FLAG
+          fi

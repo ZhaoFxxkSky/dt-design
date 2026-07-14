@@ -21,6 +21,7 @@ node_modules
 # Logs / local env
 *.log
 .env.local
+.eslintcache
 
 # AI / scratch / temp files
 scratch/

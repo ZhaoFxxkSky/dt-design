@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "components",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "noEmitOnError": false,
+    "outDir": "esm"
+  },
+  "include": ["components/**/*"],
+  "exclude": [
+    "node_modules",
+    "components/**/__tests__/**/*",
+    "components/**/demos/**/*",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
+}
