@@ -15,32 +15,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version: 22.13.x
 
+      # pnpm 版本不在这里指定，自动读取 package.json 的 packageManager 字段（pnpm@11.4.0）
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10.6.4
-          run_install: false
+        uses: pnpm/action-setup@v6
 
-#      - name: Get pnpm store directory
-#        id: pnpm-cache
-#        shell: bash
-#        run: |
-#          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-#
-#      - uses: actions/cache@v3
-#        name: Setup pnpm cache
-#        with:
-#          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-#          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-#          restore-keys: |
-#            ${{ runner.os }}-pnpm-store-
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v6
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install
