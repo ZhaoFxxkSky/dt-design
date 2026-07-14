@@ -90,7 +90,7 @@
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
     "@eslint-react/eslint-plugin": "^2.5.0",
-    "@faker-js/faker": "^7.6.0",
+    "@faker-js/faker": "^10.5.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@npmcli/run-script": "^10.0.3",
     "@prettier/sync": "^0.6.1",
