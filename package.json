@@ -25,10 +25,12 @@
   ],
   "main": "lib/index.js",
   "module": "esm/index.js",
+  "unpkg": "dist/dt-design.min.js",
   "types": "esm/index.d.ts",
   "files": [
     "esm",
-    "lib"
+    "lib",
+    "dist"
   ],
   "engines": {
     "node": ">=18"
