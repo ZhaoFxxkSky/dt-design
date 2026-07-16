@@ -1,0 +1,76 @@
+name: Test umi3 Integration
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  umi3-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build package
+        run: pnpm build
+
+      - name: Generate type declarations
+        run: pnpm build:dts
+
+      - name: Pack package
+        run: pnpm pack
+
+      - name: Setup umi3 test project
+        run: |
+          mkdir -p /tmp/umi3-test
+          cd /tmp/umi3-test
+          npm init -y
+          npm install umi@3 react@18 react-dom@18 @ant-design/icons@4 antd@4
+          npm install $(ls ${{ github.workspace }}/*.tgz | tail -1)
+
+      - name: Create umi3 config
+        run: |
+          cd /tmp/umi3-test
+          cat > .umirc.js <<'EOF'
+          export default {
+            chainWebpack(config) {
+              config.module.rule('js').include.add(/@dtjoy[\\/]dt-design/);
+            },
+          };
+          EOF
+
+      - name: Create test page
+        run: |
+          cd /tmp/umi3-test
+          mkdir -p src/pages
+          cat > src/pages/index.tsx <<'EOF'
+          import React from 'react';
+          import { BlockHeader, Button } from '@dtjoy/dt-design';
+
+          export default function Home() {
+            return (
+              <div>
+                <BlockHeader title="Test" />
+                <Button>Test</Button>
+              </div>
+            );
+          }
+          EOF
+
+      - name: Build umi3 project
+        run: |
+          cd /tmp/umi3-test
+          npx umi build
