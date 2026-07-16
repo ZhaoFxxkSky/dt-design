@@ -28,9 +28,9 @@
   "unpkg": "dist/dt-design.min.js",
   "types": "esm/index.d.ts",
   "files": [
+    "dist",
     "esm",
-    "lib",
-    "dist"
+    "lib"
   ],
   "engines": {
     "node": ">=18"

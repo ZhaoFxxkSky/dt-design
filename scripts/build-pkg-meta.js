@@ -13,7 +13,7 @@ for (const { dir, type } of metaFiles) {
   if (fs.existsSync(targetDir)) {
     fs.writeFileSync(
       path.join(targetDir, 'package.json'),
-      JSON.stringify({ type }, null, 2) + '\n',
+      `${JSON.stringify({ type }, null, 2)}\n`,
     );
     console.log(`Created ${dir}/package.json with type "${type}"`);
   }
