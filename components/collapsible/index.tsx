@@ -1,5 +1,6 @@
 import React from 'react';
-import { isEqual, pick } from 'lodash';
+import isEqual from 'lodash/isEqual';
+import pick from 'lodash/pick';
 
 import './style';
 

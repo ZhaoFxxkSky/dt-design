@@ -36,8 +36,8 @@ describe('test BlockHeader render', () => {
     cleanup();
   });
   it('should render BlockHeader success render', () => {
-    const wrapper = render(<BlockHeader {...props} />);
-    expect(wrapper).toMatchSnapshot();
+    const { container } = render(<BlockHeader {...props} />);
+    expect(container.firstChild).toMatchSnapshot();
   });
   it('should render BlockHeader default BlockHeader render', () => {
     const { getByText, rerender } = render(<BlockHeader {...props} />);

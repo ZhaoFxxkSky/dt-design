@@ -12,12 +12,7 @@ An enterprise-class React component library built on [Ant Design](https://github
 
 ## 📖 Introduction
 
-dt-design is a React component library internally developed by the **Digital Business Department**, extending Ant Design 5.x. It abstracts and 沉淀（consolidates）common business patterns into **out-of-the-box components**, boosting development velocity while reducing redundant code.
-
-In addition, we provide several framework-agnostic utilities written in vanilla JavaScript:
-
-- `ContextMenu` – right-click context menu
-- `KeyEventListener` – global keyboard event binder
+dt-design is a React component library internally developed by the **Digital Business Department**, extending Ant Design. It consolidates common business patterns into **out-of-the-box components**, boosting development velocity while reducing redundant code.
 
 ---
 
@@ -34,13 +29,13 @@ In addition, we provide several framework-agnostic utilities written in vanilla 
 
 ```bash
 # npm
-npm install dt-design
+npm install @dtjoy/dt-design
 
 # yarn
-yarn add dt-design
+yarn add @dtjoy/dt-design
 
 # pnpm
-pnpm add dt-design
+pnpm add @dtjoy/dt-design
 ```
 
 ---
@@ -61,7 +56,7 @@ const App = () => <BlockHeader title="Category Title" background />;
 ES modules are fully supported; import only what you need and the bundler will drop the rest automatically:
 
 ```ts
-import { BlockHeader, CustomTable } from '@dtjoy/dt-design';
+import { BlockHeader, Table } from '@dtjoy/dt-design';
 ```
 
 ---

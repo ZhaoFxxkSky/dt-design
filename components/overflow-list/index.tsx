@@ -5,7 +5,7 @@ import { globalConfig } from 'antd/lib/config-provider';
 import './style';
 
 import clsx from 'clsx';
-import { uniqueId } from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 
 import ReactResizeObserver from '../resize-observer';
 

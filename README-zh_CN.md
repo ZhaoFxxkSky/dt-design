@@ -1,4 +1,3 @@
-
 <div align="center">
 
 # `dt-design`
@@ -15,19 +14,14 @@
 
 `dt-design` 是基于 [Ant Design](https://github.com/ant-design/ant-design) 封装的 React 组件库，专为公司内部中后台系统打造。我们聚焦于**具体业务场景的抽象与沉淀**，提供一系列开箱即用、可扩展的业务组件，提升开发效率，降低重复开发成本。
 
-此外，我们也提供部分基于原生 JavaScript 实现的通用能力组件，如：
-
--   `ContextMenu`（右键菜单）
--   `KeyEventListener`（键盘事件监听）
-
 ---
 
 ## 🎯 使用场景
 
--   ✅ 当 Ant Design 基础组件无法满足复杂业务需求时
--   ✅ 当多个项目存在相似业务模块，需统一组件实现时
--   ✅ 当希望沉淀通用业务逻辑，减少重复开发时
--   ✅ 当需要统一 UI 规范与交互行为，提升产品一致性时
+- ✅ 当 Ant Design 基础组件无法满足复杂业务需求时
+- ✅ 当多个项目存在相似业务模块，需统一组件实现时
+- ✅ 当希望沉淀通用业务逻辑，减少重复开发时
+- ✅ 当需要统一 UI 规范与交互行为，提升产品一致性时
 
 ---
 
@@ -35,13 +29,13 @@
 
 ```bash
 # 使用 npm
-npm install dt-design
+npm install @dtjoy/dt-design
 
 # 使用 yarn
-yarn add dt-design
+yarn add @dtjoy/dt-design
 
 # 使用 pnpm
-pnpm add dt-design
+pnpm add @dtjoy/dt-design
 ```
 
 ---
@@ -62,7 +56,7 @@ const App = () => <BlockHeader title="分类标题" background />;
 本库默认支持基于 ES modules 的 tree shaking，按需引入即可自动优化打包体积：
 
 ```ts
-import { BlockHeader, CustomTable } from '@dtjoy/dt-design';
+import { BlockHeader, Table } from '@dtjoy/dt-design';
 ```
 
 ---
@@ -95,11 +89,11 @@ pnpm run dev
 pnpm build
 ```
 
-### 发布版本（内部 npm 仓库）
+### 发布版本
 
 ```bash
-pnpm release -- -r x.x.x
-npm publish --registry <公司内部npm仓库地址>
+# 自动创建 tag 并推送，触发 GitHub Actions 发布到 npm
+pnpm release
 ```
 
 ### 发布文档站点（如适用）

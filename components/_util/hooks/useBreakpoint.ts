@@ -52,13 +52,16 @@ export function useBreakpoint(needResponsive?: boolean): ScreenMap {
       if (mql.addEventListener) {
         mql.addEventListener('change', handler);
       } else {
-        (mql as any).addListener(handler);
+        // Legacy browsers use deprecated addListener API
+        (mql as MediaQueryList & { addListener: (cb: () => void) => void }).addListener(handler);
       }
       listeners.push(() => {
         if (mql.removeEventListener) {
           mql.removeEventListener('change', handler);
         } else {
-          (mql as any).removeListener(handler);
+          (mql as MediaQueryList & { removeListener: (cb: () => void) => void }).removeListener(
+            handler,
+          );
         }
       });
     });

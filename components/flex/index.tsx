@@ -2,7 +2,7 @@ import React from 'react';
 import type { ConfigConsumerProps } from 'antd/lib/config-provider';
 import { ConfigContext, globalConfig } from 'antd/lib/config-provider';
 import clsx from 'clsx';
-import { omit } from 'lodash';
+import omit from 'lodash/omit';
 
 import './style';
 

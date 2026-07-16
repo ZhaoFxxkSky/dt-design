@@ -4,7 +4,7 @@
 
 ## 开发环境
 
-- Node.js >= 18
+- Node.js >= 22
 - pnpm >= 11
 
 ```bash
@@ -87,7 +87,7 @@ pnpm release -- --release-as minor
 
 - 新增组件需提供 demo 和基础文档。
 - 修改组件行为时，请同步更新对应测试。
-- 不要直接修改 `CHANGELOG.md` 顶部未发布区域之外的已有内容。
+- `CHANGELOG.md` 采用手动维护方式，发布版本时将未发布区域更新为正式版本号和日期。
 
 ## 行为准则
 

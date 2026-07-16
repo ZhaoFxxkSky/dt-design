@@ -48,6 +48,30 @@ export default defineConfig({
         amd: 'rc-util',
         root: 'rc-util',
       },
+      '@ant-design/icons': {
+        commonjs: '@ant-design/icons',
+        commonjs2: '@ant-design/icons',
+        amd: '@ant-design/icons',
+        root: 'icons',
+      },
+      'rc-resize-observer': {
+        commonjs: 'rc-resize-observer',
+        commonjs2: 'rc-resize-observer',
+        amd: 'rc-resize-observer',
+        root: 'rc-resize-observer',
+      },
+      'rc-tree': {
+        commonjs: 'rc-tree',
+        commonjs2: 'rc-tree',
+        amd: 'rc-tree',
+        root: 'rc-tree',
+      },
+      'rc-virtual-list': {
+        commonjs: 'rc-virtual-list',
+        commonjs2: 'rc-virtual-list',
+        amd: 'rc-virtual-list',
+        root: 'rc-virtual-list',
+      },
     },
     chainWebpack(memo) {
       // lodash may require Node.js 'util' module,

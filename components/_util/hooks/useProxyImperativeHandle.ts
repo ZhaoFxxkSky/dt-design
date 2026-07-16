@@ -2,17 +2,17 @@ import type { Ref } from 'react';
 import { useImperativeHandle } from 'react';
 
 const fillProxy = (
-  element: HTMLElement & { _dtProxy?: Record<string, any> },
-  handler: Record<string, any>,
+  element: HTMLElement & { _dtProxy?: Record<string, unknown> },
+  handler: Record<string, unknown>,
 ) => {
   element._dtProxy = element._dtProxy || {};
 
   Object.keys(handler).forEach((key) => {
     if (!(key in element._dtProxy!)) {
-      const ori = (element as any)[key];
+      const ori = (element as unknown as Record<string, unknown>)[key];
       element._dtProxy![key] = ori;
 
-      (element as any)[key] = handler[key];
+      (element as unknown as Record<string, unknown>)[key] = handler[key];
     }
   });
 

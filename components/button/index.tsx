@@ -12,9 +12,25 @@ export interface ButtonProps extends Omit<AntdButtonProps, 'type'> {
   type?: ButtonType;
 }
 
+/** Map custom types to antd-compatible types */
+function mapButtonType(type: ButtonType | undefined): AntdButtonType | undefined {
+  if (type === 'secondary' || type === 'tertiary') {
+    return 'default';
+  }
+  return type as AntdButtonType | undefined;
+}
+
 function Button({ className, size = 'middle', type, ...rest }: ButtonProps) {
   return (
-    <AntdButton className={clsx(className)} size={size} type={type as AntdButtonType} {...rest} />
+    <AntdButton
+      className={clsx(className, {
+        'dt-btn-secondary': type === 'secondary',
+        'dt-btn-tertiary': type === 'tertiary',
+      })}
+      size={size}
+      type={mapButtonType(type)}
+      {...rest}
+    />
   );
 }
 

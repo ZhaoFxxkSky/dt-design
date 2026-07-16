@@ -16,7 +16,7 @@ export type CompareProps<T extends React.ComponentType<any>> = (
  * Create Immutable pair for `makeImmutable` and `responseImmutable`.
  */
 export default function createImmutable() {
-  const ImmutableContext = React.createContext<number>(null as any);
+  const ImmutableContext = React.createContext<number | null>(null);
 
   /**
    * Get render update mark by `makeImmutable` root.

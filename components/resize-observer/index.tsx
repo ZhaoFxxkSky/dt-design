@@ -110,7 +110,7 @@ export default class ReactResizeObserver extends React.Component<ReactResizeObse
     }
   };
 
-  mergeRef = (ref: React.Ref<any>, node: HTMLElement): void => {
+  mergeRef = (ref: React.Ref<any> | undefined, node: HTMLElement): void => {
     this.childNode = node;
     // 转发外部ref
     if (typeof ref === 'function') {
@@ -143,7 +143,7 @@ export default class ReactResizeObserver extends React.Component<ReactResizeObse
   render(): React.ReactElement {
     const { children, className, style, ...rest } = this.props;
     const child = React.Children.only(children) as React.ReactElement;
-    const childRef = (child as any).ref;
+    const childRef = (child as React.ReactElement & { ref?: React.Ref<any> }).ref;
 
     return React.cloneElement(child, {
       ...rest,

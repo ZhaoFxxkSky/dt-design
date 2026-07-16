@@ -8,14 +8,13 @@
     "experimentalDecorators": true,
     "baseUrl": "./",
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "paths": {
       "@@/*": [".dumi/tmp/*"],
       "@dtjoy/dt-design": ["components/index.ts"],
       "@dtjoy/dt-design/es/*": ["components/*"],
       "@dtjoy/dt-design/lib/*": ["components/*"]
     },
-    "resolvePackageJsonExports": true,
     "strict": true,
     "strictNullChecks": true,
     "noImplicitAny": true,
