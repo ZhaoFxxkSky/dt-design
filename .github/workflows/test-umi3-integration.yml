@@ -71,6 +71,8 @@ jobs:
           EOF
 
       - name: Build umi3 project
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
         run: |
           cd /tmp/umi3-test
           npx umi build
