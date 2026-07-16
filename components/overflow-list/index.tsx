@@ -7,7 +7,7 @@ import './style';
 import clsx from 'clsx';
 import { uniqueId } from 'lodash-es';
 
-import ReactResizeObserver from '../resizeObserver';
+import ReactResizeObserver from '../resize-observer';
 
 export type OverflowItem<T = Record<string, any>> = T;
 

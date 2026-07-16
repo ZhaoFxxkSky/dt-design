@@ -1,18 +1,18 @@
-export { default as BlockHeader } from './blockHeader';
+export { default as BlockHeader } from './block-header';
 export type { ButtonProps } from './button';
 export { default as Button } from './button';
 export { default as Collapsible } from './collapsible';
-export { default as CollapsibleActionItems } from './collapsibleActionItems';
+export { default as CollapsibleActionItems } from './collapsible-action-items';
 export { default as Flex } from './flex';
 export type { FlexProps } from './flex/interface';
-export { default as FormList } from './formList';
-export * from './formList';
-export { default as OverflowList } from './overflowList';
+export { default as FormList } from './form-list';
+export * from './form-list';
+export { default as OverflowList } from './overflow-list';
 export { default as Resize } from './resize';
 export { default as Splitter } from './splitter';
 export * from './splitter';
-export { default as StatusTag } from './statusTag';
-export * from './statusTag';
+export { default as StatusTag } from './status-tag';
+export * from './status-tag';
 export { Table } from './table';
 export type {
   AlignType,

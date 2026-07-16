@@ -39,7 +39,6 @@
     "start": "npm run dev",
     "dev": "dumi dev",
     "build": "father build",
-    "postbuild": "node scripts/build-pkg-meta.js",
     "build:dts": "tsc -p tsconfig.build.json",
     "build:watch": "father dev",
     "format": "biome format --write .",
