@@ -17,39 +17,26 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
-          node-version: 22.13.x
+          node-version: 22
           registry-url: 'https://registry.npmjs.org'
-
-      # pnpm 版本不在这里指定，自动读取 package.json 的 packageManager 字段
-      - name: Install pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: echo "STORE_PATH=$(pnpm store path)" >> "$GITHUB_OUTPUT"
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v6
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint code
+      - name: Lint
         run: pnpm lint
 
-      - name: Run tests
+      - name: Test
         run: pnpm test
 
       - name: Build package
@@ -61,10 +48,6 @@ jobs:
       - name: Lint package
         run: pnpm lint:pkg
 
-      # npm Trusted Publishing / provenance 需要 npm >= 11.5.1
-      - name: Upgrade npm
-        run: npm install -g npm@latest
-
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -73,10 +56,10 @@ jobs:
           if [[ "$TAG_NAME" == *"-"* ]]; then
             DIST_TAG=$(echo "$TAG_NAME" | sed -E 's/^v[0-9]+\.[0-9]+\.[0-9]+-([a-zA-Z]+).*/\1/')
             echo "Publishing prerelease with dist-tag: $DIST_TAG"
-            npm publish --provenance --access public --tag "$DIST_TAG"
+            pnpm publish --provenance --access public --tag "$DIST_TAG" --no-git-checks
           else
             echo "Publishing stable release"
-            npm publish --provenance --access public
+            pnpm publish --provenance --access public --no-git-checks
           fi
 
       - name: Create GitHub Release
@@ -85,8 +68,8 @@ jobs:
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           awk -v v="$VERSION" '
-            $0 ~ "^## \\[" v "\\]" || $0 ~ "^## " v " " {flag=1; next}
-            /^## \[/ {flag=0}
+            $0 ~ "^## " v " " || $0 ~ "^## \\[" v "\\]" {flag=1; next}
+            /^## / {flag=0}
             flag
           ' CHANGELOG.md > RELEASE_NOTES.md
 

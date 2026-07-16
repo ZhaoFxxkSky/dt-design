@@ -95,20 +95,24 @@ We use [dumi](https://d.umijs.org/) for docs & component management.
 
 ```bash
 pnpm build
+pnpm build:dts
 ```
 
-### Bump version (internal npm registry)
+### Release
 
 ```bash
-pnpm release -- -r x.x.x
-npm publish --registry <internal-npm-registry>
+# Automatically bump version, update CHANGELOG, create tag and push
+pnpm release
+
+# Or specify release type
+pnpm release -- --release-as minor
 ```
 
-### Deploy documentation site (optional)
+Pushing a `v*` tag will trigger the GitHub Actions release workflow to publish to npm and create a GitHub Release.
 
-```bash
-pnpm deploy
-```
+### Deploy documentation site
+
+Documentation is automatically deployed to GitHub Pages when pushing to `main`. You can also trigger it manually from the Actions tab.
 
 ---
 

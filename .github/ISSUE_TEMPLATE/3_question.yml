@@ -1,0 +1,39 @@
+name: ❓ Question
+Description: 提出一个使用或咨询问题
+title: '[Question]: '
+labels: ['question']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        有问题请先查阅 [文档站点](https://zhaofxxksky.github.io/dt-design) 和 [CHANGELOG](./CHANGELOG.md)。
+
+        Please check the [documentation site](https://zhaofxxksky.github.io/dt-design) and [CHANGELOG](./CHANGELOG.md) first.
+
+  - type: dropdown
+    id: version
+    attributes:
+      label: 版本 / Version
+      options:
+        - 1.1.3
+        - 1.1.2
+        - 1.1.1
+        - 1.1.0
+        - 1.0.x
+        - 其他 / Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: 问题描述 / Question
+      description: 清晰描述你的问题
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: 已尝试的解决方案 / What have you tried?
+      description: 描述你已经查阅的文档或尝试过的方案

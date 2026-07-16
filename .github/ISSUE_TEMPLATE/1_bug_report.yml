@@ -1,0 +1,97 @@
+name: 🐛 Bug Report
+Description: 提交一个 Bug 报告
+title: '[Bug]: '
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈！请填写以下信息，方便我们快速定位和修复问题。
+
+        Thanks for reporting! Please fill out the information below so we can locate and fix the issue quickly.
+
+  - type: input
+    id: component
+    attributes:
+      label: 组件 / Component
+      description: 哪个组件出现了问题？
+      placeholder: 例如：Table / Button / FormList
+    validations:
+      required: true
+
+  - type: dropdown
+    id: version
+    attributes:
+      label: 版本 / Version
+      description: 该问题出现在哪个版本？
+      options:
+        - 1.1.3
+        - 1.1.2
+        - 1.1.1
+        - 1.1.0
+        - 1.0.x
+        - 其他 / Other
+    validations:
+      required: true
+
+  - type: input
+    id: react-version
+    attributes:
+      label: React 版本 / React Version
+      placeholder: 例如：18.2.0
+
+  - type: input
+    id: reproduction
+    attributes:
+      label: 最小复现链接 / Reproduction link
+      description: 请提供 CodeSandbox / StackBlitz / GitHub 仓库链接
+      placeholder: https://codesandbox.io/...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤 / Steps to reproduce
+      description: 清晰描述如何复现该问题
+      placeholder: |
+        1. 点击 ...
+        2. 输入 ...
+        3. 出现错误
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望结果 / Expected behavior
+      description: 描述你期望发生的结果
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际结果 / Actual behavior
+      description: 描述实际发生的结果，可附截图
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: 上下文 / Context
+      description: 浏览器、操作系统、Node 版本等环境信息
+      placeholder: |
+        - OS: Windows 11
+        - Browser: Chrome 120
+        - Node: 22.x
+
+  - type: dropdown
+    id: willing
+    attributes:
+      label: 是否愿意提交 PR？ / Willing to submit PR?
+      options:
+        - 愿意 / Yes
+        - 不愿意 / No
+      default: 1
