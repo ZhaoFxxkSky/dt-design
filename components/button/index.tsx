@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ButtonProps as AntdButtonProps } from 'antd';
 import { Button as AntdButton } from 'antd';
-import type { ButtonType as AntdButtonType } from 'antd/es/button';
+import type { ButtonType as AntdButtonType } from 'antd/lib/button';
 import clsx from 'clsx';
 
 import './style';

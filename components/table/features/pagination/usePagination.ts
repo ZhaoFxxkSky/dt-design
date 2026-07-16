@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { mergeProps } from '../../../_util/rcUtil';
 
 import { isFunction, isPlainObject } from '../../../_util/is';
-import type { PaginationProps } from 'antd/es/pagination';
+import type { PaginationProps } from 'antd/lib/pagination';
 import type { TablePaginationConfig } from '../../interface';
 
 export const DEFAULT_PAGE_SIZE = 10;

@@ -1,24 +1,35 @@
-#### 变更类型
+### 🔗 关联 issue / Related issue
 
-请选择以下选项以描述 PR 的类型：
+- close #ISSUE_NUMBER
 
-- [ ] Bug 修复（修复现有问题）
-- [ ] 新功能（添加了一个功能）
-- [ ] 代码优化（性能改进、代码重构）
-- [ ] 文档更新
-- [ ] 单测新增或修改
-- [ ] 其他（请说明）：
+### 💡 变更类型 / Type of change
 
-#### 相关问题
+- [ ] 🐛 Bug fix（修复问题）
+- [ ] 🆕 New feature（新功能）
+- [ ] 🛠 Refactor（重构）
+- [ ] 📖 Documentation（文档）
+- [ ] 🧪 Tests（测试）
+- [ ] 🚀 CI/CD
+- [ ] 🔨 Chore（构建/依赖/其他）
 
+### 📝 变更描述 / Description
 
-#### 变更内容
+<!-- 请简要描述本次 PR 做了什么 -->
 
+### 📋 Changelog
 
-#### 详细描述
+| Language   | Changelog |
+| ---------- | --------- |
+| 🇺🇸 English |           |
+| 🇨🇳 Chinese |           |
 
+### 📸 截图 / Screenshots
 
-#### 对应 Previewer
+<!-- 如有 UI 变更，请附上截图或 GIF -->
 
+### ✅ 自检清单 / Self Checklist
 
-
+- [ ] 代码已本地验证通过（`pnpm lint && pnpm test`）
+- [ ] 相关文档或 demo 已更新
+- [ ] 新增/修改的代码已补充测试
+- [ ] 不影响现有功能

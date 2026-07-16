@@ -3,7 +3,6 @@ import { EXPAND_COLUMN } from './constant';
 import type { Reference, RefTable } from './interface';
 
 import type { AnyObject } from '../_util/type';
-import type { ComponentType } from 'react';
 import Column from './features/columns/Column';
 import ColumnGroup from './features/columns/ColumnGroup';
 import {
@@ -15,6 +14,7 @@ import {
 
 import type { TableProps } from './InternalTable';
 import InternalTable from './InternalTable';
+import Summary from './components/Footer/Summary';
 import './style';
 
 const Table = <RecordType extends AnyObject = AnyObject>(
@@ -35,7 +35,7 @@ const ForwardTable = React.forwardRef(Table) as unknown as RefTable & {
   SELECTION_NONE: typeof SELECTION_NONE;
   Column: typeof Column;
   ColumnGroup: typeof ColumnGroup;
-  Summary: ComponentType<unknown>;
+  Summary: typeof Summary;
 };
 
 ForwardTable.SELECTION_COLUMN = SELECTION_COLUMN;
@@ -45,16 +45,7 @@ ForwardTable.SELECTION_INVERT = SELECTION_INVERT;
 ForwardTable.SELECTION_NONE = SELECTION_NONE;
 ForwardTable.Column = Column;
 ForwardTable.ColumnGroup = ColumnGroup;
-
-// Summary will be set from core
-try {
-  const { default: Summary } = require('./components/Footer/Summary');
-  if (Summary) {
-    ForwardTable.Summary = Summary;
-  }
-} catch {
-  // Summary not available
-}
+ForwardTable.Summary = Summary;
 
 if (process.env.NODE_ENV !== 'production') {
   ForwardTable.displayName = 'Table';

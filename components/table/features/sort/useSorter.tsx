@@ -6,8 +6,8 @@ import { clsx } from 'clsx';
 
 import { isFunction, isNumber, isPlainObject } from '../../../_util/is';
 import type { AnyObject } from '../../../_util/type';
-import type { TooltipProps } from 'antd/es/tooltip';
-import Tooltip from 'antd/es/tooltip';
+import type { TooltipProps } from 'antd/lib/tooltip';
+import Tooltip from 'antd/lib/tooltip';
 import type {
   ColumnGroupType,
   ColumnSorter,
@@ -22,7 +22,12 @@ import type {
   TableLocale,
   TransformColumns,
 } from '../../interface';
-import { getColumnKey, getColumnPos, renderColumnTitle, safeColumnTitle } from '../../shared/utils/util';
+import {
+  getColumnKey,
+  getColumnPos,
+  renderColumnTitle,
+  safeColumnTitle,
+} from '../../shared/utils/util';
 
 const ASCEND = 'ascend';
 const DESCEND = 'descend';

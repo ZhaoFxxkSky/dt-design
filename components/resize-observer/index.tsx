@@ -1,5 +1,4 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
 
 interface BaseProps {
   className?: string;
@@ -48,13 +47,10 @@ export default class ReactResizeObserver extends React.Component<ReactResizeObse
   }
 
   getElement = (): Element | null => {
-    try {
-      // eslint-disable-next-line react-dom/no-find-dom-node
-      return findDOMNode(this.childNode || this) as Element | null;
-      // eslint-disable-next-line unused-imports/no-unused-vars
-    } catch (_error) {
-      return null;
+    if (this.childNode) {
+      return this.childNode as unknown as Element;
     }
+    return null;
   };
 
   handleResizeEventTriggered = (entries: ResizeEntry[]): void => {

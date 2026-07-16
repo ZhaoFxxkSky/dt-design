@@ -1,13 +1,13 @@
 import type { ReactElement, ReactNode } from 'react';
 import React, { Component, createRef } from 'react';
-import { globalConfig } from 'antd/es/config-provider';
+import { globalConfig } from 'antd/lib/config-provider';
 
 import './style';
 
 import clsx from 'clsx';
-import { uniqueId } from 'lodash-es';
+import { uniqueId } from 'lodash';
 
-import ReactResizeObserver from '../resizeObserver';
+import ReactResizeObserver from '../resize-observer';
 
 export type OverflowItem<T = Record<string, any>> = T;
 

@@ -13,8 +13,7 @@
       "@@/*": [".dumi/tmp/*"],
       "@dtjoy/dt-design": ["components/index.ts"],
       "@dtjoy/dt-design/es/*": ["components/*"],
-      "@dtjoy/dt-design/lib/*": ["components/*"],
-      "@dtjoy/dt-design/locale/*": ["components/locale/*"]
+      "@dtjoy/dt-design/lib/*": ["components/*"]
     },
     "resolvePackageJsonExports": true,
     "strict": true,

@@ -1,0 +1,12 @@
+# 全局默认审查者 / Global default reviewers
+* @ZhaoFxxkSky
+
+# 组件代码 / Components
+/components/ @ZhaoFxxkSky
+
+# 工作流与 CI / Workflows and CI
+/.github/ @ZhaoFxxkSky
+
+# 文档 / Documentation
+/docs/ @ZhaoFxxkSky
+/.dumi/ @ZhaoFxxkSky

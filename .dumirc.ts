@@ -26,7 +26,6 @@ export default defineConfig({
   alias: {
     '@dtjoy/dt-design/lib': path.join(__dirname, 'components'),
     '@dtjoy/dt-design/es': path.join(__dirname, 'components'),
-    '@dtjoy/dt-design/locale': path.join(__dirname, 'components/locale'),
     '@dtjoy/dt-design': path.join(__dirname, 'components'),
     '@ant-design/icons$': '@ant-design/icons/lib',
   },
@@ -50,8 +49,5 @@ export default defineConfig({
     ],
   ],
   clickToComponent: {},
-  lessLoader: {
-    modifyVars: {},
-    globalVars: {},
-  },
+  lessLoader: {},
 });

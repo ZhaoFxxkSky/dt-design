@@ -1,8 +1,8 @@
 import { useContext } from '../../../_util/context';
 import { clsx } from 'clsx';
-import { getDOM } from 'rc-util/es/Dom/findDOMNode';
-import getScrollBarSize from 'rc-util/es/getScrollBarSize';
-import raf from 'rc-util/es/raf';
+import { getDOM } from 'rc-util/lib/Dom/findDOMNode';
+import getScrollBarSize from 'rc-util/lib/getScrollBarSize';
+import raf from 'rc-util/lib/raf';
 import * as React from 'react';
 import TableContext from '../../shared/context/TableContext';
 import { useLayoutState } from '../virtual/useFrame';

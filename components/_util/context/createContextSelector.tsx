@@ -6,9 +6,9 @@
  * overload was retyped to return a precise `Pick` of the selected keys
  * (instead of `Partial<ContextProps>`) so consumers get non-optional fields.
  */
-import isEqual from 'rc-util/es/isEqual';
-import useEvent from 'rc-util/es/hooks/useEvent';
-import useLayoutEffect from 'rc-util/es/hooks/useLayoutEffect';
+import isEqual from 'rc-util/lib/isEqual';
+import useEvent from 'rc-util/lib/hooks/useEvent';
+import useLayoutEffect from 'rc-util/lib/hooks/useLayoutEffect';
 import * as React from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { resetWarned as rcResetWarned, warning as rcWarning } from 'rc-util/es/warning';
+import { resetWarned as rcResetWarned, warning as rcWarning } from 'rc-util/lib/warning';
 
 export function noop() {}
 let deprecatedWarnList: Record<string, string[]> | null = null;

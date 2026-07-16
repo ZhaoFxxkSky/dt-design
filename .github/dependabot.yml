@@ -1,0 +1,51 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '10:00'
+    open-pull-requests-limit: 3
+    groups:
+      actions:
+        patterns:
+          - '*'
+    commit-message:
+      prefix: 'chore(actions)'
+      include: scope
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '10:00'
+    open-pull-requests-limit: 10
+    groups:
+      dependencies-minor-patch:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+      dependencies-major:
+        dependency-type: production
+        update-types:
+          - major
+      dev-dependencies-minor-patch:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      dev-dependencies-major:
+        dependency-type: development
+        update-types:
+          - major
+    commit-message:
+      prefix: 'chore(deps)'
+      prefix-development: 'chore(deps-dev)'
+      include: scope
+    ignore:
+      - dependency-name: 'rc-motion'
+        update-types:
+          - version-update:semver-major

@@ -13,8 +13,8 @@ import {
   Typography,
 } from 'antd';
 import { DeleteOutlined, PlusOutlined, ReloadOutlined, SaveOutlined } from '@ant-design/icons';
-import { Summary, Table } from '../index';
-import type { ColumnGroupType, ColumnsType, EditableConfig, Reference } from '../index';
+import { Summary, Table } from '@dtjoy/dt-design';
+import type { ColumnGroupType, ColumnsType, EditableConfig, Reference } from '@dtjoy/dt-design';
 
 const { Text } = Typography;
 

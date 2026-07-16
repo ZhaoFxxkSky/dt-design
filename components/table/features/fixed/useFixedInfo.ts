@@ -1,5 +1,5 @@
-import isEqual from 'rc-util/es/isEqual';
-import useMemo from 'rc-util/es/hooks/useMemo';
+import isEqual from 'rc-util/lib/isEqual';
+import useMemo from 'rc-util/lib/hooks/useMemo';
 import type { ColumnType, StickyOffsets } from '../../interface';
 import { getCellFixedInfo } from './fixUtil';
 import * as React from 'react';

@@ -18,6 +18,8 @@ export default antfu(
       '**/*.snap',
       '**/*.md',
       '.dumi/scripts/clarity.js',
+      '.github/**/*.yml',
+      '.github/**/*.yaml',
     ],
     settings: {
       polyfills: ['Promise', 'URL'],

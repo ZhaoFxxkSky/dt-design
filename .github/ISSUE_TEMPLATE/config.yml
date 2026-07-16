@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 文档站点 / Documentation
+    url: https://zhaofxxksky.github.io/dt-design
+    about: 查阅组件使用文档
+
+  - name: 💬 Discussions
+    url: https://github.com/ZhaoFxxkSky/dt-design/discussions
+    about: 适合讨论使用问题、最佳实践或想法

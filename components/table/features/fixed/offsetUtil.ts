@@ -1,4 +1,4 @@
-import { getDOM } from 'rc-util/es/Dom/findDOMNode';
+import { getDOM } from 'rc-util/lib/Dom/findDOMNode';
 
 export function getOffset(node: HTMLElement | Window) {
   // All call sites pass a mounted element (never `window` or `null`).

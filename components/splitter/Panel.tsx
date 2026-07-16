@@ -1,5 +1,5 @@
 import React, { forwardRef, useContext } from 'react';
-import { ConfigContext } from 'antd/es/config-provider';
+import { ConfigContext } from 'antd/lib/config-provider';
 import clsx from 'clsx';
 
 import type { InternalPanelProps, PanelProps } from './interface';

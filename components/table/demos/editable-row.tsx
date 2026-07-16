@@ -8,8 +8,8 @@ import {
   PlusOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
-import { Summary, Table } from '../index';
-import type { ColumnsType, EditableConfig, Reference } from '../index';
+import { Summary, Table } from '@dtjoy/dt-design';
+import type { ColumnsType, EditableConfig, Reference } from '@dtjoy/dt-design';
 
 const { Text } = Typography;
 

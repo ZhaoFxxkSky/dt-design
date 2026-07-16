@@ -37,10 +37,10 @@ import { devUseWarning } from '../_util/warning';
 
 import { useBreakpoint } from '../_util/hooks/useBreakpoint';
 import useCssVar from '../_util/hooks/useCssVar';
-import Pagination from 'antd/es/pagination';
-import type { SpinProps } from 'antd/es/spin';
-import Spin from 'antd/es/spin';
-import { ConfigContext, globalConfig } from 'antd/es/config-provider';
+import Pagination from 'antd/lib/pagination';
+import type { SpinProps } from 'antd/lib/spin';
+import Spin from 'antd/lib/spin';
+import { ConfigContext, globalConfig } from 'antd/lib/config-provider';
 import renderExpandIcon from './components/ExpandIcon';
 import useContainerWidth from './shared/hooks/useContainerWidth';
 import useFilledColumns from './features/columns/useFilledColumns';
@@ -58,7 +58,7 @@ import useTitleColumns from './features/columns/useTitleColumns';
 
 import RcTable from './components/RcTable';
 import RcVirtualTable from './components/VirtualTable';
-import DefaultRenderEmpty from 'antd/es/config-provider/defaultRenderEmpty';
+import DefaultRenderEmpty from 'antd/lib/config-provider/defaultRenderEmpty';
 import { transformResizableColumns, useResize } from './features/resize';
 import {
   EditableCell,

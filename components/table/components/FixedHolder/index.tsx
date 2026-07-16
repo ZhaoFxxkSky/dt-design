@@ -1,6 +1,6 @@
 import { useContext } from '../../../_util/context';
 import { clsx } from 'clsx';
-import { fillRef } from 'rc-util/es/ref';
+import { fillRef } from 'rc-util/lib/ref';
 import * as React from 'react';
 import { useMemo } from 'react';
 import ColGroup from '../ColGroup';

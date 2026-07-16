@@ -1,6 +1,3 @@
-
-
-
 <div align="center">
 
 # dt-design
@@ -15,21 +12,21 @@ An enterprise-class React component library built on [Ant Design](https://github
 
 ## 📖 Introduction
 
-dt-design is a React component library internally developed by the **Digital Business Department**, extending Ant Design 5.x. It abstracts and沉淀（consolidates）common business patterns into **out-of-the-box components**, boosting development velocity while reducing redundant code.
+dt-design is a React component library internally developed by the **Digital Business Department**, extending Ant Design 5.x. It abstracts and 沉淀（consolidates）common business patterns into **out-of-the-box components**, boosting development velocity while reducing redundant code.
 
 In addition, we provide several framework-agnostic utilities written in vanilla JavaScript:
 
-* `ContextMenu` – right-click context menu
-* `KeyEventListener` – global keyboard event binder
+- `ContextMenu` – right-click context menu
+- `KeyEventListener` – global keyboard event binder
 
 ---
 
 ## 🎯 When to Use
 
-* ✅ Ant Design's basic components are insufficient for complex business requirements
-* ✅ Multiple projects share similar modules and need a unified implementation
-* ✅ You want to extract general business logic to avoid duplicate development
-* ✅ You need consistent UI specification and interaction behavior across products
+- ✅ Ant Design's basic components are insufficient for complex business requirements
+- ✅ Multiple projects share similar modules and need a unified implementation
+- ✅ You want to extract general business logic to avoid duplicate development
+- ✅ You need consistent UI specification and interaction behavior across products
 
 ---
 
@@ -95,20 +92,24 @@ We use [dumi](https://d.umijs.org/) for docs & component management.
 
 ```bash
 pnpm build
+pnpm build:dts
 ```
 
-### Bump version (internal npm registry)
+### Release
 
 ```bash
-pnpm release -- -r x.x.x
-npm publish --registry <internal-npm-registry>
+# Automatically bump version, update CHANGELOG, create tag and push
+pnpm release
+
+# Or specify release type
+pnpm release -- --release-as minor
 ```
 
-### Deploy documentation site (optional)
+Pushing a `v*` tag will trigger the GitHub Actions release workflow to publish to npm and create a GitHub Release.
 
-```bash
-pnpm deploy
-```
+### Deploy documentation site
+
+Documentation is automatically deployed to GitHub Pages when pushing to `main`. You can also trigger it manually from the Actions tab.
 
 ---
 

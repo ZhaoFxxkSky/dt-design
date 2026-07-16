@@ -7,9 +7,8 @@ import {
   ThunderboltOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
-import { BatchEditModal, Table } from '../index';
-import type { ColumnsType, EditableConfig, Reference } from '../index';
-import type { AnyObject } from '../../_util/type';
+import { BatchEditModal, Table } from '@dtjoy/dt-design';
+import type { ColumnsType, EditableConfig, Reference } from '@dtjoy/dt-design';
 
 const { Text, Title } = Typography;
 
@@ -331,7 +330,7 @@ export default function Demo() {
     setBatchEditOpen(true);
   };
 
-  const handleBatchApply = (newData: AnyObject[]) => {
+  const handleBatchApply = (newData: Record<string, any>[]) => {
     setData(newData as Order[]);
     setBatchEditOpen(false);
     setSelectedRowKeys([]);

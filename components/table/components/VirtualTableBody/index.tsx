@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
-import getValue from 'rc-util/es/utils/get';
+import getValue from 'rc-util/lib/utils/get';
 import useEvent from '../../../_util/hooks/useEvent';
-import warning from 'rc-util/es/warning';
+import warning from 'rc-util/lib/warning';
 import * as React from 'react';
 import { INTERNAL_HOOKS } from '../../constant';
 import { makeImmutable } from '../../shared/context/TableContext';

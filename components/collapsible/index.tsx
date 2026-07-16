@@ -1,5 +1,5 @@
 import React from 'react';
-import { isEqual, pick } from 'lodash-es';
+import { isEqual, pick } from 'lodash';
 
 import './style';
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Table } from '../index';
-import type { ColumnsType } from '../index';
+import { Table } from '@dtjoy/dt-design';
+import type { ColumnsType } from '@dtjoy/dt-design';
 import { Segmented, Space, Typography } from 'antd';
 
 interface RecordType {

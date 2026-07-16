@@ -1,8 +1,8 @@
 import React, { useContext, useMemo, useState } from 'react';
-import { ConfigContext } from 'antd/es/config-provider';
+import { ConfigContext } from 'antd/lib/config-provider';
 import ResizeObserver from 'rc-resize-observer';
-import useEvent from 'rc-util/es/hooks/useEvent';
-import warning from 'rc-util/es/warning';
+import useEvent from 'rc-util/lib/hooks/useEvent';
+import warning from 'rc-util/lib/warning';
 
 import useItems from './hooks/useItems';
 import useOrientation from './hooks/useOrientation';
