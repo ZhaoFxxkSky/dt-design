@@ -56,10 +56,10 @@ jobs:
           if [[ "$TAG_NAME" == *"-"* ]]; then
             DIST_TAG=$(echo "$TAG_NAME" | sed -E 's/^v[0-9]+\.[0-9]+\.[0-9]+-([a-zA-Z]+).*/\1/')
             echo "Publishing prerelease with dist-tag: $DIST_TAG"
-            pnpm publish --access public --tag "$DIST_TAG" --no-git-checks --no-provenance
+            pnpm publish --provenance --access public --tag "$DIST_TAG" --no-git-checks
           else
             echo "Publishing stable release"
-            pnpm publish --access public --no-git-checks --no-provenance
+            pnpm publish --provenance --access public --no-git-checks
           fi
 
       - name: Create GitHub Release
