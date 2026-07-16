@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## Unreleased
 
+## 1.1.3
+
+`2026-07-16`
+
 ### ⭐️ Breaking Changes
 
 - Table
@@ -49,9 +53,17 @@ All notable changes to this project will be documented in this file. See [standa
   - 修复折叠图标样式和提示框类名问题。
 - Build
   - 修复 `fatherrc` 中 esm 与 cjs 配置缺失 `input` 属性的问题。
+  - 移除 `package.json` 中的 `type: module`、`exports` 等现代 ESM 字段，对齐 antd v4/v5 打包风格。
+  - 全局替换 `antd/es/` → `antd/lib/`、`rc-util/es/` → `rc-util/lib/`，修复 CJS 运行时路径错误。
+  - `lodash-es` 替换为 `lodash`，提升 CJS 互操作性。
+  - 移除 `resize-observer` 中的 `findDOMNode`，改用直接 ref 适配 React 18。
+  - 补全 `components/index.ts` 缺失的 `Summary`、`BatchEditModal`、`EditableConfig` 导出。
+  - Table 中动态 `require` 改为静态 `import`。
+  - demos 相对路径导入统一为 `@dtjoy/dt-design`。
 - CI
   - 升级 Node.js 版本至 22.13.x 以兼容 pnpm 10.6.4。
   - 升级已弃用的 Actions 并修复 pnpm 版本不匹配问题。
+  - CI Node 矩阵升级至 22/24，移除不兼容 pnpm 11 的 Node 18。
 
 ### 💄 Style
 
