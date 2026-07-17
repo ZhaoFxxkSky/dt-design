@@ -2,9 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## 1.1.3
+## 1.1.5
 
-`2026-07-16`
+`2026-07-17`
+
+> **注**：`1.1.3` 与 `1.1.4` 版本在 npm 发布后因打包问题已撤回，`1.1.5` 为正式替代版本，内容等同于原计划发布的 `1.1.3`。
 
 ### ⭐️ Breaking Changes
 
