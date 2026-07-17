@@ -13,8 +13,8 @@ import {
   Typography,
 } from 'antd';
 import { DeleteOutlined, PlusOutlined, ReloadOutlined, SaveOutlined } from '@ant-design/icons';
-import { Summary, Table } from '../index';
-import type { ColumnGroupType, ColumnsType, EditableConfig, Reference } from '../index';
+import { Summary, Table } from '@dtjoy/dt-design';
+import type { ColumnGroupType, ColumnsType, EditableConfig, Reference } from '@dtjoy/dt-design';
 
 const { Text } = Typography;
 
@@ -244,8 +244,8 @@ export default function Demo() {
     tableRef.current?.resetErrors();
   };
 
-  const handleSave = (_key: string) => {
-    const result = tableRef.current?.validate();
+  const handleSave = async (_key: string) => {
+    const result = await tableRef.current?.validate();
     if (result?.valid) {
       setEditingKey(null);
       setBackupData(null);
@@ -643,8 +643,8 @@ export default function Demo() {
     tableRef.current?.resetErrors();
   };
 
-  const handleValidateAll = () => {
-    const result = tableRef.current?.validate();
+  const handleValidateAll = async () => {
+    const result = await tableRef.current?.validate();
     if (result?.valid) {
       message.success('全部校验通过！');
     } else {

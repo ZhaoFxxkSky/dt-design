@@ -26,11 +26,11 @@ import { useMultipleSelect } from '../../../_util/hooks/useMultipleSelect';
 import { isFunction, isPlainObject } from '../../../_util/is';
 import type { AnyObject } from '../../../_util/type';
 import { devUseWarning } from '../../../_util/warning';
-import type { CheckboxProps } from 'antd/es/checkbox';
-import Checkbox from 'antd/es/checkbox';
-import Dropdown from 'antd/es/dropdown';
-import type { RadioProps } from 'antd/es/radio';
-import Radio from 'antd/es/radio';
+import type { CheckboxProps } from 'antd/lib/checkbox';
+import Checkbox from 'antd/lib/checkbox';
+import Dropdown from 'antd/lib/dropdown';
+import type { RadioProps } from 'antd/lib/radio';
+import Radio from 'antd/lib/radio';
 
 function arrAdd<T>(list: T[], value: T): T[] {
   const clone = list.slice();

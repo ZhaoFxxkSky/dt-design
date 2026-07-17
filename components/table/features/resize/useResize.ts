@@ -16,6 +16,16 @@ export interface UseResizeOptions {
 }
 
 /**
+ * 获取列宽追踪用的列标识。
+ * 无 key 且无 dataIndex 的列（如 selection / expand 等功能列）不可标识，返回 null：
+ * 不注入拖拽手柄，也不进入 widths Map，避免多列共用 '' 键互相覆盖。
+ */
+function getColumnKey(col: ColumnType): Key | null {
+  const key = col.key ?? col.dataIndex;
+  return key != null ? (key as Key) : null;
+}
+
+/**
  * 表头拖拽改变列宽的 hook
  *
  * 核心交互策略：
@@ -69,7 +79,8 @@ function useResize({
   const [columnWidths, setColumnWidths] = React.useState<Map<Key, number>>(() => {
     const map = new Map<Key, number>();
     flattenColumns.forEach((col) => {
-      const key = (col.key ?? col.dataIndex ?? '') as Key;
+      const key = getColumnKey(col);
+      if (key == null) return;
       if (col.width != null) {
         const w = Number(col.width);
         if (!Number.isNaN(w)) map.set(key, w);
@@ -86,7 +97,8 @@ function useResize({
     setColumnWidths((prev) => {
       const next = new Map(prev);
       flattenColumns.forEach((col) => {
-        const key = (col.key ?? col.dataIndex ?? '') as Key;
+        const key = getColumnKey(col);
+        if (key == null) return;
         if (col.width != null && !next.has(key)) {
           const w = Number(col.width);
           if (!Number.isNaN(w)) next.set(key, w);
@@ -132,7 +144,8 @@ function useResize({
   // 获取列的可调整配置
   const getResizeConfig = React.useCallback(
     (col: ColumnType): { enabled: boolean; minWidth: number; maxWidth?: number } => {
-      const colEnabled = col.resizable ?? enabled;
+      // 不可标识的列（无 key/dataIndex，如 selection / expand 列）不可调整
+      const colEnabled = (col.resizable ?? enabled) && getColumnKey(col) != null;
       return {
         enabled: colEnabled,
         minWidth: col.minWidth ?? defaultMinWidth,
@@ -225,11 +238,15 @@ function useResize({
     let totalWidth = 0;
 
     flattenColumns.forEach((col) => {
-      const key = (col.key ?? col.dataIndex ?? '') as Key;
+      const key = getColumnKey(col);
+      // 不可标识的列不参与宽度分配，保留自身 width / 自然宽度
+      if (key == null) return;
       const mapWidth = columnWidths.get(key);
-      // Guard against NaN: non-numeric string widths default to 0
+      // Guard against NaN: non-numeric string widths are treated as missing
       const rawW = col.width != null ? Number(col.width) : 0;
-      const baseWidth = mapWidth ?? (Number.isNaN(rawW) ? 0 : rawW);
+      // 未设 width 且未被拖拽冻结的列：以 defaultMinWidth 为基础宽度参与弹性分配，
+      // 避免渲染宽度被覆盖为 0 而塌陷为 0~1px
+      const baseWidth = mapWidth ?? (Number.isNaN(rawW) || rawW <= 0 ? defaultMinWidth : rawW);
       const flex = !resizedKeys.has(key) && baseWidth > 0;
       entries.push({ key, width: baseWidth, flex });
       totalWidth += baseWidth;
@@ -374,9 +391,9 @@ function useResize({
   // actualWidth 由 ResizeHandle 从 th.offsetWidth 测量后传入，确保与实际渲染宽度一致
   const onStartResize = React.useCallback(
     (e: React.MouseEvent, col: ColumnType, actualWidth?: number) => {
-      const key = (col.key ?? col.dataIndex ?? '') as Key;
+      const key = getColumnKey(col);
       const config = getResizeConfig(col);
-      if (!config.enabled) return;
+      if (key == null || !config.enabled) return;
 
       e.preventDefault();
       e.stopPropagation();
@@ -461,7 +478,8 @@ function useResize({
             const next = new Map(prev);
             // 冻结所有列的 baseWidth 为当前渲染宽度
             currentRendered.forEach((w, key) => {
-              next.set(key, w);
+              // 不冻结 0 / NaN：未分配到渲染宽度的列保持弹性，避免塌陷宽度被永久化
+              if (w > 0 && !Number.isNaN(w)) next.set(key, w);
             });
             // 被拖拽的列使用用户拖拽的最终宽度
             next.set(k, latestWidth);
@@ -472,8 +490,8 @@ function useResize({
           setResizedKeys((prev) => {
             const next = new Set(prev);
             flattenColumnsRef.current.forEach((col) => {
-              const key = (col.key ?? col.dataIndex ?? '') as Key;
-              next.add(key);
+              const key = getColumnKey(col);
+              if (key != null) next.add(key);
             });
             return next;
           });
@@ -482,9 +500,7 @@ function useResize({
           onColumnResizeRef.current?.(k, latestWidth);
 
           // 触发列的 onResize 回调
-          const col = flattenColumnsRef.current.find(
-            (c) => ((c.key ?? c.dataIndex ?? '') as Key) === k,
-          );
+          const col = flattenColumnsRef.current.find((c) => getColumnKey(c) === k);
           col?.onResize?.(latestWidth);
         }
 
@@ -512,7 +528,9 @@ function useResize({
   // 获取列的渲染宽度（= 用户宽度 + 剩余空间分配）
   const getColumnRenderWidth = React.useCallback(
     (col: ColumnType): number | undefined => {
-      const key = (col.key ?? col.dataIndex ?? '') as Key;
+      const key = getColumnKey(col);
+      // 不可标识的列不注入覆盖宽度
+      if (key == null) return undefined;
       const renderWidth = renderWidths.get(key);
       if (renderWidth != null) return renderWidth;
       const mapWidth = columnWidths.get(key);
@@ -531,6 +549,46 @@ function useResize({
     [getResizeConfig],
   );
 
+  // 键盘调整列宽（不走 MouseEvent 路径，直接更新 state）
+  const setColumnWidth = React.useCallback(
+    (col: ColumnType, newWidth: number) => {
+      const key = getColumnKey(col);
+      const config = getResizeConfig(col);
+      if (key == null || !config.enabled) return;
+
+      // clamp 到 minWidth / maxWidth
+      newWidth = Math.max(newWidth, config.minWidth);
+      if (config.maxWidth != null) {
+        newWidth = Math.min(newWidth, config.maxWidth);
+      }
+
+      // 冻结所有列的 baseWidth 为当前渲染宽度，标记为固定列
+      const currentRendered = renderWidthsRef.current;
+      setColumnWidths((prev) => {
+        const next = new Map(prev);
+        currentRendered.forEach((w, k) => {
+          // 不冻结 0 / NaN：未分配到渲染宽度的列保持弹性，避免塌陷宽度被永久化
+          if (w > 0 && !Number.isNaN(w)) next.set(k, w);
+        });
+        next.set(key, newWidth);
+        return next;
+      });
+
+      setResizedKeys((prev) => {
+        const next = new Set(prev);
+        flattenColumnsRef.current.forEach((c) => {
+          const k = getColumnKey(c);
+          if (k != null) next.add(k);
+        });
+        return next;
+      });
+
+      onColumnResizeRef.current?.(key, newWidth);
+      col.onResize?.(newWidth);
+    },
+    [getResizeConfig],
+  );
+
   // 重置列宽（同时清空 resizedKeys，恢复所有列为弹性列）
   const resetColumnWidths = React.useCallback(() => {
     setColumnWidths(new Map());
@@ -545,6 +603,7 @@ function useResize({
     getColumnRenderWidth,
     isColumnResizable,
     onStartResize,
+    setColumnWidth,
     resetColumnWidths,
   };
 }

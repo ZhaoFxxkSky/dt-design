@@ -13,6 +13,7 @@ import type {
   GetRowKey,
   Reference as RcReference,
   RefInternalTable,
+  ScrollConfig,
   SorterResult,
   SorterTooltipProps,
   SortOrder,
@@ -37,10 +38,10 @@ import { devUseWarning } from '../_util/warning';
 
 import { useBreakpoint } from '../_util/hooks/useBreakpoint';
 import useCssVar from '../_util/hooks/useCssVar';
-import Pagination from 'antd/es/pagination';
-import type { SpinProps } from 'antd/es/spin';
-import Spin from 'antd/es/spin';
-import { ConfigContext, globalConfig } from 'antd/es/config-provider';
+import Pagination from 'antd/lib/pagination';
+import type { SpinProps } from 'antd/lib/spin';
+import Spin from 'antd/lib/spin';
+import { ConfigContext, globalConfig } from 'antd/lib/config-provider';
 import renderExpandIcon from './components/ExpandIcon';
 import useContainerWidth from './shared/hooks/useContainerWidth';
 import useFilledColumns from './features/columns/useFilledColumns';
@@ -58,7 +59,7 @@ import useTitleColumns from './features/columns/useTitleColumns';
 
 import RcTable from './components/RcTable';
 import RcVirtualTable from './components/VirtualTable';
-import DefaultRenderEmpty from 'antd/es/config-provider/defaultRenderEmpty';
+import DefaultRenderEmpty from 'antd/lib/config-provider/defaultRenderEmpty';
 import { transformResizableColumns, useResize } from './features/resize';
 import {
   EditableCell,
@@ -242,7 +243,10 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
           | boolean
           | { type?: string }
           | undefined;
-        return ed === true || (ed && typeof ed === 'object' && ed.type);
+        // 与 parseEditableConfig 语义对齐：列显式开启 = true 或任意配置对象；
+        // editable === false（显式关闭）或未配置 → 非显式开启，
+        // 全局开启时由 parseEditableConfig 继承、false 时优先关闭
+        return ed === true || (ed !== null && typeof ed === 'object');
       }),
     [editableEnabled, mergedColumns],
   );
@@ -372,17 +376,15 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
 
   // 用于暴露 validate / resetErrors 的 ref
   const editableMethodsRef = React.useRef<{
-    validate: () => EditableValidateResult;
+    validate: () => Promise<EditableValidateResult>;
     resetErrors: () => void;
   } | null>(null);
 
-  useProxyImperativeHandle(ref, () => ({
-    ...tblRef.current!,
-    nativeElement: rootRef.current!,
-    validate: () => editableMethodsRef.current?.validate() ?? { valid: true, errors: new Map() },
-    resetErrors: () => editableMethodsRef.current?.resetErrors(),
-    resetColumnWidths: () => resizeResult.resetColumnWidths(),
-  }));
+  // 跨页滚动 timer ref（防止组件卸载后 timer 泄漏）
+  const scrollTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  React.useEffect(() => () => {
+    if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+  }, []);
 
   // ============================ RowKey ============================
   const rowKey = customizeRowKey || 'key';
@@ -420,6 +422,10 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   // onCellChange / validateCell 用此 index 匹配 rawData，导致跨页编辑写入错误行。
   const pageOffsetRef = React.useRef(0);
 
+  // mergedData（排序/筛选后、分页前）ref — scrollToRow 按 rowKey 定位行所在页时使用。
+  // useEditable 在 mergedData 计算之前调用，所以用 ref 传递（同 paginationInfoRef 模式）。
+  const mergedDataRef = React.useRef<readonly RecordType[]>(EMPTY_LIST);
+
   // 分页控制 ref — validate 时用于自动跳转到错误行所在页
   // useEditable 在 usePagination 之前调用，所以用 ref 传递
   const resetPaginationRef = React.useRef<(current?: number, pageSize?: number) => void>(() => {});
@@ -436,38 +442,100 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     onChange: onEditableChange as ((data: AnyObject[]) => void) | undefined,
     onValidate: onValidateProp,
     getRowKey: getRowKey as (record: AnyObject, index: number) => React.Key,
-    scrollToRow: (idx: number) => {
+    childrenColumnName,
+    scrollToRow: (key: React.Key, idx: number) => {
       const { current, pageSize, enabled } = paginationInfoRef.current;
+      // 在 mergedData（排序/筛选后、分页前）中按 key 定位顶层行下标；
+      // 树形子行归属于其顶层祖先。定位失败（无 key / 行被过滤掉）降级为传入下标。
+      const matchRow = (row: RecordType, index: number): boolean => {
+        if (getRowKey(row, index) === key) return true;
+        const children = row?.[childrenColumnName] as RecordType[] | undefined;
+        return Array.isArray(children) && children.some((child, ci) => matchRow(child, ci));
+      };
+      const list = mergedDataRef.current;
+      let topIndex = -1;
+      for (let i = 0; i < list.length; i += 1) {
+        if (matchRow(list[i], i)) {
+          topIndex = i;
+          break;
+        }
+      }
+      const foundByKey = topIndex !== -1;
+      if (!foundByKey) topIndex = idx;
+
+      const scrollToRowOnPage = (pageLocalIdx: number) => {
+        // key 定位成功时直接按 key 滚动（树形子行也能命中）；否则用页内下标
+        if (foundByKey) {
+          tblRef.current?.scrollTo({ key, align: 'center' });
+        } else {
+          tblRef.current?.scrollTo({ index: pageLocalIdx, align: 'center' });
+        }
+      };
+
       if (enabled && pageSize > 0) {
-        const targetPage = Math.floor(idx / pageSize) + 1;
+        const targetPage = Math.floor(topIndex / pageSize) + 1;
         if (targetPage !== current) {
-          // 切换到错误行所在页
-          resetPaginationRef.current(targetPage, pageSize);
+          if (isPlainObject(pagination) && pagination.current !== undefined) {
+            // 受控分页：current 由外部持有，内部 setState 无法换页（merge 时受控值优先），
+            // 自动跳页只能通过 onChange 发起请求，由外部响应后更新 current
+            pagination.onChange?.(targetPage, pageSize);
+          } else {
+            // 切换到错误行所在页
+            resetPaginationRef.current(targetPage, pageSize);
+          }
           // 等待页面渲染后滚动到错误行（page-local index）
-          const localIdx = idx - (targetPage - 1) * pageSize;
-          setTimeout(() => {
-            tblRef.current?.scrollTo({ index: localIdx, align: 'center' });
+          const localIdx = topIndex - (targetPage - 1) * pageSize;
+          if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+          scrollTimerRef.current = setTimeout(() => {
+            scrollToRowOnPage(localIdx);
+            scrollTimerRef.current = null;
           }, 50);
           return;
         }
         // 同页：直接滚动（使用 page-local index）
-        const localIdx = idx - (current - 1) * pageSize;
-        tblRef.current?.scrollTo({ index: localIdx, align: 'center' });
+        scrollToRowOnPage(topIndex - (current - 1) * pageSize);
       } else {
         // 无分页：直接用全局 index 滚动
-        tblRef.current?.scrollTo({ index: idx, align: 'center' });
+        scrollToRowOnPage(topIndex);
       }
     },
     enabled: hasEditableColumns,
   });
 
   // 暴露 validate / resetErrors 到 ref
+  // validate 不传参数，内部用 dataRef.current 获取最新数据
   editableMethodsRef.current = hasEditableColumns
     ? {
-        validate: () => editableResult.validateAll(rawData as AnyObject[]),
+        validate: () => editableResult.validateAll(),
         resetErrors: editableResult.resetErrors,
       }
     : null;
+
+  // 用于稳定 validate / resetErrors 引用，配合 useProxyImperativeHandle deps=[]
+  // 避免 each render 重建 Proxy
+  const validateAllRef = React.useRef(editableResult.validateAll);
+  validateAllRef.current = editableResult.validateAll;
+  const resetErrorsRef = React.useRef(editableResult.resetErrors);
+  resetErrorsRef.current = editableResult.resetErrors;
+  const resetColumnWidthsRef = React.useRef(resizeResult.resetColumnWidths);
+  resetColumnWidthsRef.current = resizeResult.resetColumnWidths;
+
+  // useImperativeHandle 在 commit 阶段执行（DOM ref 已挂载），
+  // 所以直接读 rootRef.current / tblRef.current 即可。
+  // deps=[] 保证只创建一次 Proxy；方法通过 ref 间接访问最新值。
+  useProxyImperativeHandle(ref, () => ({
+    nativeElement: rootRef.current!,
+    // 惰性间接调用，不展开 tblRef.current：
+    // 1. 展开会形成首次渲染快照 — RcTable 的 scrollTo 闭包捕获当次 render 的
+    //    mergedData/getRowKey，dataSource/分页变化后用旧数据解析 rowKey 导致找不到/找错行；
+    // 2. 展开会对 getter 提前求值（如虚拟表格 BodyGrid 的 scrollLeft/scrollTop 变成静态数字）。
+    scrollTo: (config: ScrollConfig) => tblRef.current?.scrollTo?.(config),
+    validate: () =>
+      validateAllRef.current?.() ??
+      Promise.resolve({ valid: true, errors: new Map() }),
+    resetErrors: () => resetErrorsRef.current?.(),
+    resetColumnWidths: () => resetColumnWidthsRef.current?.(),
+  }), []);
 
   // 可编辑列 transform
   // 错误状态通过 EditableContext 传递，不需要重建列 transform。
@@ -499,7 +567,9 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
         return {
           ...leafCol,
           render: (value: unknown, record: RecordType, index: number) => {
-            // index 是 pageData 的局部索引，加上 pageOffset 后才是 rawData 全局索引
+            // index 是 pageData 的局部索引，加上 pageOffset 后才是 rawData 全局索引。
+            // rowKey 是排序/筛选/树形展开后唯一稳定的行标识：editable 链路（提交、错误查找）
+            // 都以 rowKey 定位，globalRowIndex 仅作无 key 时的降级与列回调参数。
             const globalRowIndex = index + pageOffsetRef.current;
             return (
               <EditableCell
@@ -507,6 +577,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
                 // pass the column config through as-is.
                 dataIndex={leafCol.dataIndex as string | number}
                 title={leafCol.title as React.ReactNode}
+                rowKey={getRowKey(record, index)}
                 rowIndex={globalRowIndex}
                 record={record as AnyObject}
                 value={value}
@@ -518,7 +589,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
         };
       });
     },
-    [hasEditableColumns, editableEnabled, prefixCls],
+    [hasEditableColumns, editableEnabled, prefixCls, getRowKey],
   );
 
   // ============================ Events =============================
@@ -609,6 +680,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     rootClassName,
   });
   const mergedData = getFilterData(sortedData, filterStates, childrenColumnName);
+  mergedDataRef.current = mergedData;
 
   changeEventInfo.filters = filters;
   changeEventInfo.filterStates = filterStates;
@@ -747,12 +819,13 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
       );
       // 在 transformColumns 链末端注入 resize（resize 依赖最终列结构）
       if (hasResizableColumns) {
-        result = transformResizableColumns(result, {
-          prefixCls,
-          enabled: hasResizableColumns,
-          isColumnResizable: resizeResult.isColumnResizable,
-          onStartResize: resizeResult.onStartResize,
-        });
+result = transformResizableColumns(result, {
+prefixCls,
+enabled: hasResizableColumns,
+isColumnResizable: resizeResult.isColumnResizable,
+onStartResize: resizeResult.onStartResize,
+onKeyboardResize: resizeResult.setColumnWidth,
+});
       }
       return result;
     },

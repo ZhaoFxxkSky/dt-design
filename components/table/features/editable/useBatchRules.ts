@@ -13,8 +13,13 @@ import { createEmptyRule, normalizeRuleOnFieldChange, resetRuleByType } from './
 function useBatchRules(open: boolean, columns: ColumnsType) {
   const [rules, setRules] = React.useState<BatchRule[]>([]);
 
+  // 仅在 open 由 false → true 跳变时初始化规则；
+  // open 期间 columns 引用变化（父组件重渲染）不得重置用户已配置的规则
+  const prevOpenRef = React.useRef(false);
   React.useEffect(() => {
-    if (open) {
+    const justOpened = open && !prevOpenRef.current;
+    prevOpenRef.current = open;
+    if (justOpened) {
       setRules(columns.length > 0 ? [createEmptyRule(columns)] : []);
     }
   }, [open, columns]);

@@ -17,7 +17,6 @@ export function useLayoutState<State>(
   function setFrameState(updater: Updater<State>) {
     updateBatchRef.current.push(updater);
 
-    // eslint-disable-next-line compat/compat
     const promise = Promise.resolve();
     lastPromiseRef.current = promise;
 
