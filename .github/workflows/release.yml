@@ -1,0 +1,91 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build package
+        run: pnpm build
+
+      - name: Generate type declarations
+        run: pnpm build:dts
+
+      - name: Lint package
+        run: pnpm lint:pkg
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          TAG_NAME="${GITHUB_REF_NAME}"
+          if [[ "$TAG_NAME" == *"-"* ]]; then
+            DIST_TAG=$(echo "$TAG_NAME" | sed -E 's/^v[0-9]+\.[0-9]+\.[0-9]+-([a-zA-Z]+).*/\1/')
+            echo "Publishing prerelease with dist-tag: $DIST_TAG"
+            pnpm publish --provenance --access public --tag "$DIST_TAG" --no-git-checks --ignore-scripts
+          else
+            echo "Publishing stable release"
+            pnpm publish --provenance --access public --no-git-checks --ignore-scripts
+          fi
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          awk -v v="$VERSION" '
+            $0 ~ "^## " v "( |$)" || $0 ~ "^## \\[" v "\\]" {flag=1; next}
+            /^## / {flag=0}
+            flag
+          ' CHANGELOG.md > RELEASE_NOTES.md
+
+          PRERELEASE_FLAG=""
+          if [[ "${GITHUB_REF_NAME}" == *"-"* ]]; then
+            PRERELEASE_FLAG="--prerelease"
+          fi
+
+          if [ -s RELEASE_NOTES.md ]; then
+            gh release create "${GITHUB_REF_NAME}" \
+              --title "${GITHUB_REF_NAME}" \
+              --notes-file RELEASE_NOTES.md \
+              $PRERELEASE_FLAG
+          else
+            gh release create "${GITHUB_REF_NAME}" \
+              --title "${GITHUB_REF_NAME}" \
+              --generate-notes \
+              $PRERELEASE_FLAG
+          fi

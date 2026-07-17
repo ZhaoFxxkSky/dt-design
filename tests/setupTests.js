@@ -1,7 +1,9 @@
 const { TextDecoder, TextEncoder } = require('node:util');
 const ResizeObserver = require('resize-observer-polyfill');
 
+// Use the polyfill as the global ResizeObserver (single definition)
 global.ResizeObserver = ResizeObserver;
+window.ResizeObserver = ResizeObserver;
 
 Object.defineProperty(window, 'matchMedia', {
     writable: true,
@@ -16,11 +18,12 @@ Object.defineProperty(window, 'matchMedia', {
         dispatchEvent: jest.fn(),
     })),
 });
+
 Object.defineProperty(window, 'IntersectionObserver', {
     writable: true,
     value: jest.fn().mockImplementation(() => ({
         observe: jest.fn(),
-        disconnectMock: jest.fn(),
+        disconnect: jest.fn(),
         root: null,
         rootMargin: '',
         thresholds: [],
@@ -28,17 +31,6 @@ Object.defineProperty(window, 'IntersectionObserver', {
         unobserve: jest.fn(),
     })),
 });
-
-window.ResizeObserver = class ResizeObserver {
-    
-    observe() {}
-    disconnect() {}
-};
-
-window.IntersectionObserver = class IntersectionObserver {
-    observe() {}
-    disconnect() {}
-};
 
 Object.assign(global, { TextDecoder, TextEncoder });
 

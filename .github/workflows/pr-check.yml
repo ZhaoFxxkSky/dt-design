@@ -1,0 +1,52 @@
+name: PR Check
+
+on:
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check-title:
+    name: Check PR title
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check conventional title
+        uses: amannn/action-semantic-pull-request@v5
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            chore
+            ci
+            build
+            revert
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  check-changelog:
+    name: Check changelog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR body contains changelog
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || '';
+            const hasChangelog = /Changelog|更新日志|CHANGELOG/i.test(body);
+            const isSkipType = /^(docs|chore|test|ci|style)(\(.+\))?!?:/.test(context.payload.pull_request.title);
+
+            if (!hasChangelog && !isSkipType) {
+              core.setFailed('请填写 PR 中的 Changelog 区块，便于生成发布日志。');
+            }
