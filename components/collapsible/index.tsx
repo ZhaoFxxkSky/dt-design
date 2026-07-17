@@ -1,5 +1,6 @@
 import React from 'react';
-import { isEqual, pick } from 'lodash-es';
+import isEqual from 'lodash/isEqual';
+import pick from 'lodash/pick';
 
 import './style';
 
@@ -220,7 +221,7 @@ class Collapsible extends React.Component<CollapsibleProps, CollapsibleState> {
     } = this.props;
     const { domHeight, isTransitioning, visible } = this.state;
 
-    const prefixCls = getPrefixCls('splitter', customizePrefixCls);
+    const prefixCls = getPrefixCls('collapsible', customizePrefixCls);
 
     const wrapperStyle: React.CSSProperties = {
       overflow: 'hidden',

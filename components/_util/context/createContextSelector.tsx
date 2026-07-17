@@ -6,11 +6,18 @@
  * overload was retyped to return a precise `Pick` of the selected keys
  * (instead of `Partial<ContextProps>`) so consumers get non-optional fields.
  */
-import isEqual from 'rc-util/es/isEqual';
-import useEvent from 'rc-util/es/hooks/useEvent';
-import useLayoutEffect from 'rc-util/es/hooks/useLayoutEffect';
+import isEqual from 'rc-util/lib/isEqual';
+import useEvent from 'rc-util/lib/hooks/useEvent';
+import useLayoutEffect from 'rc-util/lib/hooks/useLayoutEffect';
 import * as React from 'react';
-import { unstable_batchedUpdates } from 'react-dom';
+import * as ReactDOM from 'react-dom';
+
+// React 19 的生产构建移除了 unstable_batchedUpdates(React 18 起已是 no-op),
+// 直接命名导入会在 React 19 生产环境调用 undefined 而崩溃。
+// 经命名空间属性访问并在缺失时降级为直接调用。
+const batchedUpdates: (fn: () => void) => void =
+  (ReactDOM as { unstable_batchedUpdates?: (fn: () => void) => void }).unstable_batchedUpdates ??
+  ((fn) => fn());
 
 export type Selector<ContextProps, SelectorValue = ContextProps> = (
   value: ContextProps,
@@ -51,7 +58,7 @@ export function createContext<ContextProps>(
     }));
 
     useLayoutEffect(() => {
-      unstable_batchedUpdates(() => {
+      batchedUpdates(() => {
         context.listeners.forEach((listener) => {
           listener(value);
         });

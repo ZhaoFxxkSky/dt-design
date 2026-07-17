@@ -2,12 +2,12 @@
 import React, { useMemo, useState } from 'react';
 import { QuestionCircleOutlined, UpOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
-import { globalConfig } from 'antd/es/config-provider';
+import { globalConfig } from 'antd/lib/config-provider';
 import clsx from 'clsx';
 
 import './style';
 
-import type { SizeType } from 'antd/es/config-provider/SizeContext';
+import type { SizeType } from 'antd/lib/config-provider/SizeContext';
 
 import type { LabelTooltipType } from '../_util';
 import { toTooltipProps } from '../_util';

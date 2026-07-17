@@ -5,6 +5,7 @@
 
   .anticon {
     font-size: @icon-size;
+
     + span {
       margin-left: @gap;
     }
@@ -19,12 +20,12 @@
   &[disabled]:active,
   &[disabled]:focus {
     color: @color;
+    text-shadow: none;
     background: @bg;
     border-color: @border;
+    box-shadow: none;
     cursor: not-allowed;
     opacity: 1;
-    box-shadow: none;
-    text-shadow: none;
   }
 }
 

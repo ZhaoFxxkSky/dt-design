@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ButtonProps as AntdButtonProps } from 'antd';
 import { Button as AntdButton } from 'antd';
-import type { ButtonType as AntdButtonType } from 'antd/es/button';
+import type { ButtonType as AntdButtonType } from 'antd/lib/button';
 import clsx from 'clsx';
 
 import './style';
@@ -12,12 +12,31 @@ export interface ButtonProps extends Omit<AntdButtonProps, 'type'> {
   type?: ButtonType;
 }
 
-function Button({ className, size = 'middle', type, ...rest }: ButtonProps) {
-  return (
-    <AntdButton className={clsx(className)} size={size} type={type as AntdButtonType} {...rest} />
-  );
+/** Map custom types to antd-compatible types */
+function mapButtonType(type: ButtonType | undefined): AntdButtonType | undefined {
+  if (type === 'secondary' || type === 'tertiary') {
+    return 'default';
+  }
+  return type as AntdButtonType | undefined;
 }
 
-export default Button as React.ForwardRefExoticComponent<
-  ButtonProps & React.RefAttributes<HTMLElement>
->;
+const Button = React.forwardRef<HTMLElement, ButtonProps>(
+  ({ className, size = 'middle', type, ...rest }, ref) => {
+    return (
+      <AntdButton
+        ref={ref}
+        className={clsx(className, {
+          'dt-btn-secondary': type === 'secondary',
+          'dt-btn-tertiary': type === 'tertiary',
+        })}
+        size={size}
+        type={mapButtonType(type)}
+        {...rest}
+      />
+    );
+  },
+);
+
+Button.displayName = 'Button';
+
+export default Button;

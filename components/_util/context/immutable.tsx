@@ -4,7 +4,7 @@
  * Direct copy from @rc-component/context source.
  * Replaced `@rc-component/util` imports with `rc-util` subpath imports.
  */
-import { supportRef } from 'rc-util/es/ref';
+import { supportRef } from 'rc-util/lib/ref';
 import * as React from 'react';
 
 export type CompareProps<T extends React.ComponentType<any>> = (
@@ -16,7 +16,7 @@ export type CompareProps<T extends React.ComponentType<any>> = (
  * Create Immutable pair for `makeImmutable` and `responseImmutable`.
  */
 export default function createImmutable() {
-  const ImmutableContext = React.createContext<number>(null as any);
+  const ImmutableContext = React.createContext<number | null>(null);
 
   /**
    * Get render update mark by `makeImmutable` root.

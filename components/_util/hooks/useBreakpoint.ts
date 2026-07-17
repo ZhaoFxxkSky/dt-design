@@ -45,26 +45,32 @@ export function useBreakpoint(needResponsive?: boolean): ScreenMap {
 
     update();
 
-    const listeners: Array<() => void> = [];
+    const mqlList: MediaQueryList[] = [];
+    const handlerList: Array<() => void> = [];
     Object.keys(mediaQueries).forEach((key) => {
       const mql = mediaQueries[key];
       const handler = () => update();
       if (mql.addEventListener) {
         mql.addEventListener('change', handler);
       } else {
-        (mql as any).addListener(handler);
+        // Legacy browsers use deprecated addListener API
+        (mql as MediaQueryList & { addListener: (cb: () => void) => void }).addListener(handler);
       }
-      listeners.push(() => {
-        if (mql.removeEventListener) {
-          mql.removeEventListener('change', handler);
-        } else {
-          (mql as any).removeListener(handler);
-        }
-      });
+      mqlList.push(mql);
+      handlerList.push(handler);
     });
 
     return () => {
-      listeners.forEach((fn) => fn());
+      mqlList.forEach((mql, index) => {
+        const handler = handlerList[index];
+        if (mql.removeEventListener) {
+          mql.removeEventListener('change', handler);
+        } else {
+          (mql as MediaQueryList & { removeListener: (cb: () => void) => void }).removeListener(
+            handler,
+          );
+        }
+      });
     };
   }, [needResponsive]);
 

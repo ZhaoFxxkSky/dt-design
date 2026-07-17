@@ -20,13 +20,13 @@
 
 .@{splitter-prefix-cls} {
   display: flex;
+  align-items: stretch;
   width: 100%;
   height: 100%;
-  align-items: stretch;
 
   & > .@{splitter-prefix-cls}-bar {
-    flex: none;
     position: relative;
+    flex: none;
     user-select: none;
 
     .@{splitter-prefix-cls}-bar-dragger {
@@ -35,14 +35,14 @@
       pointer-events: auto;
 
       &::before {
-        content: '';
         background: @item-hover-bg;
+        content: '';
         .center-position();
       }
 
       &::after {
-        content: '';
         background: rgba(0, 0, 0, 0.15);
+        content: '';
         .center-position();
       }
 
@@ -99,15 +99,15 @@
     .@{splitter-prefix-cls}-bar-collapse-bar {
       .center-position();
       z-index: @zindex-popover;
-      background: @item-hover-bg;
-      font-size: @font-size-base;
-      border-radius: @border-radius-base;
-      color: @text-color;
-      cursor: pointer;
-      opacity: 0;
       display: flex;
       align-items: center;
       justify-content: center;
+      color: @text-color;
+      font-size: @font-size-base;
+      background: @item-hover-bg;
+      border-radius: @border-radius-base;
+      cursor: pointer;
+      opacity: 0;
 
       &:hover {
         background: @item-active-bg;
@@ -160,11 +160,11 @@
 
   .@{splitter-prefix-cls}-mask {
     position: fixed;
-    z-index: 9999;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
+    z-index: 9999;
     background: transparent;
 
     &.@{splitter-prefix-cls}-mask-horizontal {
@@ -183,36 +183,35 @@
       width: 0;
 
       .@{splitter-prefix-cls}-bar-preview {
-        height: 100%;
-        width: @splitter-split-bar-size;
         position: absolute;
-        background: @primary-color;
-        opacity: 0.2;
-        pointer-events: none;
-        transition: none;
         z-index: 1;
         display: none;
+        width: @splitter-split-bar-size;
+        height: 100%;
+        background: @primary-color;
+        opacity: 0.2;
+        transition: none;
+        pointer-events: none;
 
         &.@{splitter-prefix-cls}-bar-preview-active {
           display: block;
-
           transform: @splitter-transform-x;
         }
       }
 
       .@{splitter-prefix-cls}-bar-dragger {
-        cursor: col-resize;
-        height: 100%;
         width: @splitter-split-trigger-size;
+        height: 100%;
+        cursor: col-resize;
 
         &::before {
-          height: 100%;
           width: @splitter-split-bar-size;
+          height: 100%;
         }
 
         &::after {
-          height: @splitter-split-bar-draggable-size;
           width: @splitter-split-bar-size;
+          height: @splitter-split-bar-draggable-size;
         }
       }
 
@@ -221,14 +220,14 @@
         height: @btn-height-sm;
 
         &.@{splitter-prefix-cls}-bar-collapse-bar-start {
-          left: auto;
           right: (@splitter-split-trigger-size / 2);
+          left: auto;
           transform: translateY(-50%);
         }
 
         &.@{splitter-prefix-cls}-bar-collapse-bar-end {
-          left: (@splitter-split-trigger-size / 2);
           right: auto;
+          left: (@splitter-split-trigger-size / 2);
           transform: translateY(-50%);
         }
       }
@@ -242,15 +241,15 @@
       height: 0;
 
       .@{splitter-prefix-cls}-bar-preview {
-        height: @splitter-split-bar-size;
-        width: 100%;
         position: absolute;
-        background: @primary-color;
-        opacity: 0.2;
-        pointer-events: none;
-        transition: none;
         z-index: 1;
         display: none;
+        width: 100%;
+        height: @splitter-split-bar-size;
+        background: @primary-color;
+        opacity: 0.2;
+        transition: none;
+        pointer-events: none;
 
         &.@{splitter-prefix-cls}-bar-preview-active {
           display: block;
@@ -259,9 +258,9 @@
       }
 
       .@{splitter-prefix-cls}-bar-dragger {
-        cursor: row-resize;
         width: 100%;
         height: @splitter-split-trigger-size;
+        cursor: row-resize;
 
         &::before {
           width: 100%;
@@ -275,8 +274,8 @@
       }
 
       .@{splitter-prefix-cls}-bar-collapse-bar {
-        height: @font-size-sm;
         width: @btn-height-sm;
+        height: @font-size-sm;
 
         &.@{splitter-prefix-cls}-bar-collapse-bar-start {
           top: auto;
@@ -294,8 +293,8 @@
   }
 
   .@{splitter-prefix-cls}-panel {
-    overflow: auto;
     box-sizing: border-box;
+    overflow: auto;
 
     &.@{splitter-prefix-cls}-panel-motion {
       transition: flex-basis 0.3s ease-in-out;

@@ -1,1 +1,1 @@
-export { default } from 'rc-util/es/hooks/useEvent';
+export { default } from 'rc-util/lib/hooks/useEvent';

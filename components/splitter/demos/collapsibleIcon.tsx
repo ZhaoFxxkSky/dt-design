@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { RadioChangeEvent } from 'antd';
 import { Radio, Typography } from 'antd';
-import type { CheckboxGroupProps } from 'antd/es/checkbox';
+import type { CheckboxGroupProps } from 'antd/lib/checkbox';
 import { Flex, Splitter } from '@dtjoy/dt-design';
 
 const Desc: React.FC<Readonly<{ text?: string | number }>> = (props) => (

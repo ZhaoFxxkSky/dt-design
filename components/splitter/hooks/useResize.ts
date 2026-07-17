@@ -55,6 +55,13 @@ export default function useResize(
     // First time trigger move index update is not sync in the state
     let confirmedIndex: number | null = null;
 
+    // Drag offsets are cumulative from the drag start, so compute on the
+    // drag-start baseline (`cacheSizes`). Keyboard resize fires start/update
+    // synchronously and the seeded state is not committed yet (`movingIndex`
+    // is still null), so compute on the current sizes instead of an empty
+    // baseline which would produce NaN sizes.
+    const numSizes = movingIndex ? [...cacheSizes] : getPxSizes();
+
     // We need to know what the real index is.
     if ((!movingIndex || !movingIndex.confirmed) && offset !== 0) {
       // Search for the real index
@@ -66,7 +73,7 @@ export default function useResize(
         });
       } else {
         for (let i = index; i >= 0; i -= 1) {
-          if (cacheSizes[i] > 0 && resizableInfos[i].resizable) {
+          if (numSizes[i] > 0 && resizableInfos[i].resizable) {
             confirmedIndex = i;
             setMovingIndex({
               index: i,
@@ -79,7 +86,6 @@ export default function useResize(
     }
     const mergedIndex = confirmedIndex ?? movingIndex?.index ?? index;
 
-    const numSizes = [...cacheSizes];
     const nextIndex = mergedIndex + 1;
 
     // Get boundary
@@ -113,8 +119,9 @@ export default function useResize(
     return numSizes;
   };
 
-  const onOffsetEnd = () => {
+  const onOffsetEnd = (nextSizes?: number[]) => {
     setMovingIndex(null);
+    return nextSizes;
   };
 
   // ======================= Collapse =======================
