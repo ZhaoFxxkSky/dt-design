@@ -1,6 +1,3 @@
-
-
-
 <div align="center">
 
 # dt-design
@@ -15,21 +12,16 @@ An enterprise-class React component library built on [Ant Design](https://github
 
 ## 📖 Introduction
 
-dt-design is a React component library internally developed by the **Digital Business Department**, extending Ant Design 5.x. It abstracts and沉淀（consolidates）common business patterns into **out-of-the-box components**, boosting development velocity while reducing redundant code.
-
-In addition, we provide several framework-agnostic utilities written in vanilla JavaScript:
-
-* `ContextMenu` – right-click context menu
-* `KeyEventListener` – global keyboard event binder
+dt-design is a React component library internally developed by the **Digital Business Department**, extending Ant Design. It consolidates common business patterns into **out-of-the-box components**, boosting development velocity while reducing redundant code.
 
 ---
 
 ## 🎯 When to Use
 
-* ✅ Ant Design's basic components are insufficient for complex business requirements
-* ✅ Multiple projects share similar modules and need a unified implementation
-* ✅ You want to extract general business logic to avoid duplicate development
-* ✅ You need consistent UI specification and interaction behavior across products
+- ✅ Ant Design's basic components are insufficient for complex business requirements
+- ✅ Multiple projects share similar modules and need a unified implementation
+- ✅ You want to extract general business logic to avoid duplicate development
+- ✅ You need consistent UI specification and interaction behavior across products
 
 ---
 
@@ -37,13 +29,13 @@ In addition, we provide several framework-agnostic utilities written in vanilla 
 
 ```bash
 # npm
-npm install dt-design
+npm install @dtjoy/dt-design
 
 # yarn
-yarn add dt-design
+yarn add @dtjoy/dt-design
 
 # pnpm
-pnpm add dt-design
+pnpm add @dtjoy/dt-design
 ```
 
 ---
@@ -64,8 +56,32 @@ const App = () => <BlockHeader title="Category Title" background />;
 ES modules are fully supported; import only what you need and the bundler will drop the rest automatically:
 
 ```ts
-import { BlockHeader, CustomTable } from '@dtjoy/dt-design';
+import { BlockHeader, Table } from '@dtjoy/dt-design';
 ```
+
+---
+
+## 🎨 Styles & Bundler Setup
+
+Component entries import their own Less sources, so your bundler must be able to compile Less from `node_modules`:
+
+- **webpack 4 / 5**: install `less` + `less-loader` — works out of the box.
+- **Vite**: install `less` (`pnpm add -D less`) — no extra config needed.
+- **Jest**: map style files to a mock:
+
+```js
+moduleNameMapper: { '\\.(css|less)$': '<rootDir>/tests/styleMock.js' }
+```
+
+A prebuilt stylesheet is also shipped at `@dtjoy/dt-design/dist/dt-design.min.css`.
+
+> **Peer dependencies**: `react >= 17`, `antd >= 4.24.0 < 5.0.0` (Ant Design v4 only). Since entries import Less sources, requiring the package directly in plain Node (SSR, or Jest without the mock above) throws on the `.less` imports — use the style mock or go through your bundler.
+
+---
+
+## 🌐 UMD / CDN
+
+`dist/dt-design.min.js` exposes the global `DtDesign`. Load these globals first: `React`, `ReactDOM`, `antd` and `icons` (the UMD build of `@ant-design/icons`), and include `dist/dt-design.min.css` for styles.
 
 ---
 
@@ -95,20 +111,24 @@ We use [dumi](https://d.umijs.org/) for docs & component management.
 
 ```bash
 pnpm build
+pnpm build:dts
 ```
 
-### Bump version (internal npm registry)
+### Release
 
 ```bash
-pnpm release -- -r x.x.x
-npm publish --registry <internal-npm-registry>
+# Automatically bump version, update CHANGELOG, create tag and push
+pnpm release
+
+# Or specify release type
+pnpm release -- --release-as minor
 ```
 
-### Deploy documentation site (optional)
+Pushing a `v*` tag will trigger the GitHub Actions release workflow to publish to npm and create a GitHub Release.
 
-```bash
-pnpm deploy
-```
+### Deploy documentation site
+
+Documentation is automatically deployed to GitHub Pages when pushing to `main`. You can also trigger it manually from the Actions tab.
 
 ---
 

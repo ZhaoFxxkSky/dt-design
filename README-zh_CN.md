@@ -1,4 +1,3 @@
-
 <div align="center">
 
 # `dt-design`
@@ -15,19 +14,14 @@
 
 `dt-design` 是基于 [Ant Design](https://github.com/ant-design/ant-design) 封装的 React 组件库，专为公司内部中后台系统打造。我们聚焦于**具体业务场景的抽象与沉淀**，提供一系列开箱即用、可扩展的业务组件，提升开发效率，降低重复开发成本。
 
-此外，我们也提供部分基于原生 JavaScript 实现的通用能力组件，如：
-
--   `ContextMenu`（右键菜单）
--   `KeyEventListener`（键盘事件监听）
-
 ---
 
 ## 🎯 使用场景
 
--   ✅ 当 Ant Design 基础组件无法满足复杂业务需求时
--   ✅ 当多个项目存在相似业务模块，需统一组件实现时
--   ✅ 当希望沉淀通用业务逻辑，减少重复开发时
--   ✅ 当需要统一 UI 规范与交互行为，提升产品一致性时
+- ✅ 当 Ant Design 基础组件无法满足复杂业务需求时
+- ✅ 当多个项目存在相似业务模块，需统一组件实现时
+- ✅ 当希望沉淀通用业务逻辑，减少重复开发时
+- ✅ 当需要统一 UI 规范与交互行为，提升产品一致性时
 
 ---
 
@@ -35,13 +29,13 @@
 
 ```bash
 # 使用 npm
-npm install dt-design
+npm install @dtjoy/dt-design
 
 # 使用 yarn
-yarn add dt-design
+yarn add @dtjoy/dt-design
 
 # 使用 pnpm
-pnpm add dt-design
+pnpm add @dtjoy/dt-design
 ```
 
 ---
@@ -62,8 +56,32 @@ const App = () => <BlockHeader title="分类标题" background />;
 本库默认支持基于 ES modules 的 tree shaking，按需引入即可自动优化打包体积：
 
 ```ts
-import { BlockHeader, CustomTable } from '@dtjoy/dt-design';
+import { BlockHeader, Table } from '@dtjoy/dt-design';
 ```
+
+---
+
+## 🎨 样式与构建工具配置
+
+组件入口会直接引入自身的 Less 源文件，因此打包工具需要能编译 `node_modules` 中的 Less：
+
+- **webpack 4 / 5**：安装 `less` 与 `less-loader` 即可，开箱即用。
+- **Vite**：安装 `less`（`pnpm add -D less`），无需额外配置。
+- **Jest**：将样式文件映射到 mock：
+
+```js
+moduleNameMapper: { '\\.(css|less)$': '<rootDir>/tests/styleMock.js' }
+```
+
+另提供预编译样式表：`@dtjoy/dt-design/dist/dt-design.min.css`。
+
+> **peer 依赖**：`react >= 17`、`antd >= 4.24.0 < 5.0.0`（仅支持 Ant Design v4）。由于入口直接引入 Less 源文件，在纯 Node 环境（SSR、未配置上述 mock 的 Jest）中直接 require 本包会因 `.less` 导入报错——请使用样式 mock 或经由打包工具引入。
+
+---
+
+## 🌐 UMD / CDN
+
+`dist/dt-design.min.js` 暴露全局变量 `DtDesign`，需先加载以下全局依赖：`React`、`ReactDOM`、`antd`、`icons`（`@ant-design/icons` 的 UMD 版本），并引入 `dist/dt-design.min.css` 样式。
 
 ---
 
@@ -95,11 +113,11 @@ pnpm run dev
 pnpm build
 ```
 
-### 发布版本（内部 npm 仓库）
+### 发布版本
 
 ```bash
-pnpm release -- -r x.x.x
-npm publish --registry <公司内部npm仓库地址>
+# 自动创建 tag 并推送，触发 GitHub Actions 发布到 npm
+pnpm release
 ```
 
 ### 发布文档站点（如适用）
