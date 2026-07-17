@@ -5,7 +5,13 @@ export { default as Collapsible } from './collapsible';
 export { default as CollapsibleActionItems } from './collapsible-action-items';
 export { default as Flex } from './flex';
 export type { FlexProps } from './flex/interface';
+/**
+ * @deprecated FormList 组件已废弃，将在后续大版本中移除，请尽快迁移到替代方案。
+ */
 export { default as FormList } from './form-list';
+/**
+ * @deprecated FormList 相关类型已废弃，将在后续大版本中移除。
+ */
 export type { ColumnType as FormListColumnType, IFormTableProps } from './form-list';
 export { default as OverflowList } from './overflow-list';
 export { default as Resize } from './resize';
