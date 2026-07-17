@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { DownOutlined, LeftOutlined, RightOutlined, UpOutlined } from '@ant-design/icons';
 import clsx from 'clsx';
-import useEvent from 'rc-util/es/hooks/useEvent';
+import useEvent from 'rc-util/lib/hooks/useEvent';
 
 import useDragListeners from './hooks/useDragListeners';
 
@@ -20,8 +20,8 @@ export interface SplitBarProps {
   startIcon?: React.ReactNode;
   endIcon?: React.ReactNode;
   onOffsetStart: (index: number) => void;
-  onOffsetUpdate: (index: number, offsetX: number, offsetY: number, lazyEnd?: boolean) => void;
-  onOffsetEnd: (lazyEnd?: boolean) => void;
+  onOffsetUpdate: (index: number, offsetX: number, offsetY: number, lazyEnd?: boolean) => number[];
+  onOffsetEnd: (nextSizes?: number[], lazyEnd?: boolean) => void;
   onCollapse: (index: number, type: 'start' | 'end') => void;
   vertical: boolean;
   ariaNow: number;
@@ -114,19 +114,24 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
         offsetY = isHorizontal ? 0 : STEP;
         break;
       case 'Home':
-        e.preventDefault();
-        onOffsetUpdate(index, isHorizontal ? -containerSize : 0, isHorizontal ? 0 : -containerSize);
-        return;
+        offsetX = isHorizontal ? -containerSize : 0;
+        offsetY = isHorizontal ? 0 : -containerSize;
+        break;
       case 'End':
-        e.preventDefault();
-        onOffsetUpdate(index, isHorizontal ? containerSize : 0, isHorizontal ? 0 : containerSize);
-        return;
+        offsetX = isHorizontal ? containerSize : 0;
+        offsetY = isHorizontal ? 0 : containerSize;
+        break;
       default:
         return;
     }
 
     e.preventDefault();
-    onOffsetUpdate(index, offsetX, offsetY);
+    // Each key press is a complete start -> update -> end resize lifecycle:
+    // seed from the current sizes, apply the offset, then reset the moving
+    // state so the resize mask never lingers after a key press.
+    onOffsetStart(index);
+    const nextSizes = onOffsetUpdate(index, offsetX, offsetY);
+    onOffsetEnd(nextSizes);
   };
 
   const getConstrainedOffset = (rawOffset: number) => {
@@ -146,9 +151,9 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
   });
 
   const handleLazyEnd = useEvent(() => {
-    onOffsetUpdate(index, constrainedOffsetX, constrainedOffsetY, true);
+    const nextSizes = onOffsetUpdate(index, constrainedOffsetX, constrainedOffsetY, true);
     setConstrainedOffset(0);
-    onOffsetEnd(true);
+    onOffsetEnd(nextSizes, true);
   });
 
   const getVisibilityClass = (mode: ShowCollapsibleIconMode): string => {
@@ -187,6 +192,8 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
     <div
       className={splitBarPrefixCls}
       role="separator"
+      // Splitter bar is keyboard-focusable for ARIA slider/splitter interaction
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={resizable ? 0 : -1}
       aria-valuenow={getValidNumber(ariaNow)}
       aria-valuemin={getValidNumber(ariaMin)}

@@ -5,7 +5,7 @@ import type { ButtonProps } from '@dtjoy/dt-design';
 import { Button } from '@dtjoy/dt-design';
 import type { DropDownProps } from 'antd';
 import { Divider, Dropdown, Menu } from 'antd';
-import { globalConfig } from 'antd/es/config-provider';
+import { globalConfig } from 'antd/lib/config-provider';
 
 import './style';
 

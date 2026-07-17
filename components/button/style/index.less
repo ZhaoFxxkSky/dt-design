@@ -1,14 +1,14 @@
 @import '../../style/themes/index.less';
 @import './mixin.less';
 
-@btn-prefix-cls: ~'@{ant-prefix}-btn';
+@btn-prefix-cls: ~'dt-btn';
 
 .ant-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   padding:  0;
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
 
   .apply-btn-size(4px 16px; 14px; 16px; 8px);
 
@@ -21,8 +21,8 @@
   }
 
   &-circle {
-    padding-inline: 0;
     border-radius: 50%;
+    padding-inline: 0;
   }
 
 
@@ -32,6 +32,14 @@
     .generate-btn-disabled(@disabled-color; #f9f9f9; @disabled-color);
   }
 
+  // 默认按钮
+  &-default {
+    .generate-btn-disabled(transparent; @disabled-color; @border-color-base);
+  }
+}
+
+// 自定义按钮类型：JS 侧为 secondary/tertiary 类型附加 dt-btn-secondary / dt-btn-tertiary 类
+.@{btn-prefix-cls} {
   // 次按钮
   &-secondary {
     color: @primary-color;
@@ -48,11 +56,6 @@
 
     .btn-hover-variant(@primary-color; fade(@primary-color, 10%); @primary-color);
     .generate-btn-disabled(@primary-color-disabled; @disabled-color; @border-color-base);
-  }
-
-  // 默认按钮
-  &-default {
-    .generate-btn-disabled(transparent; @disabled-color; @border-color-base);
   }
 }
 

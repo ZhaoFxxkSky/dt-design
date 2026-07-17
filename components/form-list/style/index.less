@@ -8,12 +8,12 @@
   &__column {
     &--required {
       &::before {
-        content: "*";
         display: inline-block;
-        margin-inline-end: 4px;
+        color: @error-color;
         font-size: 14px;
         line-height: 1;
-        color: @error-color;
+        content: "*";
+        margin-inline-end: 4px;
       }
 
       vertical-align: -0.1em;

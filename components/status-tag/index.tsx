@@ -2,7 +2,7 @@ import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import React, { useMemo } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
-import { globalConfig } from 'antd/es/config-provider';
+import { globalConfig } from 'antd/lib/config-provider';
 
 import './style';
 

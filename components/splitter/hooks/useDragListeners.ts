@@ -1,4 +1,4 @@
-import useLayoutEffect from 'rc-util/es/hooks/useLayoutEffect';
+import useLayoutEffect from 'rc-util/lib/hooks/useLayoutEffect';
 
 type StartPos = readonly [number, number];
 
@@ -7,7 +7,7 @@ export interface UseDragListenersOptions {
   vertical: boolean;
   lazy?: boolean;
   onOffsetUpdate: (index: number, offsetX: number, offsetY: number, lazyEnd?: boolean) => void;
-  onOffsetEnd: (lazyEnd?: boolean) => void;
+  onOffsetEnd: (nextSizes?: number[], lazyEnd?: boolean) => void;
   handleLazyMove: (offsetX: number, offsetY: number) => void;
   handleLazyEnd: () => void;
   setStartPos: (pos: StartPos | null) => void;
@@ -102,9 +102,9 @@ export default function useDragListeners(options: UseDragListenersOptions) {
     };
 
     for (const [event, handler] of Object.entries(eventHandlerMap)) {
-      // eslint-disable-next-line react-web-api/no-leaked-event-listener
       const options =
         event === 'touchmove' ? ({ passive: false } as AddEventListenerOptions) : undefined;
+      // eslint-disable-next-line react-web-api/no-leaked-event-listener
       window.addEventListener(event, handler, options);
     }
 

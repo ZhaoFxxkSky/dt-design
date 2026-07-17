@@ -348,4 +348,152 @@ describe('Splitter', () => {
         expect(panels[0]).toHaveClass('ant-splitter-panel-motion');
         expect(panels[1]).toHaveClass('ant-splitter-panel-motion');
     });
+
+    describe('keyboard resize lifecycle (regression)', () => {
+        it('produces finite controlled sizes on first key press without prior drag', async () => {
+            (global as any).__mockSplitterResize__ = true;
+            try {
+                const onResize = jest.fn();
+                const { container } = render(
+                    <Splitter onResize={onResize}>
+                        <Splitter.Panel size="30%">left</Splitter.Panel>
+                        <Splitter.Panel>right</Splitter.Panel>
+                    </Splitter>,
+                );
+
+                await reactAct(async () => {
+                    await Promise.resolve();
+                });
+
+                const bar = container.querySelector('.ant-splitter-bar');
+                // No mouseDown happened before: the cached sizes are still empty
+                fireEvent.keyDown(bar!, { key: 'ArrowRight' });
+
+                expect(onResize).toHaveBeenCalledTimes(1);
+                const sizes = onResize.mock.calls[0][0];
+                sizes.forEach((size: number) => {
+                    expect(Number.isFinite(size)).toBe(true);
+                });
+                expect(sizes).toEqual([310, 690]);
+            } finally {
+                (global as any).__mockSplitterResize__ = false;
+            }
+        });
+
+        it('adjusts uncontrolled panel sizes by STEP on every key press', async () => {
+            (global as any).__mockSplitterResize__ = true;
+            try {
+                const { container } = render(
+                    <Splitter>
+                        <Splitter.Panel defaultSize="30%">left</Splitter.Panel>
+                        <Splitter.Panel>right</Splitter.Panel>
+                    </Splitter>,
+                );
+
+                await reactAct(async () => {
+                    await Promise.resolve();
+                });
+
+                const bar = container.querySelector('.ant-splitter-bar');
+                const panels = container.querySelectorAll('.ant-splitter-panel');
+
+                expect(panels[0]).toHaveStyle({ flexBasis: '300px' });
+                expect(panels[1]).toHaveStyle({ flexBasis: '700px' });
+
+                fireEvent.keyDown(bar!, { key: 'ArrowRight' });
+                expect(panels[0]).toHaveStyle({ flexBasis: '310px' });
+                expect(panels[1]).toHaveStyle({ flexBasis: '690px' });
+
+                // Consecutive presses must keep accumulating, not alternate with no-ops
+                fireEvent.keyDown(bar!, { key: 'ArrowRight' });
+                expect(panels[0]).toHaveStyle({ flexBasis: '320px' });
+                expect(panels[1]).toHaveStyle({ flexBasis: '680px' });
+
+                fireEvent.keyDown(bar!, { key: 'ArrowLeft' });
+                expect(panels[0]).toHaveStyle({ flexBasis: '310px' });
+                expect(panels[1]).toHaveStyle({ flexBasis: '690px' });
+            } finally {
+                (global as any).__mockSplitterResize__ = false;
+            }
+        });
+
+        it('leaves no resize mask and keeps motion support after key press', async () => {
+            (global as any).__mockSplitterResize__ = true;
+            try {
+                const { container } = render(
+                    <Splitter motion>
+                        <Splitter.Panel defaultSize="30%">left</Splitter.Panel>
+                        <Splitter.Panel>right</Splitter.Panel>
+                    </Splitter>,
+                );
+
+                await reactAct(async () => {
+                    await Promise.resolve();
+                });
+
+                const bar = container.querySelector('.ant-splitter-bar');
+                fireEvent.keyDown(bar!, { key: 'ArrowRight' });
+
+                expect(container.querySelector('.ant-splitter-mask')).not.toBeInTheDocument();
+                expect(
+                    container.querySelector('.ant-splitter-bar-dragger-active'),
+                ).not.toBeInTheDocument();
+
+                const panels = container.querySelectorAll('.ant-splitter-panel');
+                panels.forEach((panel) => {
+                    expect(panel).toHaveClass('ant-splitter-panel-motion');
+                });
+
+                fireEvent.keyDown(bar!, { key: 'ArrowLeft' });
+                expect(container.querySelector('.ant-splitter-mask')).not.toBeInTheDocument();
+            } finally {
+                (global as any).__mockSplitterResize__ = false;
+            }
+        });
+
+        it('runs Home and End keys through a complete resize lifecycle', async () => {
+            (global as any).__mockSplitterResize__ = true;
+            try {
+                const onResizeStart = jest.fn();
+                const onResize = jest.fn();
+                const onResizeEnd = jest.fn();
+                const { container } = render(
+                    <Splitter
+                        onResizeStart={onResizeStart}
+                        onResize={onResize}
+                        onResizeEnd={onResizeEnd}
+                    >
+                        <Splitter.Panel size="30%">left</Splitter.Panel>
+                        <Splitter.Panel>right</Splitter.Panel>
+                    </Splitter>,
+                );
+
+                await reactAct(async () => {
+                    await Promise.resolve();
+                });
+
+                const bar = container.querySelector('.ant-splitter-bar');
+
+                fireEvent.keyDown(bar!, { key: 'End' });
+                expect(onResize).toHaveBeenCalledTimes(1);
+                expect(onResize.mock.calls[0][0]).toEqual([1000, 0]);
+                expect(container.querySelector('.ant-splitter-mask')).not.toBeInTheDocument();
+
+                // Controlled size stays 30%, so the next press starts from [300, 700] again
+                fireEvent.keyDown(bar!, { key: 'Home' });
+                expect(onResize).toHaveBeenCalledTimes(2);
+                expect(onResize.mock.calls[1][0]).toEqual([0, 1000]);
+                expect(container.querySelector('.ant-splitter-mask')).not.toBeInTheDocument();
+
+                // Each key press is a full start -> update -> end lifecycle
+                expect(onResizeStart).toHaveBeenCalledTimes(2);
+                expect(onResizeEnd).toHaveBeenCalledTimes(2);
+                // onResizeEnd must receive the new sizes, not the stale baseline
+                expect(onResizeEnd.mock.calls[0][0]).toEqual([1000, 0]);
+                expect(onResizeEnd.mock.calls[1][0]).toEqual([0, 1000]);
+            } finally {
+                (global as any).__mockSplitterResize__ = false;
+            }
+        });
+    });
 });

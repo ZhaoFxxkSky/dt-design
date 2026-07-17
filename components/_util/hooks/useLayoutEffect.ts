@@ -1,1 +1,1 @@
-export { default } from 'rc-util/es/hooks/useLayoutEffect';
+export { default } from 'rc-util/lib/hooks/useLayoutEffect';

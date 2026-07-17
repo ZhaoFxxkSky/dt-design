@@ -1,13 +1,12 @@
 import type { ReactElement, ReactNode } from 'react';
 import React, { Component, createRef } from 'react';
-import { globalConfig } from 'antd/es/config-provider';
+import { globalConfig } from 'antd/lib/config-provider';
 
 import './style';
 
 import clsx from 'clsx';
-import { uniqueId } from 'lodash-es';
 
-import ReactResizeObserver from '../resizeObserver';
+import ReactResizeObserver from '../resize-observer';
 
 export type OverflowItem<T = Record<string, any>> = T;
 
@@ -59,7 +58,7 @@ class OverflowList<T extends object> extends Component<OverflowListProps<T>, Ove
     }
   }
 
-  componentUpdate(prevProps: OverflowListProps<T>) {
+  componentDidUpdate(prevProps: OverflowListProps<T>) {
     if (prevProps.items !== this.props.items || prevProps.renderMode !== this.props.renderMode) {
       this.setState(
         { isMeasuring: true, visibleCount: this.props.items.length },
@@ -70,7 +69,14 @@ class OverflowList<T extends object> extends Component<OverflowListProps<T>, Ove
 
   private measureAndAdjust = () => {
     const container = this.containerRef.current;
-    if (!container || this.props.renderMode !== 'collapse') return;
+    // 非 collapse 模式（或容器未挂载）无需测量：复位 isMeasuring，
+    // 避免 items/renderMode 变更后组件卡在 measuring 态、overflow 指示节点恒渲染
+    if (!container || this.props.renderMode !== 'collapse') {
+      if (this.state.isMeasuring) {
+        this.setState({ isMeasuring: false });
+      }
+      return;
+    }
 
     const { items, minVisibleItems, collapseFrom, onOverflow } = this.props;
     const containerWidth = container.offsetWidth;
@@ -106,6 +112,23 @@ class OverflowList<T extends object> extends Component<OverflowListProps<T>, Ove
     return collapseFrom === 'end' ? items.slice(count) : items.slice(0, items.length - count);
   };
 
+  // item → key 缓存：同一 item 对象始终映射到同一个 key，保证跨 render key 稳定
+  private itemKeyCache = new WeakMap<object, string>();
+  private nextItemKeyId = 0;
+
+  private getItemKey = (item: OverflowItem<T>, index: number): string => {
+    // WeakMap 只接受对象键：原始类型（string/number 等）item 回退到基于 index 的稳定 key
+    if (typeof item !== 'object' || item === null) {
+      return `overflow-list-item-index-${index}`;
+    }
+    let key = this.itemKeyCache.get(item);
+    if (key === undefined) {
+      key = `overflow-list-item-${this.nextItemKeyId++}`;
+      this.itemKeyCache.set(item, key);
+    }
+    return key;
+  };
+
   renderCollapse() {
     const { items, visibleItemRenderer, overflowRenderer, collapseFrom, style, className } =
       this.props;
@@ -128,16 +151,21 @@ class OverflowList<T extends object> extends Component<OverflowListProps<T>, Ove
 
         if (!isVisible) return null;
 
+        const child = visibleItemRenderer(item, i);
+        // 优先使用渲染元素自带的 key；否则用 item 对象身份维系的稳定 key，
+        // 避免每次 render 生成全新 key 导致 item DOM 全量重挂载
+        const key = child.key ?? this.getItemKey(item, i);
+
         return (
           <div
-            key={uniqueId('overflow-list-item')}
+            key={key}
             ref={(el) => {
               if (el) this.itemRefs.set(i, el);
               else this.itemRefs.delete(i);
             }}
             className={`${this.prefixCls}-item`}
           >
-            {visibleItemRenderer(item, i)}
+            {child}
           </div>
         );
       });

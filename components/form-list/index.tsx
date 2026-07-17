@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { Utils } from '@dtinsight/dt-utils';
 import type { FormListFieldData, TableProps } from 'antd';
 import { Form, Table } from 'antd';
-import { globalConfig } from 'antd/es/config-provider';
+import { globalConfig } from 'antd/lib/config-provider';
 import type { FormItemProps, FormListProps, Rule, RuleObject, RuleRender } from 'antd/lib/form';
 import type { ColumnsType, ColumnType as TableColumnType } from 'antd/lib/table';
 import clsx from 'clsx';
@@ -174,7 +174,7 @@ export default function InternalTable({
           ...cols,
           title: (...titleProps) => (
             <React.Fragment>
-              {isRequired && <span className="dtc-form__table__column--required" />}
+              {isRequired && <span className={`${prefixCls}__column--required`} />}
               {typeof cols.title === 'function' ? cols.title(...titleProps) : cols.title}
             </React.Fragment>
           ),
