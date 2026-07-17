@@ -1,4 +1,4 @@
-import warning from 'rc-util/es/warning';
+import warning from 'rc-util/lib/warning';
 import * as React from 'react';
 import { INTERNAL_HOOKS } from '../../constant';
 import type {

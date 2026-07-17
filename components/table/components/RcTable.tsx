@@ -26,14 +26,14 @@
 
 import { clsx } from 'clsx';
 import ResizeObserver from 'rc-resize-observer';
-import { getDOM } from 'rc-util/es/Dom/findDOMNode';
-import getValue from 'rc-util/es/utils/get';
-import { getTargetScrollBarSize } from 'rc-util/es/getScrollBarSize';
-import isEqual from 'rc-util/es/isEqual';
+import { getDOM } from 'rc-util/lib/Dom/findDOMNode';
+import getValue from 'rc-util/lib/utils/get';
+import { getTargetScrollBarSize } from 'rc-util/lib/getScrollBarSize';
+import isEqual from 'rc-util/lib/isEqual';
 import { pickAttrs } from '../../_util/rcUtil';
 import useEvent from '../../_util/hooks/useEvent';
 import useLayoutEffect from '../../_util/hooks/useLayoutEffect';
-import warning from 'rc-util/es/warning';
+import warning from 'rc-util/lib/warning';
 import * as React from 'react';
 import type { AnyObject } from '../../_util/type';
 import type { InternalTableProps } from '../InternalTable';
@@ -396,7 +396,7 @@ const Table = <RecordType extends DefaultRecordType>(
   const scrollSummaryRef = React.useRef<HTMLDivElement>(null);
   const [shadowStart, setShadowStart] = React.useState(false);
   const [shadowEnd, setShadowEnd] = React.useState(false);
-  const [colsWidths, updateColsWidths] = React.useState(new Map<React.Key, number>());
+  const [colsWidths, updateColsWidths] = React.useState(() => new Map<React.Key, number>());
 
   // Convert map to number width
   const colsKeys = getColumnsKey(flattenColumns);

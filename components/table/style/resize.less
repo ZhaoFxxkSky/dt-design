@@ -30,8 +30,8 @@
   &::after {
     position: absolute;
     top: 0;
-    bottom: 0;
     right: 4px;
+    bottom: 0;
     width: 0;
     background-color: transparent;
     transition: width 0.15s ease, background-color 0.15s ease;
@@ -68,11 +68,11 @@
 .@{table-prefix-cls}-resize-line {
   position: absolute;
   top: 0;
+  z-index: 10;
+  display: none;
   width: 2px;
   margin-left: -1px;
   background-color: @table-color-primary;
-  z-index: 10;
-  pointer-events: none;
-  display: none;
   box-shadow: 0 0 6px rgba(22, 119, 255, 0.4);
+  pointer-events: none;
 }

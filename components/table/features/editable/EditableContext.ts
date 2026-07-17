@@ -17,14 +17,15 @@ import type { AnyObject } from '../../../_util/type';
  *   - record 使用 `AnyObject`：行数据始终是对象。
  */
 export interface EditableContextValue {
-  /** 错误 Map: key = `${rowIndex}-${dataIndex}` */
+  /** 错误 Map: key = `${rowKey}-${dataIndex}`（无 key 时降级为 `${rowIndex}-${dataIndex}`） */
   errors: Map<string, string[]>;
   /** 校验单个单元格 */
   validateCell: (
-    rowIndex: number,
+    rowKey: React.Key | undefined,
     dataIndex: string | number,
     value: any,
     record: AnyObject,
+    rowIndex?: number,
   ) => void;
   /** 校验全部数据 */
   validateAll: (data: AnyObject[]) => void;
@@ -32,13 +33,14 @@ export interface EditableContextValue {
   resetErrors: () => void;
   /** 更新单元格值 */
   onCellChange: (
-    rowIndex: number,
+    rowKey: React.Key | undefined,
     dataIndex: string | number,
     value: any,
     record: AnyObject,
+    rowIndex: number,
   ) => void;
   /** 滚动到错误行 */
-  scrollToError: (rowIndex: number) => void;
+  scrollToError: (rowKey: React.Key, rowIndex?: number) => void;
 }
 
 const EditableContext = React.createContext<EditableContextValue | null>(null);

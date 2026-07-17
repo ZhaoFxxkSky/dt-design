@@ -7,13 +7,14 @@ export interface TransformResizableOptions {
   enabled: boolean;
   isColumnResizable: (col: ColumnType) => boolean;
   onStartResize: (e: React.MouseEvent, col: ColumnType, actualWidth?: number) => void;
+  onKeyboardResize: (col: ColumnType, newWidth: number) => void;
 }
 
 function transformResizableColumns<RecordType = any>(
   columns: ColumnsType<RecordType>,
   options: TransformResizableOptions,
 ): ColumnsType<RecordType> {
-  const { prefixCls, enabled, isColumnResizable, onStartResize } = options;
+  const { prefixCls, enabled, isColumnResizable, onStartResize, onKeyboardResize } = options;
 
   if (!enabled) return columns;
 
@@ -38,6 +39,7 @@ function transformResizableColumns<RecordType = any>(
             column={leafCol as ColumnType}
             prefixCls={prefixCls}
             onStartResize={onStartResize}
+            onKeyboardResize={onKeyboardResize}
           />
         </>
       );

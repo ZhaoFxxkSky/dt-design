@@ -1,9 +1,10 @@
 import * as React from 'react';
 import ResizeObserver from 'rc-resize-observer';
 import MeasureCell from './MeasureCell';
-import isVisible from 'rc-util/es/Dom/isVisible';
+import isVisible from 'rc-util/lib/Dom/isVisible';
 import { useContext } from '../../../_util/context';
 import TableContext from '../../shared/context/TableContext';
+import TableMeasureRowContext from '../../TableMeasureRowContext';
 import type { ColumnType } from '../../interface';
 
 export interface MeasureRowProps {
@@ -58,7 +59,13 @@ const MeasureRow: React.FC<MeasureRowProps> = ({
     </tr>
   );
 
-  return typeof measureRowRender === 'function' ? measureRowRender(measureRow) : measureRow;
+  const row = (
+    <TableMeasureRowContext.Provider value={true}>
+      {measureRow}
+    </TableMeasureRowContext.Provider>
+  );
+
+  return typeof measureRowRender === 'function' ? measureRowRender(row) : row;
 };
 
 export default MeasureRow;

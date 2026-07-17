@@ -11,37 +11,34 @@ interface DataType {
   address: string;
 }
 
-// 共享 render 函数 — 返回包含 colSpan/rowSpan 的对象
-const renderContent = (text: string, row: number, col: number) => {
-  const obj: { children: React.ReactNode; props: { colSpan?: number; rowSpan?: number } } = {
-    children: text,
-    props: {},
-  };
+const onCell = (colIndex: number) => (_record: DataType, rowIndex?: number) => {
+  const props: { colSpan?: number; rowSpan?: number } = {};
+  if (rowIndex == null) return props;
   // 第一行 name 跨 2 行
-  if (row === 0 && col === 0) {
-    obj.props.rowSpan = 2;
+  if (rowIndex === 0 && colIndex === 0) {
+    props.rowSpan = 2;
   }
   // 第二行 name 被占用
-  if (row === 1 && col === 0) {
-    obj.props.rowSpan = 0;
+  if (rowIndex === 1 && colIndex === 0) {
+    props.rowSpan = 0;
   }
   // 第三行 name 跨 3 行
-  if (row === 2 && col === 0) {
-    obj.props.rowSpan = 3;
+  if (rowIndex === 2 && colIndex === 0) {
+    props.rowSpan = 3;
   }
   // 第四、五行 name 被占用
-  if ((row === 3 || row === 4) && col === 0) {
-    obj.props.rowSpan = 0;
+  if ((rowIndex === 3 || rowIndex === 4) && colIndex === 0) {
+    props.rowSpan = 0;
   }
   // 第一行 address 跨 2 列
-  if (row === 0 && col === 4) {
-    obj.props.colSpan = 2;
+  if (rowIndex === 0 && colIndex === 4) {
+    props.colSpan = 2;
   }
   // 第一行 phone 被占用
-  if (row === 0 && col === 5) {
-    obj.props.colSpan = 0;
+  if (rowIndex === 0 && colIndex === 5) {
+    props.colSpan = 0;
   }
-  return obj;
+  return props;
 };
 
 const columns: ColumnsType<DataType> = [
@@ -50,42 +47,43 @@ const columns: ColumnsType<DataType> = [
     dataIndex: 'name',
     key: 'name',
     width: 120,
-    render: (text, _record, index) => renderContent(text, index, 0) as any,
+    onCell: onCell(0),
   },
   {
     title: '年龄',
     dataIndex: 'age',
     key: 'age',
     width: 80,
-    render: (text, _record, index) => renderContent(text, index, 1) as any,
+    onCell: onCell(1),
   },
   {
     title: '座机',
     dataIndex: 'tel',
     key: 'tel',
     width: 140,
-    render: (text, _record, index) => renderContent(text, index, 2) as any,
+    onCell: onCell(2),
   },
   {
     title: '手机',
     dataIndex: 'phone',
     key: 'phone',
     width: 140,
-    render: (text, _record, index) => renderContent(text, index, 3) as any,
+    onCell: onCell(3),
   },
   {
     title: '住址',
     dataIndex: 'address',
     key: 'address',
     width: 250,
-    render: (text, _record, index) => renderContent(text, index, 4) as any,
+    onCell: onCell(4),
   },
   {
     title: '备注',
     dataIndex: 'remark',
     key: 'remark',
     width: 200,
-    render: (text, _record, index) => renderContent(text || '—', index, 5) as any,
+    render: (text: string) => text || '—',
+    onCell: onCell(5),
   },
 ];
 

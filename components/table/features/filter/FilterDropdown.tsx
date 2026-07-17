@@ -9,19 +9,19 @@ import { useSyncState } from '../../../_util/hooks/useSyncState';
 import { isFunction, isNumber } from '../../../_util/is';
 import type { AnyObject } from '../../../_util/type';
 import { devUseWarning } from '../../../_util/warning';
-import Button from 'antd/es/button';
-import type { CheckboxChangeEvent } from 'antd/es/checkbox';
-import Checkbox from 'antd/es/checkbox';
-import { ConfigContext } from 'antd/es/config-provider';
-import type { DropdownProps } from 'antd/es/dropdown';
-import Dropdown from 'antd/es/dropdown';
-import Empty from 'antd/es/empty';
-import type { MenuProps } from 'antd/es/menu';
-import Menu from 'antd/es/menu';
-import OverrideProvider from 'antd/es/menu/OverrideContext';
-import Radio from 'antd/es/radio';
-import type { EventDataNode } from 'antd/es/tree';
-import Tree from 'antd/es/tree';
+import Button from 'antd/lib/button';
+import type { CheckboxChangeEvent } from 'antd/lib/checkbox';
+import Checkbox from 'antd/lib/checkbox';
+import { ConfigContext } from 'antd/lib/config-provider';
+import type { DropdownProps } from 'antd/lib/dropdown';
+import Dropdown from 'antd/lib/dropdown';
+import Empty from 'antd/lib/empty';
+import type { MenuProps } from 'antd/lib/menu';
+import Menu from 'antd/lib/menu';
+import OverrideProvider from 'antd/lib/menu/OverrideContext';
+import Radio from 'antd/lib/radio';
+import type { EventDataNode } from 'antd/lib/tree';
+import Tree from 'antd/lib/tree';
 import type {
   ColumnFilterItem,
   ColumnType,
@@ -548,6 +548,10 @@ const FilterDropdown = <RecordType extends AnyObject = AnyObject>(
     );
   }
 
+  // antd v4.24+ 废弃 overlay，改用 menu + dropdownRender
+  const { dropdownRender: userDropdownRender, ...restFilterDropdownProps } =
+    filterDropdownProps as DropdownProps;
+
   const mergedDropdownProps = mergeProps<DropdownProps>(
     {
       trigger: ['click'],
@@ -556,15 +560,16 @@ const FilterDropdown = <RecordType extends AnyObject = AnyObject>(
       getPopupContainer,
     },
     {
-      ...filterDropdownProps,
+      ...restFilterDropdownProps,
       open: mergedVisible,
       onOpenChange: onVisibleChange,
-      overlay: (() => {
-        if (isFunction((filterDropdownProps as any)?.dropdownRender)) {
-          return (filterDropdownProps as any).dropdownRender(dropdownContent);
+      menu: { items: [] },
+      dropdownRender: () => {
+        if (isFunction(userDropdownRender)) {
+          return userDropdownRender(dropdownContent);
         }
         return dropdownContent;
-      })(),
+      },
     },
   );
 

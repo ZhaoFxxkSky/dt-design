@@ -2,7 +2,7 @@ import * as React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { Summary, Table } from '../index';
-import type { ColumnsType } from '../index';
+import type { ColumnsType, Reference } from '../index';
 
 // ============================================================
 // Shared test data
@@ -594,7 +594,7 @@ describe('TableFeatures — Editable', () => {
     expect(newData[1].name).toBe('Bob');
   });
 
-  it('exposes validate method via ref', () => {
+  it('exposes validate method via ref', async () => {
     const cols: ColumnsType = [
       {
         title: 'Name',
@@ -622,13 +622,13 @@ describe('TableFeatures — Editable', () => {
       />,
     );
 
-    const result = ref.current?.validate();
+    const result = await ref.current?.validate();
     expect(result).toBeDefined();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBeGreaterThan(0);
   });
 
-  it('validate passes when all data is valid', () => {
+  it('validate passes when all data is valid', async () => {
     const cols: ColumnsType = [
       {
         title: 'Name',
@@ -656,12 +656,12 @@ describe('TableFeatures — Editable', () => {
       />,
     );
 
-    const result = ref.current?.validate();
+    const result = await ref.current?.validate();
     expect(result.valid).toBe(true);
     expect(result.errors.size).toBe(0);
   });
 
-  it('exposes resetErrors method via ref', () => {
+  it('exposes resetErrors method via ref', async () => {
     const cols: ColumnsType = [
       {
         title: 'Name',
@@ -687,7 +687,7 @@ describe('TableFeatures — Editable', () => {
     );
 
     // First validate to create errors
-    const result1 = ref.current?.validate();
+    const result1 = await ref.current?.validate();
     expect(result1.valid).toBe(false);
 
     // Reset errors
@@ -695,11 +695,11 @@ describe('TableFeatures — Editable', () => {
 
     // Errors should be cleared (we can't directly check internal state,
     // but validate again should still work)
-    const result2 = ref.current?.validate();
+    const result2 = await ref.current?.validate();
     expect(result2).toBeDefined();
   });
 
-  it('supports pattern validation rule', () => {
+  it('supports pattern validation rule', async () => {
     const cols: ColumnsType = [
       {
         title: 'Email',
@@ -729,12 +729,12 @@ describe('TableFeatures — Editable', () => {
       />,
     );
 
-    const result = ref.current?.validate();
+    const result = await ref.current?.validate();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBe(1);
   });
 
-  it('supports custom validator rule', () => {
+  it('supports custom validator rule', async () => {
     const cols: ColumnsType = [
       {
         title: 'Age',
@@ -767,7 +767,7 @@ describe('TableFeatures — Editable', () => {
       />,
     );
 
-    const result = ref.current?.validate();
+    const result = await ref.current?.validate();
     expect(result.valid).toBe(false);
   });
 
@@ -925,6 +925,84 @@ describe('TableFeatures — Pagination', () => {
     );
 
     expect(container.textContent).toContain('Total 5 items');
+  });
+
+  it('follows controlled pagination.current on rerender', () => {
+    const sixRows = [
+      { key: '1', name: 'Alice', age: 30, department: 'Tech' },
+      { key: '2', name: 'Bob', age: 25, department: 'Product' },
+      { key: '3', name: 'Charlie', age: 35, department: 'Tech' },
+      { key: '4', name: 'David', age: 28, department: 'Design' },
+      { key: '5', name: 'Eve', age: 32, department: 'Product' },
+      { key: '6', name: 'Frank', age: 40, department: 'Tech' },
+    ];
+    const { container, rerender } = render(
+      <Table
+        dataSource={sixRows}
+        columns={basicColumns}
+        rowKey="key"
+        pagination={{ current: 2, pageSize: 2, total: 6 }}
+      />,
+    );
+
+    // 受控 current=2 → 渲染第 2 页数据
+    expect(container.textContent).toContain('Charlie');
+    expect(container.textContent).toContain('David');
+    expect(container.textContent).not.toContain('Alice');
+
+    // 外部改 current=3 → 表格跟随渲染第 3 页
+    rerender(
+      <Table
+        dataSource={sixRows}
+        columns={basicColumns}
+        rowKey="key"
+        pagination={{ current: 3, pageSize: 2, total: 6 }}
+      />,
+    );
+    expect(container.textContent).toContain('Eve');
+    expect(container.textContent).toContain('Frank');
+    expect(container.textContent).not.toContain('Charlie');
+  });
+
+  it('follows controlled pagination.pageSize on rerender', () => {
+    const onPaginationChange = jest.fn();
+    const sixRows = [
+      { key: '1', name: 'Alice', age: 30, department: 'Tech' },
+      { key: '2', name: 'Bob', age: 25, department: 'Product' },
+      { key: '3', name: 'Charlie', age: 35, department: 'Tech' },
+      { key: '4', name: 'David', age: 28, department: 'Design' },
+      { key: '5', name: 'Eve', age: 32, department: 'Product' },
+      { key: '6', name: 'Frank', age: 40, department: 'Tech' },
+    ];
+    const { container, rerender } = render(
+      <Table
+        dataSource={sixRows}
+        columns={basicColumns}
+        rowKey="key"
+        pagination={{ current: 1, pageSize: 2, total: 6, onChange: onPaginationChange }}
+      />,
+    );
+
+    // 受控 pageSize=2 → 渲染 2 行
+    expect(container.querySelectorAll('tbody tr').length).toBe(2);
+    expect(container.textContent).not.toContain('Charlie');
+
+    // 外部改 pageSize=3 → 表格跟随渲染 3 行
+    rerender(
+      <Table
+        dataSource={sixRows}
+        columns={basicColumns}
+        rowKey="key"
+        pagination={{ current: 1, pageSize: 3, total: 6, onChange: onPaginationChange }}
+      />,
+    );
+    expect(container.querySelectorAll('tbody tr').length).toBe(3);
+    expect(container.textContent).toContain('Charlie');
+
+    // onChange 语义保持：点击下一页仍回传 current + pageSize
+    const nextBtn = container.querySelector('.ant-pagination-next') as HTMLElement;
+    fireEvent.click(nextBtn);
+    expect(onPaginationChange).toHaveBeenCalledWith(2, 3);
   });
 });
 
@@ -1351,5 +1429,57 @@ describe('TableFeatures — Additional Edge Cases', () => {
     expect(rows[1]).not.toHaveClass('ant-table-row-selected');
     expect(rows[2]).toHaveClass('row-3');
     expect(rows[2]).toHaveClass('ant-table-row-selected');
+  });
+});
+
+// ============================================================
+// ref.scrollTo freshness (stale closure regression)
+// ============================================================
+describe('TableFeatures — ref scrollTo freshness', () => {
+  it('scrollTo resolves the row key against the latest dataSource after re-render', () => {
+    const scrollIntoViewSpy = jest
+      .spyOn(window.HTMLElement.prototype, 'scrollIntoView')
+      .mockImplementation(() => {});
+    try {
+      const cols: ColumnsType = [{ title: 'Name', dataIndex: 'name', key: 'name' }];
+      const ref = React.createRef<Reference>();
+      const { container, rerender } = render(
+        <Table
+          ref={ref}
+          dataSource={[
+            { key: '1', name: 'Alice' },
+            { key: '2', name: 'Bob' },
+          ]}
+          columns={cols}
+          rowKey="key"
+          scroll={{ y: 100 }}
+        />,
+      );
+
+      // change dataSource after the first render
+      rerender(
+        <Table
+          ref={ref}
+          dataSource={[
+            { key: '3', name: 'Charlie' },
+            { key: '4', name: 'Dave' },
+          ]}
+          columns={cols}
+          rowKey="key"
+          scroll={{ y: 100 }}
+        />,
+      );
+
+      ref.current!.scrollTo({ index: 1 });
+
+      // must resolve index 1 against the LATEST data (key=4),
+      // not the first-render snapshot (key=2, no longer in the DOM)
+      const latestRow = container.querySelector('[data-row-key="4"]');
+      expect(latestRow).not.toBeNull();
+      expect(scrollIntoViewSpy).toHaveBeenCalledTimes(1);
+      expect(scrollIntoViewSpy.mock.instances[0]).toBe(latestRow);
+    } finally {
+      scrollIntoViewSpy.mockRestore();
+    }
   });
 });

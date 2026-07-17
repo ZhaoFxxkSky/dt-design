@@ -953,3 +953,203 @@ describe('Resize — Edge Cases', () => {
     expect(handles.length).toBe(3);
   });
 });
+
+// ============================================================
+// Resize — Width-less Columns (R1 regression)
+// ============================================================
+describe('Resize — Width-less Columns', () => {
+  beforeEach(() => {
+    // containerWidth = 1000, offsetWidth = 200
+    mockElementWidths(200, 1000);
+  });
+  afterEach(() => {
+    restoreElementWidths();
+  });
+
+  const mixedColumns: ColumnsType = [
+    { title: 'Name', dataIndex: 'name', key: 'name', width: 150, minWidth: 60 },
+    { title: 'Age', dataIndex: 'age', key: 'age', width: 100, minWidth: 60 },
+    // 未设 width 的列
+    { title: 'Email', dataIndex: 'email', key: 'email', minWidth: 60 },
+  ];
+
+  function getColWidths(container: HTMLElement): number[] {
+    return Array.from(container.querySelectorAll('colgroup col')).map((col) => {
+      const style = col.getAttribute('style') || '';
+      return Number.parseInt(style.match(/(\d+)px/)?.[1] || '0', 10);
+    });
+  }
+
+  it('does not collapse width-less columns to 0/1px when resizable', () => {
+    const { container } = render(
+      <Table dataSource={data} columns={mixedColumns} rowKey="key" resizable />,
+    );
+
+    const widths = getColWidths(container);
+    expect(widths.length).toBe(3);
+    // 无 width 列应参与剩余空间分配，而不是塌陷为 0/1px
+    expect(widths[2]).toBeGreaterThan(60);
+  });
+
+  it('distributes container width when all columns are width-less', () => {
+    const cols: ColumnsType = [
+      { title: 'Name', dataIndex: 'name', key: 'name' },
+      { title: 'Age', dataIndex: 'age', key: 'age' },
+    ];
+    const { container } = render(
+      <Table dataSource={data} columns={cols} rowKey="key" resizable />,
+    );
+
+    const widths = getColWidths(container);
+    expect(widths[0]).toBeGreaterThan(60);
+    expect(widths[1]).toBeGreaterThan(60);
+    expect(widths[0] + widths[1]).toBe(1000);
+  });
+
+  it('does not freeze 0 into widths after dragging another column', () => {
+    const { container } = render(
+      <Table dataSource={data} columns={mixedColumns} rowKey="key" resizable />,
+    );
+
+    // 拖拽第一个有宽列
+    simulateDrag(container, 50, 0);
+
+    const widths = getColWidths(container);
+    // 无宽列在拖拽冻结后仍不塌陷
+    expect(widths[2]).toBeGreaterThan(60);
+  });
+});
+
+// ============================================================
+// Resize — Internal / Keyless Columns (R2 regression)
+// ============================================================
+describe('Resize — Internal Columns', () => {
+  beforeEach(() => {
+    // containerWidth = 1000, offsetWidth = 200
+    mockElementWidths(200, 1000);
+  });
+  afterEach(() => {
+    restoreElementWidths();
+  });
+
+  it('does not inject resize handle into selection column header', () => {
+    const { container } = render(
+      <Table
+        dataSource={data}
+        columns={baseColumns}
+        rowKey="key"
+        resizable
+        rowSelection={{ columnWidth: 60 }}
+      />,
+    );
+
+    // 仅 3 个数据列有拖拽手柄（measure row 会复制 title，这里只断言表头）
+    expect(container.querySelectorAll('thead .ant-table-resize-handle').length).toBe(3);
+    const selectionTh = container.querySelector('th.ant-table-selection-column');
+    expect(selectionTh).toBeInTheDocument();
+    expect(selectionTh!.querySelector('.ant-table-resize-handle')).toBeNull();
+  });
+
+  it('does not inject resize handle into expand column header', () => {
+    const { container } = render(
+      <Table
+        dataSource={data}
+        columns={baseColumns}
+        rowKey="key"
+        resizable
+        expandable={{ expandedRowRender: () => 'detail' }}
+      />,
+    );
+
+    // 仅 3 个数据列有拖拽手柄（measure row 会复制 title，这里只断言表头）
+    expect(container.querySelectorAll('thead .ant-table-resize-handle').length).toBe(3);
+    const expandTh = container.querySelector('th.ant-table-row-expand-icon-cell');
+    expect(expandTh).toBeInTheDocument();
+    expect(expandTh!.querySelector('.ant-table-resize-handle')).toBeNull();
+  });
+
+  it('does not change selection column width after dragging a keyed column', () => {
+    const { container } = render(
+      <Table
+        dataSource={data}
+        columns={baseColumns}
+        rowKey="key"
+        resizable
+        rowSelection={{ columnWidth: 60 }}
+      />,
+    );
+
+    const firstColStyle = () =>
+      container.querySelector('colgroup col')?.getAttribute('style') || '';
+    const before = firstColStyle();
+    expect(before).toContain('60px');
+
+    simulateDrag(container, 50, 0);
+
+    expect(firstColStyle()).toBe(before);
+  });
+
+  it('does not share widths between keyless columns after dragging a keyed column', () => {
+    const cols: ColumnsType = [
+      { title: 'Name', dataIndex: 'name', key: 'name', width: 150, minWidth: 60 },
+      // 无 key/dataIndex 的列（与 selection/expand 列同样不可标识）
+      { title: 'Action A', width: 100, render: () => 'a' },
+      { title: 'Action B', width: 200, render: () => 'b' },
+    ];
+    const { container } = render(
+      <Table dataSource={data} columns={cols} rowKey="key" resizable />,
+    );
+
+    simulateDrag(container, 50, 0);
+
+    const widths = Array.from(container.querySelectorAll('colgroup col')).map((col) => {
+      const style = col.getAttribute('style') || '';
+      return Number.parseInt(style.match(/(\d+)px/)?.[1] || '0', 10);
+    });
+    // 无键列各自保留自己的宽度，不共用 '' 键互相覆盖
+    expect(widths[1]).toBe(100);
+    expect(widths[2]).toBe(200);
+  });
+});
+
+// ============================================================
+// Resize — Measure Row Handle Focus (R3 regression)
+// ============================================================
+describe('Resize — Measure Row Handle Focus', () => {
+  beforeEach(() => {
+    mockElementWidths(200, 0);
+  });
+  afterEach(() => {
+    restoreElementWidths();
+  });
+
+  it('hides resize handles in the measure row from focus and screen readers', () => {
+    const { container } = render(
+      <Table
+        dataSource={data}
+        columns={baseColumns}
+        rowKey="key"
+        resizable
+        scroll={{ x: 400 }}
+      />,
+    );
+
+    // 表头手柄可键盘聚焦
+    const headerHandles = container.querySelectorAll('thead .ant-table-resize-handle');
+    expect(headerHandles.length).toBeGreaterThan(0);
+    headerHandles.forEach((handle) => {
+      expect(handle).not.toHaveAttribute('aria-hidden');
+      expect(handle).toHaveAttribute('tabindex', '0');
+      expect(handle).toHaveAttribute('role', 'separator');
+    });
+
+    // 测量行（visibility:hidden）内的手柄必须移出焦点顺序并隐藏于辅助技术
+    const measureHandles = container.querySelectorAll('.ant-table-measure-row .ant-table-resize-handle');
+    expect(measureHandles.length).toBeGreaterThan(0);
+    measureHandles.forEach((handle) => {
+      expect(handle).toHaveAttribute('aria-hidden');
+      expect(handle).toHaveAttribute('tabindex', '-1');
+      expect(handle).not.toHaveAttribute('role');
+    });
+  });
+});

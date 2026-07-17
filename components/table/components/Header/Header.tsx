@@ -128,7 +128,7 @@ const Header = <RecordType,>(props: HeaderProps<RecordType>) => {
           <HeaderRow
             classNames={headerCls}
             styles={headerStyles}
-            key={rowIndex}
+            key={row.map((cell) => cell.key).join('-') || `header-row-${rowIndex}`}
             flattenColumns={flattenColumns}
             cells={row}
             stickyOffsets={stickyOffsets}

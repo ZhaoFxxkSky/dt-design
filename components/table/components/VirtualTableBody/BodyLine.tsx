@@ -108,7 +108,7 @@ const BodyLine = React.forwardRef<HTMLDivElement, BodyLineProps>((props, ref) =>
       {flattenColumns.map((column, colIndex) => {
         return (
           <VirtualCell
-            key={colIndex}
+            key={column.key != null ? String(column.key) : `cell-${colIndex}`}
             className={classNames?.body?.cell}
             style={styles?.body?.cell}
             component={cellComponent}

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import isEqual from 'rc-util/es/isEqual';
+import isEqual from 'rc-util/lib/isEqual';
 
 /**
  * HOC that prevents re-render when props are equal.

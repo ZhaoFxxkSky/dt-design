@@ -1,6 +1,6 @@
 import React from 'react';
-import { Table } from '../index';
-import type { ColumnsType } from '../index';
+import { Table } from '@dtjoy/dt-design';
+import type { ColumnsType } from '@dtjoy/dt-design';
 import { Space, Tag, Typography } from 'antd';
 
 interface RecordType {
@@ -56,10 +56,17 @@ const dataSource: RecordType[] = [
 ];
 
 export default function Demo() {
-  const [logs, setLogs] = React.useState<string[]>([]);
+  const [logs, setLogs] = React.useState<{ id: number; text: string }[]>([]);
+  const logIdRef = React.useRef(0);
 
   const addLog = React.useCallback((msg: string) => {
-    setLogs((prev) => [`${new Date().toLocaleTimeString()} — ${msg}`, ...prev].slice(0, 8));
+    logIdRef.current += 1;
+    setLogs((prev) =>
+      [{ id: logIdRef.current, text: `${new Date().toLocaleTimeString()} — ${msg}` }, ...prev].slice(
+        0,
+        8,
+      ),
+    );
   }, []);
 
   const columns: ColumnsType<RecordType> = React.useMemo(
@@ -162,12 +169,12 @@ export default function Demo() {
               overflow: 'auto',
             }}
           >
-            {logs.map((log, i) => (
+            {logs.map((log) => (
               <div
-                key={i}
+                key={log.id}
                 style={{ fontFamily: 'monospace', fontSize: 12, lineHeight: '20px', color: '#666' }}
               >
-                {log}
+                {log.text}
               </div>
             ))}
           </div>

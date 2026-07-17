@@ -1,10 +1,10 @@
 import type * as React from 'react';
 import type { Breakpoint } from '../_util/hooks/useBreakpoint';
 import type { AnyObject } from '../_util/type';
-import type { CheckboxProps } from 'antd/es/checkbox';
-import type { DropdownProps } from 'antd/es/dropdown';
-import type { PaginationProps } from 'antd/es/pagination';
-import type { TooltipProps } from 'antd/es/tooltip';
+import type { CheckboxProps } from 'antd/lib/checkbox';
+import type { DropdownProps } from 'antd/lib/dropdown';
+import type { PaginationProps } from 'antd/lib/pagination';
+import type { TooltipProps } from 'antd/lib/tooltip';
 import type { INTERNAL_SELECTION_ITEM } from './features/selection/useSelection';
 import type { InternalTableProps, TableProps } from './InternalTable';
 
@@ -99,15 +99,16 @@ export type EditableErrors = Map<string, string[]>;
 
 export interface EditableValidateResult {
   valid: boolean;
-  firstError?: { rowIndex: number; dataIndex: string | number; message: string };
+  /** 首个错误：rowKey 用于定位行（排序/筛选后依然准确），rowIndex 保留 rawData 下标语义 */
+  firstError?: EditableError & { rowIndex: number };
   errors: EditableErrors;
 }
 
 export type Reference = {
   nativeElement: HTMLDivElement;
   scrollTo: (config: ScrollConfig) => void;
-  /** 校验全部可编辑单元格，返回校验结果 */
-  validate: () => EditableValidateResult;
+/** 校验全部可编辑单元格，返回校验结果（异步 — 支持异步 validator） */
+validate: () => Promise<EditableValidateResult>;
   /** 重置所有校验错误 */
   resetErrors: () => void;
   /** 重置所有列宽为初始弹性分配（清除用户拖拽记录） */
@@ -190,7 +191,7 @@ export interface EditableConfig<RecordType = AnyObject> {
 
 export interface EditableError {
   rowKey: React.Key;
-  dataIndex: string;
+  dataIndex: string | number;
   message: string;
 }
 

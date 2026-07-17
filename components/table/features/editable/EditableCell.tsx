@@ -10,6 +10,8 @@ import { renderBuiltinEditor } from './builtinEditors';
 export interface EditableCellProps {
   dataIndex: string | number;
   title?: React.ReactNode;
+  /** 本行 record 的 rowKey — 排序/筛选/树形展开后唯一定位该行；缺失时降级为 rowIndex */
+  rowKey?: React.Key;
   rowIndex: number;
   record: AnyObject;
   value: unknown;
@@ -44,7 +46,7 @@ export interface EditableCellProps {
  *    getPopupContainer 返回表格滚动容器，确保 Popover 随表格滚动。
  */
 const EditableCellInner = React.memo<EditableCellProps>(
-  ({ dataIndex, title, rowIndex, record, value, editableConfig, prefixCls }) => {
+  ({ dataIndex, title, rowKey, rowIndex, record, value, editableConfig, prefixCls }) => {
     const editCtx = React.useContext(EditableContext);
 
     // ---- 连续型 vs 离散型 ----
@@ -78,8 +80,8 @@ const EditableCellInner = React.memo<EditableCellProps>(
       }
     }, [value]);
 
-    // ---- 错误查找 ----
-    const errorKey = `${rowIndex}-${dataIndex}`;
+    // ---- 错误查找（rowKey 定位，与 useEditable 写入侧一致；无 key 降级 rowIndex）----
+    const errorKey = `${rowKey ?? rowIndex}-${dataIndex}`;
     const globalErrors = editCtx?.errors.get(errorKey) ?? [];
     const effectiveErrors = isDirtyRef.current ? localErrors : globalErrors;
     const hasError = effectiveErrors.length > 0;
@@ -137,9 +139,9 @@ const EditableCellInner = React.memo<EditableCellProps>(
     // ---- 提交到父组件 ----
     const commitToParent = React.useCallback(
       (val: unknown) => {
-        editCtx?.onCellChange(rowIndex, dataIndex, val, record);
+        editCtx?.onCellChange(rowKey, dataIndex, val, record, rowIndex);
       },
-      [editCtx, rowIndex, dataIndex, record],
+      [editCtx, rowKey, dataIndex, record, rowIndex],
     );
 
     // ---- change 处理 ----
@@ -267,8 +269,10 @@ const EditableCellInner = React.memo<EditableCellProps>(
       prevProps.record === nextProps.record &&
       prevProps.value === nextProps.value &&
       prevProps.dataIndex === nextProps.dataIndex &&
+      prevProps.rowKey === nextProps.rowKey &&
       prevProps.rowIndex === nextProps.rowIndex &&
-      prevProps.prefixCls === nextProps.prefixCls
+      prevProps.prefixCls === nextProps.prefixCls &&
+      prevProps.editableConfig === nextProps.editableConfig
     );
   },
 );

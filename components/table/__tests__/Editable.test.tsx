@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { renderHook } from '@testing-library/react-hooks';
 import '@testing-library/jest-dom/extend-expect';
 import { Summary, Table } from '../index';
 import type { ColumnsType, Reference } from '../index';
@@ -335,7 +336,7 @@ describe('Editable — Custom Editor', () => {
 // 6. Validation Tests
 // ============================================================
 describe('Editable — Validation', () => {
-  it('required rule detects empty value', () => {
+  it('required rule detects empty value', async () => {
     const cols: ColumnsType = [
       {
         title: 'Name',
@@ -359,12 +360,12 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current!.validate();
+    const result = await ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBe(1);
   });
 
-  it('required rule detects undefined value', () => {
+  it('required rule detects undefined value', async () => {
     const cols: ColumnsType = [
       {
         title: 'Age',
@@ -388,11 +389,11 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current!.validate();
+    const result = await ref.current!.validate();
     expect(result.valid).toBe(false);
   });
 
-  it('required rule detects null value', () => {
+  it('required rule detects null value', async () => {
     const cols: ColumnsType = [
       {
         title: 'Name',
@@ -416,11 +417,11 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current!.validate();
+    const result = await ref.current!.validate();
     expect(result.valid).toBe(false);
   });
 
-  it('required rule passes when value is provided', () => {
+  it('required rule passes when value is provided', async () => {
     const cols: ColumnsType = [
       {
         title: 'Name',
@@ -444,12 +445,12 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current!.validate();
+    const result = await ref.current!.validate();
     expect(result.valid).toBe(true);
     expect(result.errors.size).toBe(0);
   });
 
-  it('pattern rule validates email format', () => {
+  it('pattern rule validates email format', async () => {
     const cols: ColumnsType = [
       {
         title: 'Email',
@@ -477,12 +478,12 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current!.validate();
+    const result = await ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBe(1);
   });
 
-  it('custom validator returns error message', () => {
+  it('custom validator returns error message', async () => {
     const cols: ColumnsType = [
       {
         title: 'Age',
@@ -514,12 +515,12 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current!.validate();
+    const result = await ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBe(1);
   });
 
-  it('multiple rules on the same column all checked', () => {
+  it('multiple rules on the same column all checked', async () => {
     const cols: ColumnsType = [
       {
         title: 'Name',
@@ -553,12 +554,12 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current!.validate();
+    const result = await ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBe(2); // row 1 (empty) + row 2 (too short)
   });
 
-  it('validate returns firstError with correct info', () => {
+  it('validate returns firstError with correct info', async () => {
     const cols: ColumnsType = [
       {
         title: 'Name',
@@ -586,14 +587,14 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    const result = ref.current!.validate();
+    const result = await ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.firstError).toBeDefined();
     expect(result.firstError!.rowIndex).toBe(1);
     expect(result.firstError!.message).toBe('Name is required');
   });
 
-  it('onValidate callback is called on validate', () => {
+  it('onValidate callback is called on validate', async () => {
     const onValidate = jest.fn();
     const cols: ColumnsType = [
       {
@@ -619,12 +620,12 @@ describe('Editable — Validation', () => {
       />,
     );
 
-    ref.current!.validate();
+    await ref.current!.validate();
     expect(onValidate).toHaveBeenCalled();
     expect(onValidate.mock.calls[0][0].valid).toBe(false);
   });
 
-  it('validate returns valid for empty data array', () => {
+  it('validate returns valid for empty data array', async () => {
     const cols: ColumnsType = [
       {
         title: 'Name',
@@ -649,7 +650,7 @@ describe('Editable — Validation', () => {
     );
 
     // Empty data should be valid (no rows to validate)
-    const result = ref.current!.validate();
+    const result = await ref.current!.validate();
     expect(result.valid).toBe(true);
     expect(result.errors.size).toBe(0);
   });
@@ -755,7 +756,7 @@ describe('Editable — Reset Errors', () => {
     );
 
     // First validate to create errors
-    const result = ref.current!.validate();
+    const result = await ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBe(1);
 
@@ -763,7 +764,7 @@ describe('Editable — Reset Errors', () => {
     ref.current?.resetErrors();
 
     // Validate again — errors should be fresh
-    const result2 = ref.current!.validate();
+    const result2 = await ref.current!.validate();
     expect(result2).toBeDefined();
     // Still invalid because data hasn't changed, but errors Map is fresh
     expect(result2.valid).toBe(false);
@@ -1007,7 +1008,7 @@ describe('Editable — Virtual Scrolling', () => {
 // 14. Edge Cases
 // ============================================================
 describe('Editable — Edge Cases', () => {
-  it('handles empty data array gracefully', () => {
+  it('handles empty data array gracefully', async () => {
     const cols: ColumnsType = [
       { title: 'Name', dataIndex: 'name', key: 'name', width: 150, editable: { type: 'input' } },
     ];
@@ -1020,7 +1021,7 @@ describe('Editable — Edge Cases', () => {
     expect(editableCells.length).toBe(0);
 
     // Validate on empty data
-    const result = ref.current!.validate();
+    const result = await ref.current!.validate();
     expect(result.valid).toBe(true);
     expect(result.errors.size).toBe(0);
   });
@@ -1040,7 +1041,7 @@ describe('Editable — Edge Cases', () => {
     expect(editableCells.length).toBe(3);
   });
 
-  it('validate on table without editable columns returns undefined', () => {
+  it('validate on table without editable columns returns undefined', async () => {
     const cols: ColumnsType = [
       { title: 'Name', dataIndex: 'name', key: 'name', width: 150 },
     ];
@@ -1055,7 +1056,7 @@ describe('Editable — Edge Cases', () => {
     );
 
     // validate should be null/undefined when no editable columns
-    const result = ref.current?.validate?.();
+    const result = await ref.current?.validate?.();
     // If validate is available, it should return a valid result; otherwise undefined
     if (result) {
       expect(result.valid).toBe(true);
@@ -1177,7 +1178,7 @@ describe('Editable — Async Validator', () => {
 // 16. Editable with Multiple Columns
 // ============================================================
 describe('Editable — Multiple Editable Columns', () => {
-  it('all editable columns are validated in validateAll', () => {
+  it('all editable columns are validated in validateAll', async () => {
     const cols: ColumnsType = [
       {
         title: 'Name',
@@ -1227,7 +1228,7 @@ describe('Editable — Multiple Editable Columns', () => {
       />,
     );
 
-    const result = ref.current!.validate();
+    const result = await ref.current!.validate();
     // Row 2 has 3 errors: empty name, undefined age, bad email (required + pattern)
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBeGreaterThanOrEqual(3);
@@ -1450,7 +1451,7 @@ describe('Editable — Column Group Header', () => {
     expect(container.textContent).toContain('Contact');
   });
 
-  it('validation works with column groups', () => {
+  it('validation works with column groups', async () => {
     const cols: ColumnsType = [
       {
         title: 'Info',
@@ -1480,7 +1481,7 @@ describe('Editable — Column Group Header', () => {
       />,
     );
 
-    const result = ref.current!.validate();
+    const result = await ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBe(1);
   });
@@ -1672,7 +1673,7 @@ describe('Editable — Pagination Fix', () => {
     expect(newData[5].name).toBe('User6'); // unchanged
   });
 
-  it('validate works correctly with paginated editable data', () => {
+  it('validate works correctly with paginated editable data', async () => {
     const largeData = Array.from({ length: 15 }, (_, i) => ({
       key: String(i + 1),
       name: i < 10 ? `User${i + 1}` : '', // rows 10-14 have empty names
@@ -1704,12 +1705,12 @@ describe('Editable — Pagination Fix', () => {
     );
 
     // validate should check ALL rows, not just current page
-    const result = ref.current!.validate();
+    const result = await ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.errors.size).toBe(5); // 5 empty names on page 3
   });
 
-  it('validate auto-jumps to the page containing the first error', () => {
+  it('validate auto-jumps to the page containing the first error', async () => {
     // Row 1 (index 0) has an empty name — it's on page 1
     // Start on page 2, validate should switch to page 1
     const largeData = Array.from({ length: 15 }, (_, i) => ({
@@ -1742,11 +1743,379 @@ describe('Editable — Pagination Fix', () => {
       />,
     );
 
-    const result = ref.current!.validate();
+    const result = await ref.current!.validate();
     expect(result.valid).toBe(false);
     expect(result.firstError?.rowIndex).toBe(0);
     // After validate, the pagination should have switched to page 1
     // (the setTimeout in scrollToRow will handle the actual scroll)
+  });
+});
+
+// ============================================================
+// 23.5 Editable — RowKey Location (Sort / Filter / Tree)
+// ============================================================
+describe('Editable — RowKey Location (Sort/Filter/Tree)', () => {
+  const sortableCols: ColumnsType = [
+    { title: 'Name', dataIndex: 'name', key: 'name', width: 150, editable: { type: 'input' } },
+    {
+      title: 'Age',
+      dataIndex: 'age',
+      key: 'age',
+      width: 100,
+      sorter: (a: any, b: any) => a.age - b.age,
+      defaultSortOrder: 'ascend' as const,
+    },
+  ];
+
+  it('editing the first displayed row after sorting writes to the record with the matching rowKey', () => {
+    const onEditableChange = jest.fn();
+    const sortData = [
+      { key: '1', name: 'Charlie', age: 35 },
+      { key: '2', name: 'Alice', age: 25 },
+      { key: '3', name: 'Bob', age: 30 },
+    ];
+    const { container } = render(
+      <Table
+        dataSource={sortData}
+        columns={sortableCols}
+        rowKey="key"
+        editable
+        onEditableChange={onEditableChange}
+        showSorterTooltip={false}
+      />,
+    );
+
+    // ascending by age → first displayed row is Alice (key=2), not rawData[0]
+    const firstRow = container.querySelector('tbody tr[data-row-key]') as HTMLTableRowElement;
+    expect(firstRow.getAttribute('data-row-key')).toBe('2');
+
+    const input = firstRow.querySelector('input') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'AliceEdited' } });
+    fireEvent.blur(input);
+
+    expect(onEditableChange).toHaveBeenCalledTimes(1);
+    const newData = onEditableChange.mock.calls[0][0];
+    // must write into the record with key=2, NOT rawData[0]
+    expect(newData.find((r: any) => r.key === '2').name).toBe('AliceEdited');
+    expect(newData.find((r: any) => r.key === '1').name).toBe('Charlie');
+    expect(newData.find((r: any) => r.key === '3').name).toBe('Bob');
+  });
+
+  it('editing after filtering writes to the record with the matching rowKey', () => {
+    const onEditableChange = jest.fn();
+    const filterData = [
+      { key: '1', name: 'Charlie', dept: 'Tech' },
+      { key: '2', name: 'Alice', dept: 'Product' },
+      { key: '3', name: 'Bob', dept: 'Tech' },
+    ];
+    const cols: ColumnsType = [
+      { title: 'Name', dataIndex: 'name', key: 'name', width: 150, editable: { type: 'input' } },
+      {
+        title: 'Dept',
+        dataIndex: 'dept',
+        key: 'dept',
+        width: 120,
+        filters: [
+          { text: 'Tech', value: 'Tech' },
+          { text: 'Product', value: 'Product' },
+        ],
+        filteredValue: ['Tech'],
+        onFilter: (value: any, record: any) => record.dept === value,
+      },
+    ];
+    const { container } = render(
+      <Table
+        dataSource={filterData}
+        columns={cols}
+        rowKey="key"
+        editable
+        onEditableChange={onEditableChange}
+      />,
+    );
+
+    // filtered to Tech → displayed rows are key=1 (Charlie) and key=3 (Bob)
+    const rows = container.querySelectorAll('tbody tr[data-row-key]');
+    expect(rows.length).toBe(2);
+    const bobRow = rows[1] as HTMLTableRowElement;
+    expect(bobRow.getAttribute('data-row-key')).toBe('3');
+
+    const input = bobRow.querySelector('input') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'BobEdited' } });
+    fireEvent.blur(input);
+
+    expect(onEditableChange).toHaveBeenCalledTimes(1);
+    const newData = onEditableChange.mock.calls[0][0];
+    // Bob is displayed at index 1 but lives at rawData index 2
+    expect(newData.find((r: any) => r.key === '3').name).toBe('BobEdited');
+    expect(newData.find((r: any) => r.key === '2').name).toBe('Alice');
+    expect(newData.find((r: any) => r.key === '1').name).toBe('Charlie');
+  });
+
+  it('editing on a sorted page 2 writes to the correct record', () => {
+    const onEditableChange = jest.fn();
+    const ages = [30, 25, 35, 20, 28, 33, 22, 40, 18, 27];
+    const largeData = Array.from({ length: 10 }, (_, i) => ({
+      key: String(i + 1),
+      name: `User${i + 1}`,
+      age: ages[i],
+    }));
+    const { container } = render(
+      <Table
+        dataSource={largeData}
+        columns={sortableCols}
+        rowKey="key"
+        editable
+        onEditableChange={onEditableChange}
+        showSorterTooltip={false}
+        pagination={{ pageSize: 5, current: 2 }}
+      />,
+    );
+
+    // ages asc: 18(k9),20(k4),22(k7),25(k2),27(k10) | 28(k5),30(k1),33(k6),35(k3),40(k8)
+    // page 2 first row → key 5 (rawData index 4)
+    const firstRow = container.querySelector('tbody tr[data-row-key]') as HTMLTableRowElement;
+    expect(firstRow.getAttribute('data-row-key')).toBe('5');
+
+    const input = firstRow.querySelector('input') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'Page2Sorted' } });
+    fireEvent.blur(input);
+
+    expect(onEditableChange).toHaveBeenCalledTimes(1);
+    const newData = onEditableChange.mock.calls[0][0];
+    expect(newData.find((r: any) => r.key === '5').name).toBe('Page2Sorted');
+    // key 6 sits at rawData index 5 — the row the buggy index math would hit
+    expect(newData.find((r: any) => r.key === '6').name).toBe('User6');
+  });
+
+  it('validateAll errors attach to the correct row after sorting', async () => {
+    const validateData = [
+      { key: '1', name: 'Charlie', age: 35 },
+      { key: '2', name: '', age: 25 },
+      { key: '3', name: 'Bob', age: 30 },
+    ];
+    const cols: ColumnsType = [
+      {
+        title: 'Name',
+        dataIndex: 'name',
+        key: 'name',
+        width: 150,
+        editable: { type: 'input', rules: [{ required: true, message: 'Name required' }] },
+      },
+      {
+        title: 'Age',
+        dataIndex: 'age',
+        key: 'age',
+        width: 100,
+        sorter: (a: any, b: any) => a.age - b.age,
+        defaultSortOrder: 'ascend' as const,
+      },
+    ];
+    const ref = React.createRef<Reference>();
+    const { container } = render(
+      <Table
+        ref={ref}
+        dataSource={validateData}
+        columns={cols}
+        rowKey="key"
+        editable
+        showSorterTooltip={false}
+      />,
+    );
+
+    let result!: Awaited<ReturnType<Reference['validate']>>;
+    await act(async () => {
+      result = await ref.current!.validate();
+    });
+    expect(result.valid).toBe(false);
+    expect(result.errors.size).toBe(1);
+    // firstError carries the rowKey; rowIndex stays the rawData index
+    expect(result.firstError?.rowKey).toBe('2');
+    expect(result.firstError?.rowIndex).toBe(1);
+
+    // sorted asc → display order: key 2 (empty name), key 3, key 1
+    const aliceRow = container.querySelector('[data-row-key="2"]');
+    const bobRow = container.querySelector('[data-row-key="3"]');
+    expect(aliceRow?.querySelector('.ant-table-editable-cell-error')).not.toBeNull();
+    expect(bobRow?.querySelector('.ant-table-editable-cell-error')).toBeNull();
+  });
+
+  it('validateAll errors attach to the correct row after filtering', async () => {
+    const validateData = [
+      { key: '1', name: 'Charlie', dept: 'Tech' },
+      { key: '2', name: 'Alice', dept: 'Product' },
+      { key: '3', name: '', dept: 'Tech' },
+    ];
+    const cols: ColumnsType = [
+      {
+        title: 'Name',
+        dataIndex: 'name',
+        key: 'name',
+        width: 150,
+        editable: { type: 'input', rules: [{ required: true, message: 'Name required' }] },
+      },
+      {
+        title: 'Dept',
+        dataIndex: 'dept',
+        key: 'dept',
+        width: 120,
+        filters: [
+          { text: 'Tech', value: 'Tech' },
+          { text: 'Product', value: 'Product' },
+        ],
+        filteredValue: ['Tech'],
+        onFilter: (value: any, record: any) => record.dept === value,
+      },
+    ];
+    const ref = React.createRef<Reference>();
+    const { container } = render(
+      <Table ref={ref} dataSource={validateData} columns={cols} rowKey="key" editable />,
+    );
+
+    let result!: Awaited<ReturnType<Reference['validate']>>;
+    await act(async () => {
+      result = await ref.current!.validate();
+    });
+    expect(result.valid).toBe(false);
+    expect(result.errors.size).toBe(1);
+    expect(result.firstError?.rowKey).toBe('3');
+    expect(result.firstError?.rowIndex).toBe(2);
+
+    // filtered to Tech → displayed: key 1, key 3 — error must be on key=3
+    const bobRow = container.querySelector('[data-row-key="3"]');
+    const charlieRow = container.querySelector('[data-row-key="1"]');
+    expect(bobRow?.querySelector('.ant-table-editable-cell-error')).not.toBeNull();
+    expect(charlieRow?.querySelector('.ant-table-editable-cell-error')).toBeNull();
+  });
+
+  it('editing an expanded tree child row writes to the child record', () => {
+    const onEditableChange = jest.fn();
+    const treeData = [
+      {
+        key: '1',
+        name: 'Parent1',
+        children: [
+          { key: '1-1', name: 'Child1' },
+          { key: '1-2', name: 'Child2' },
+        ],
+      },
+      { key: '2', name: 'Parent2' },
+    ];
+    const cols: ColumnsType = [
+      { title: 'Name', dataIndex: 'name', key: 'name', width: 150, editable: { type: 'input' } },
+    ];
+    const { container } = render(
+      <Table
+        dataSource={treeData}
+        columns={cols}
+        rowKey="key"
+        editable
+        onEditableChange={onEditableChange}
+        expandable={{ defaultExpandedRowKeys: ['1'] }}
+      />,
+    );
+
+    const childRow = container.querySelector('[data-row-key="1-1"]') as HTMLTableRowElement;
+    expect(childRow).not.toBeNull();
+    const input = childRow.querySelector('input') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'Child1Edited' } });
+    fireEvent.blur(input);
+
+    expect(onEditableChange).toHaveBeenCalledTimes(1);
+    const newData = onEditableChange.mock.calls[0][0];
+    // the child must be updated inside its parent's children array,
+    // not by overwriting the top-level rawData row at the flattened index
+    expect(newData[0].children[0].name).toBe('Child1Edited');
+    expect(newData[0].children[1].name).toBe('Child2');
+    expect(newData[0].name).toBe('Parent1');
+    expect(newData[1].name).toBe('Parent2');
+  });
+
+  it('editing a tree child row after sorting the parent rows writes to the child record', () => {
+    const onEditableChange = jest.fn();
+    const treeData = [
+      {
+        key: '1',
+        name: 'B-parent',
+        age: 20,
+        children: [{ key: '1-1', name: 'B-child', age: 5 }],
+      },
+      { key: '2', name: 'A-parent', age: 10 },
+    ];
+    const { container } = render(
+      <Table
+        dataSource={treeData}
+        columns={sortableCols}
+        rowKey="key"
+        editable
+        onEditableChange={onEditableChange}
+        showSorterTooltip={false}
+        expandable={{ defaultExpandedRowKeys: ['1'] }}
+      />,
+    );
+
+    // parents sorted asc by age → display: A-parent(2), B-parent(1), B-child(1-1)
+    const childRow = container.querySelector('[data-row-key="1-1"]') as HTMLTableRowElement;
+    expect(childRow).not.toBeNull();
+    const input = childRow.querySelector('input') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'BChildEdited' } });
+    fireEvent.blur(input);
+
+    expect(onEditableChange).toHaveBeenCalledTimes(1);
+    const newData = onEditableChange.mock.calls[0][0];
+    expect(newData[0].children[0].name).toBe('BChildEdited');
+    expect(newData[0].name).toBe('B-parent');
+    expect(newData[1].name).toBe('A-parent');
+  });
+
+  it('falls back to index-based update when records have no key field', () => {
+    const onEditableChange = jest.fn();
+    const noKeyData = [{ name: 'Alice' }, { name: 'Bob' }];
+    const cols: ColumnsType = [
+      { title: 'Name', dataIndex: 'name', key: 'name', width: 150, editable: { type: 'input' } },
+    ];
+    const { container } = render(
+      <Table dataSource={noKeyData} columns={cols} editable onEditableChange={onEditableChange} />,
+    );
+
+    const inputs = container.querySelectorAll('.ant-table-editable-cell input');
+    expect(inputs.length).toBe(2);
+    fireEvent.change(inputs[1], { target: { value: 'BobEdited' } });
+    fireEvent.blur(inputs[1]);
+
+    expect(onEditableChange).toHaveBeenCalledTimes(1);
+    const newData = onEditableChange.mock.calls[0][0];
+    expect(newData[0].name).toBe('Alice');
+    expect(newData[1].name).toBe('BobEdited');
+  });
+
+  it('falls back to index-based update when row keys are duplicated', () => {
+    const onEditableChange = jest.fn();
+    const dupData = [
+      { key: '1', name: 'Alice' },
+      { key: '1', name: 'Bob' },
+    ];
+    const cols: ColumnsType = [
+      { title: 'Name', dataIndex: 'name', key: 'name', width: 150, editable: { type: 'input' } },
+    ];
+    const { container } = render(
+      <Table
+        dataSource={dupData}
+        columns={cols}
+        rowKey="key"
+        editable
+        onEditableChange={onEditableChange}
+      />,
+    );
+
+    const inputs = container.querySelectorAll('.ant-table-editable-cell input');
+    expect(inputs.length).toBe(2);
+    fireEvent.change(inputs[1], { target: { value: 'BobEdited' } });
+    fireEvent.blur(inputs[1]);
+
+    expect(onEditableChange).toHaveBeenCalledTimes(1);
+    const newData = onEditableChange.mock.calls[0][0];
+    expect(newData[0].name).toBe('Alice');
+    expect(newData[1].name).toBe('BobEdited');
   });
 });
 
@@ -2177,5 +2546,165 @@ describe('Batch Edit — useBatchRules', () => {
       hookResult.updateRule(ruleId, { value: 'TestValue' });
     });
     expect(hookResult.rules[0].value).toBe('TestValue');
+  });
+});
+
+// ============================================================
+// 27. Editable — Column editable:false Overrides Global (Bug E2)
+// ============================================================
+describe('Editable — Column editable Overrides Global (Bug E2)', () => {
+  it('column editable:false renders plain text even when global editable is on', () => {
+    const cols: ColumnsType = [
+      { title: 'Name', dataIndex: 'name', key: 'name', width: 150 },
+      { title: 'Age', dataIndex: 'age', key: 'age', width: 100, editable: false },
+    ];
+    const { container } = render(
+      <Table dataSource={testData} columns={cols} rowKey="key" editable />,
+    );
+
+    // 只有 name 列（3 行）渲染编辑器；age 列显式关闭 → 纯文本
+    expect(container.querySelectorAll('.ant-table-editable-cell').length).toBe(3);
+    expect(container.textContent).toContain('30');
+    expect(container.textContent).toContain('25');
+  });
+
+  it('column config object without type still enables editing (aligned with parseEditableConfig)', () => {
+    const cols: ColumnsType = [
+      {
+        title: 'Name',
+        dataIndex: 'name',
+        key: 'name',
+        width: 150,
+        editable: { rules: [{ required: true, message: 'Name required' }] },
+      },
+    ];
+    const { container } = render(<Table dataSource={testData} columns={cols} rowKey="key" />);
+
+    // 列级配置对象 = 显式开启（hasEditableColumns 与 parseEditableConfig 语义一致）
+    expect(container.querySelectorAll('.ant-table-editable-cell').length).toBe(3);
+  });
+});
+
+// ============================================================
+// 28. Batch Edit — Rules Survive Parent Re-render (Bug E3)
+// ============================================================
+describe('Batch Edit — Rules Survive Parent Re-render (Bug E3)', () => {
+  it('keeps configured rules when columns reference changes while open', () => {
+    const useBatchRules = require('../features/editable/useBatchRules').default;
+    // 父组件每次渲染都构造新 columns 引用（内容相同）
+    const makeCols = (): ColumnsType => [
+      { title: 'Name', dataIndex: 'name', key: 'name', editable: { type: 'input' } },
+    ];
+
+    let hookResult: any;
+    function TestComp({ cols }: { cols: ColumnsType }) {
+      hookResult = useBatchRules(true, cols);
+      return null;
+    }
+
+    const { rerender } = render(<TestComp cols={makeCols()} />);
+    expect(hookResult.rules).toHaveLength(1);
+
+    // 用户配置规则：修改已有规则 + 新增一条
+    act(() => {
+      hookResult.updateRule(hookResult.rules[0].id, { value: 'HalfDone' });
+      hookResult.addRule();
+    });
+    expect(hookResult.rules).toHaveLength(2);
+
+    // 弹窗打开期间父组件重渲染（columns 新引用）
+    rerender(<TestComp cols={makeCols()} />);
+
+    // 已配置的规则必须保留（bug：被重置为 1 条空规则）
+    expect(hookResult.rules).toHaveLength(2);
+    expect(hookResult.rules[0].value).toBe('HalfDone');
+  });
+
+  it('re-initializes rules on reopen (open false → true)', () => {
+    const useBatchRules = require('../features/editable/useBatchRules').default;
+    const cols: ColumnsType = [
+      { title: 'Name', dataIndex: 'name', key: 'name', editable: { type: 'input' } },
+    ];
+
+    let hookResult: any;
+    function TestComp({ open }: { open: boolean }) {
+      hookResult = useBatchRules(open, cols);
+      return null;
+    }
+
+    const { rerender } = render(<TestComp open={true} />);
+    act(() => {
+      hookResult.addRule();
+    });
+    expect(hookResult.rules).toHaveLength(2);
+
+    // 关闭再打开 → 重新初始化为一条空规则
+    rerender(<TestComp open={false} />);
+    rerender(<TestComp open={true} />);
+    expect(hookResult.rules).toHaveLength(1);
+    expect(hookResult.rules[0].value).toBeUndefined();
+  });
+});
+
+// ============================================================
+// 29. Editable — validateAll Race (Bug E4)
+// ============================================================
+describe('Editable — validateAll Race (Bug E4)', () => {
+  it('validateAll does not clobber errors written by validateCell during async validation', async () => {
+    const useEditable = require('../features/editable/useEditable').default;
+
+    // name 列异步 validator — 制造 validateAll 的异步等待窗口
+    let resolveValidator: (msg?: string) => void = () => {};
+    const validatorGate = new Promise<string | undefined>((resolve) => {
+      resolveValidator = resolve;
+    });
+
+    const cols: ColumnsType = [
+      {
+        title: 'Name',
+        dataIndex: 'name',
+        key: 'name',
+        editable: { type: 'input', rules: [{ validator: () => validatorGate }] },
+      },
+      {
+        title: 'Age',
+        dataIndex: 'age',
+        key: 'age',
+        editable: { type: 'input', rules: [{ required: true, message: 'Age is required' }] },
+      },
+    ];
+    const data = [{ key: '1', name: 'Alice', age: 30 }];
+
+    const { result } = renderHook(() =>
+      useEditable({ columns: cols, data, getRowKey: (r: any) => r.key }),
+    );
+
+    let validatePromise!: Promise<any>;
+    await act(async () => {
+      validatePromise = result.current.validateAll();
+      // 让 validateAll 进入 name 列 validator 的 await 窗口
+      await Promise.resolve();
+    });
+
+    // validateAll 等待期间，用户编辑 age 单元格 → validateCell 写入最新错误
+    await act(async () => {
+      await result.current.validateCell('1', 'age', '', data[0], 0);
+    });
+    expect(result.current.errors.get('1-age')).toEqual(['Age is required']);
+
+    // validator resolve → validateAll 完成
+    let validateResult: any;
+    await act(async () => {
+      resolveValidator(undefined);
+      validateResult = await validatePromise;
+    });
+
+    // age 单元格的错误必须是用户编辑后的最新状态，未被 validateAll 快照覆盖；
+    // 未被触碰的 name 单元格应用 validateAll 的校验结果（无错误）
+    expect(result.current.errors.get('1-age')).toEqual(['Age is required']);
+    expect(result.current.errors.get('1-name')).toBeUndefined();
+    // validateAll 的返回值与合并后状态一致（不是校验时刻的旧快照）
+    expect(validateResult.errors.get('1-age')).toEqual(['Age is required']);
+    expect(validateResult.valid).toBe(false);
   });
 });

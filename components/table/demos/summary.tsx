@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table } from '@dtjoy/dt-design';
+import { Summary, Table } from '@dtjoy/dt-design';
 import type { ColumnsType } from '@dtjoy/dt-design';
 
 interface DataType {
@@ -43,20 +43,12 @@ export default () => (
       const totalSalary = data.reduce((sum: number, item: DataType) => sum + item.salary, 0);
       const totalBonus = data.reduce((sum: number, item: DataType) => sum + item.bonus, 0);
       return (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <tbody>
-            <tr style={{ fontWeight: 600, background: '#fafafa' }}>
-              <td style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0' }}>合计</td>
-              <td style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0' }} />
-              <td style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0' }}>
-                ¥{totalSalary.toLocaleString()}
-              </td>
-              <td style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0' }}>
-                ¥{totalBonus.toLocaleString()}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <Summary.Row>
+          <Summary.Cell index={0}>合计</Summary.Cell>
+          <Summary.Cell index={1} />
+          <Summary.Cell index={2}>¥{totalSalary.toLocaleString()}</Summary.Cell>
+          <Summary.Cell index={3}>¥{totalBonus.toLocaleString()}</Summary.Cell>
+        </Summary.Row>
       );
     }}
   />

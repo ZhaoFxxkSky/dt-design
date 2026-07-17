@@ -1,6 +1,6 @@
 import React from 'react';
-import { Table } from '../index';
-import type { ColumnsType } from '../index';
+import { Table } from '@dtjoy/dt-design';
+import type { ColumnsType } from '@dtjoy/dt-design';
 import { Button, Space, Typography } from 'antd';
 
 interface RecordType {
@@ -19,7 +19,8 @@ const dataSource: RecordType[] = [
 ];
 
 export default function Demo() {
-  const [resizeLog, setResizeLog] = React.useState<string[]>([]);
+  const [resizeLog, setResizeLog] = React.useState<{ id: number; text: string }[]>([]);
+  const logIdRef = React.useRef(0);
 
   const columns: ColumnsType<RecordType> = React.useMemo(
     () => [
@@ -47,7 +48,10 @@ export default function Demo() {
         resizable: true,
         minWidth: 100,
         onResize: (width: number) => {
-          setResizeLog((prev) => [`地址列宽度变化 → ${width}px`, ...prev.slice(0, 4)]);
+          logIdRef.current += 1;
+          setResizeLog((prev) =>
+            [{ id: logIdRef.current, text: `地址列宽度变化 → ${width}px` }, ...prev.slice(0, 4)],
+          );
         },
       },
     ],
@@ -70,8 +74,12 @@ export default function Demo() {
         rowKey="key"
         resizable
         onColumnResize={(key, width) => {
+          logIdRef.current += 1;
           setResizeLog((prev) => [
-            `[onColumnResize] key=${String(key)}, width=${width}px`,
+            {
+              id: logIdRef.current,
+              text: `[onColumnResize] key=${String(key)}, width=${width}px`,
+            },
             ...prev.slice(0, 4),
           ]);
         }}
@@ -80,9 +88,9 @@ export default function Demo() {
       {resizeLog.length > 0 && (
         <Space direction="vertical" style={{ marginTop: 16 }}>
           <Typography.Text strong>回调日志：</Typography.Text>
-          {resizeLog.map((log, i) => (
-            <Typography.Text key={i} type="secondary" code>
-              {log}
+          {resizeLog.map((log) => (
+            <Typography.Text key={log.id} type="secondary" code>
+              {log.text}
             </Typography.Text>
           ))}
           <Button size="small" onClick={() => setResizeLog([])}>
