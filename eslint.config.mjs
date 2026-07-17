@@ -18,6 +18,8 @@ export default antfu(
       '**/*.snap',
       '**/*.md',
       '.dumi/scripts/clarity.js',
+      '.github/**/*.yml',
+      '.github/**/*.yaml',
     ],
     settings: {
       polyfills: ['Promise', 'URL'],
@@ -28,28 +30,28 @@ export default antfu(
     react: true,
     rules: {
       'react/jsx-key-before-spread': 'off',
-      'node/prefer-global/process': 'off', // TODO: remove this
-      'node/prefer-global/buffer': 'off', // TODO: remove this
+      'node/prefer-global/process': 'off',
+      'node/prefer-global/buffer': 'off',
       'jsdoc/empty-tags': 'off',
       'ts/no-require-imports': 'off',
       'ts/explicit-function-return-type': 'off',
-      'ts/ban-ts-comment': 'off', // TODO: remove this
+      'ts/ban-ts-comment': 'off',
       'ts/consistent-type-definitions': 'off',
       'ts/no-non-null-asserted-optional-chain': 'off',
       'unicorn/prefer-node-protocol': 'off',
-      'unicorn/prefer-string-starts-ends-with': 'off', // TODO: remove this
+      'unicorn/prefer-string-starts-ends-with': 'off',
       'regexp/no-unused-capturing-group': 'off',
       'regexp/no-misleading-capturing-group': 'off',
-      'regexp/no-super-linear-backtracking': 'off', // TODO: remove this
+      'regexp/no-super-linear-backtracking': 'off',
       'regexp/optimal-quantifier-concatenation': 'off',
       'react-hooks/exhaustive-deps': 'off',
-      'react-refresh/only-export-components': 'off', // TODO: remove this
+      'react-refresh/only-export-components': 'off',
       'react/no-clone-element': 'off',
       'react/no-children-for-each': 'off',
       'react/no-children-map': 'off',
       'react/no-children-only': 'off',
       'react/no-unstable-default-props': 'off',
-      'react/no-create-ref': 'off', // TODO: remove this
+      'react/no-create-ref': 'off',
       'react/no-implicit-key': 'off', // requires type-aware parserOptions not currently configured
       'perfectionist/sort-imports': 'off',
       'regexp/strict': 'off',
@@ -77,7 +79,7 @@ export default antfu(
       'jsx-a11y/no-static-element-interactions': 'off',
       'jsx-a11y/click-events-have-key-events': 'off',
       'jsx-a11y/no-autofocus': 'off',
-      'jsx-a11y/anchor-is-valid': 'off', // TODO: remove this
+      'jsx-a11y/anchor-is-valid': 'off',
     },
   },
   {
@@ -107,7 +109,7 @@ export default antfu(
   },
   {
     // demos
-    files: ['components/*/demo/*.tsx'],
+    files: ['components/*/demos/*.tsx'],
     rules: {
       'react/no-create-ref': 'off',
       'no-console': 'off',
@@ -123,8 +125,8 @@ export default antfu(
     // dumi site
     files: ['.dumi/**/*'],
     rules: {
-      'react-refresh/only-export-components': 'off', // TODO: remove this
-      'react-dom/no-dangerously-set-innerhtml': 'off', // TODO: remove this
+      'react-refresh/only-export-components': 'off',
+      'react-dom/no-dangerously-set-innerhtml': 'off',
       'react/no-array-index-key': 'off',
       'react-dom/no-missing-iframe-sandbox': 'off',
       'no-restricted-globals': 'off',

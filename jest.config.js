@@ -10,12 +10,6 @@ module.exports = {
   },
   moduleNameMapper: {
     '\\.(css|scss|less)$': '<rootDir>/tests/styleMock.js',
-    // make tests access in handsontable@6.22.0
     '@babel/polyfill/lib/noConflict': '<rootDir>/tests/styleMock.js',
-    '^lodash-es$': 'lodash',
-    'react-markdown': '<rootDir>/node_modules/react-markdown/react-markdown.min.js',
-    '@dtinsight/react-icons': '<rootDir>/tests/iconMock.js',
-    '^antd/es/(.*)$': 'antd/lib/$1',
-    '^rc-util/es/(.*)$': 'rc-util/lib/$1',
   },
 };

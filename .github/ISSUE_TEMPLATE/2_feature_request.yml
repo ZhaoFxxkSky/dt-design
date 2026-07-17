@@ -1,0 +1,67 @@
+name: 💡 Feature Request
+Description: 提交一个新功能建议
+title: '[Feature]: '
+labels: ['feature']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        欢迎提出新功能建议！请尽可能详细地描述你的需求和使用场景。
+
+        Welcome to propose new features! Please describe your needs and use cases in as much detail as possible.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: 功能类型 / Feature type
+      options:
+        - 新组件 / New component
+        - 现有组件增强 / Enhancement to existing component
+        - 文档改进 / Documentation improvement
+        - 测试补充 / Test coverage
+        - 其他 / Other
+    validations:
+      required: true
+
+  - type: input
+    id: component
+    attributes:
+      label: 相关组件 / Related component
+      placeholder: 例如：Table / Splitter
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 问题场景 / What problem does this solve?
+      description: 描述你遇到的痛点或需要解决的问题
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 期望方案 / Proposed solution
+      description: 描述你期望的 API、行为或交互方式
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternative
+    attributes:
+      label: 替代方案 / Alternatives considered
+      description: 是否考虑过其他实现方式？
+
+  - type: textarea
+    id: reference
+    attributes:
+      label: 参考 / Reference
+      description: 可附上 antd 或其他组件库的参考链接、设计稿等
+
+  - type: dropdown
+    id: willing
+    attributes:
+      label: 是否愿意提交 PR？ / Willing to submit PR?
+      options:
+        - 愿意 / Yes
+        - 不愿意 / No
+      default: 1
