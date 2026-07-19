@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { ColumnGroupType, ColumnsType, ColumnType } from '../../interface';
+import type { ColumnGroupType, ColumnsType, ColumnType, Direction } from '../../interface';
 import ResizeHandle from './ResizeHandle';
 
 export interface TransformResizableOptions {
@@ -8,13 +8,16 @@ export interface TransformResizableOptions {
   isColumnResizable: (col: ColumnType) => boolean;
   onStartResize: (e: React.MouseEvent, col: ColumnType, actualWidth?: number) => void;
   onKeyboardResize: (col: ColumnType, newWidth: number) => void;
+  /** RTL 下手柄在列左缘，键盘方向键语义镜像 */
+  direction?: Direction;
 }
 
 function transformResizableColumns<RecordType = any>(
   columns: ColumnsType<RecordType>,
   options: TransformResizableOptions,
 ): ColumnsType<RecordType> {
-  const { prefixCls, enabled, isColumnResizable, onStartResize, onKeyboardResize } = options;
+  const { prefixCls, enabled, isColumnResizable, onStartResize, onKeyboardResize, direction } =
+    options;
 
   if (!enabled) return columns;
 
@@ -40,6 +43,7 @@ function transformResizableColumns<RecordType = any>(
             prefixCls={prefixCls}
             onStartResize={onStartResize}
             onKeyboardResize={onKeyboardResize}
+            direction={direction}
           />
         </>
       );

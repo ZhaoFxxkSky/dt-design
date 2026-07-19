@@ -57,6 +57,8 @@ demo:
 
 <code src="./demos/sticky.tsx" description="通过 `sticky` 属性让表头在页面滚动时粘性吸顶。">粘性表头</code>
 
+<code src="./demos/rtl.tsx" description="通过 `direction` 或 ConfigProvider 切换 RTL（从右到左）布局，固定列、选择列、列宽拖拽均支持方向镜像。">RTL 从右到左</code>
+
 ## 展开与树形
 
 <code src="./demos/expand-row.tsx" description="通过 `expandable.expandedRowRender` 实现行展开功能。">行展开</code>
@@ -120,6 +122,7 @@ demo:
 | bordered | 是否展示外边框和列边框 | `boolean` | `false` |
 | size | 表格大小 | `large \| middle \| small` | `large` |
 | showHeader | 是否显示表头 | `boolean` | `true` |
+| direction | 表格文本方向，默认跟随 `ConfigProvider` 的 `direction` 配置 | `ltr \| rtl` | `ltr` |
 | title | 表格标题 | `(data) => ReactNode` | - |
 | footer | 表格页脚 | `(data) => ReactNode` | - |
 | summary | 表格总结栏 | `(data) => ReactNode` | - |
