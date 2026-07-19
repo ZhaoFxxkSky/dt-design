@@ -48,7 +48,7 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({
       const actualWidth = th ? th.offsetWidth : undefined;
       onStartResize(e, column, actualWidth);
     },
-    [column, onStartResize],
+    [column, onStartResize, inMeasureRow],
   );
 
   const handleKeyDown = React.useCallback(
@@ -85,7 +85,7 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({
           break;
       }
     },
-    [column, onKeyboardResize, isRtl],
+    [column, onKeyboardResize, isRtl, inMeasureRow],
   );
 
   // aria 属性需要数值类型

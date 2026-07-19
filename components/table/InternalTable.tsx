@@ -995,7 +995,7 @@ direction,
   const wrappercls = clsx(
     `${prefixCls}-wrapper`,
     {
-      [`${prefixCls}-wrapper-rtl`]: false,
+      [`${prefixCls}-wrapper-rtl`]: direction === 'rtl',
       [`${prefixCls}-middle`]: customizeSize === 'middle',
       [`${prefixCls}-small`]: customizeSize === 'small',
       [`${prefixCls}-wrapper-resizing`]: resizeResult.resizingKey != null,
