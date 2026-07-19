@@ -72,7 +72,7 @@ export default function useWidthColumns(
         missWidthCount * VIRTUAL_MISSING_WIDTH_COLUMN_MIN,
       );
       let restCount = missWidthCount;
-      const avgWidth = restWidth / missWidthCount;
+      const avgWidth = missWidthCount > 0 ? restWidth / missWidthCount : 0;
 
       let realTotal = 0;
 
