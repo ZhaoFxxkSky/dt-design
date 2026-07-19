@@ -200,6 +200,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     showSorterTooltip = { target: 'full-header' },
     virtual,
     resizable = false,
+    direction: customizeDirection,
     onColumnResize: onColumnResizeProp,
     editable: editableEnabled = false,
     onEditableChange,
@@ -274,6 +275,12 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     [ariaProps, components?.header?.table],
   );
   const prefixCls = globalConfig().getPrefixCls('table', customizePrefixCls);
+
+  // RTL 方向：显式 direction prop > ConfigProvider.direction > 默认 ltr，
+  // 贯通到 RcTable 与列宽拖拽
+  const { direction: contextDirection } = React.useContext(ConfigContext);
+  const direction: 'ltr' | 'rtl' =
+    customizeDirection ?? (contextDirection === 'rtl' ? 'rtl' : 'ltr');
 
   // ============================= Refs =============================
   const rootRef = React.useRef<HTMLDivElement>(null);
@@ -363,6 +370,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     onColumnResize: onColumnResizeProp,
     prefixCls,
     extraFixedWidth: internalColumnsWidth,
+    direction,
   });
 
   const mergedComponents = React.useMemo<RcTableProps<RecordType>['components']>(() => {
@@ -376,12 +384,11 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     };
   }, [components, hasAriaProps]);
 
-  // Use antd@4 ConfigContext for locale and renderEmpty
   const {
     locale: contextLocale,
     renderEmpty,
     getPopupContainer: getContextPopupContainer,
-  } = React.useContext(ConfigContext) as any;
+  } = React.useContext(ConfigContext);
 
   const tableLocale: TableLocale = {
     filterTitle: 'Filter',
@@ -902,6 +909,7 @@ enabled: hasResizableColumns,
 isColumnResizable: resizeResult.isColumnResizable,
 onStartResize: resizeResult.onStartResize,
 onKeyboardResize: resizeResult.setColumnWidth,
+direction,
 });
       }
       return result;
@@ -915,6 +923,7 @@ onKeyboardResize: resizeResult.setColumnWidth,
       prefixCls,
       resizeResult.isColumnResizable,
       resizeResult.onStartResize,
+      direction,
     ],
   );
 
@@ -986,7 +995,7 @@ onKeyboardResize: resizeResult.setColumnWidth,
   const wrappercls = clsx(
     `${prefixCls}-wrapper`,
     {
-      [`${prefixCls}-wrapper-rtl`]: false,
+      [`${prefixCls}-wrapper-rtl`]: direction === 'rtl',
       [`${prefixCls}-middle`]: customizeSize === 'middle',
       [`${prefixCls}-small`]: customizeSize === 'small',
       [`${prefixCls}-wrapper-resizing`]: resizeResult.resizingKey != null,
@@ -1060,7 +1069,7 @@ onKeyboardResize: resizeResult.setColumnWidth,
               onAutoColumnMeasure={handleAutoColumnMeasure}
               ref={tblRef}
               columns={finalColumns as RcTableProps<RecordType>['columns']}
-              direction={'ltr'}
+              direction={direction}
               expandable={mergedExpandable}
               prefixCls={prefixCls}
               className={clsx({

@@ -1213,3 +1213,63 @@ describe('Resize — Measure Row Handle Focus', () => {
     });
   });
 });
+
+// ============================================================
+// Resize — RTL
+// ============================================================
+describe('Resize — RTL', () => {
+  beforeEach(() => {
+    mockElementWidths(200, 1000);
+  });
+  afterEach(() => {
+    restoreElementWidths();
+  });
+
+  it('mirrors drag delta in RTL (dragging left widens the column)', () => {
+    const onColumnResize = jest.fn();
+    const { container } = render(
+      <Table
+        dataSource={data}
+        columns={baseColumns}
+        rowKey="key"
+        resizable
+        direction="rtl"
+        onColumnResize={onColumnResize}
+      />,
+    );
+
+    // RTL 下手柄在列左缘：向左拖 50px（delta=-50）应变宽 → 200 + 50 = 250
+    simulateDrag(container, -50, 0);
+    expect(onColumnResize).toHaveBeenCalledWith('name', 250);
+  });
+
+  it('mirrors keyboard arrows in RTL (ArrowLeft widens)', () => {
+    const onColumnResize = jest.fn();
+    const { container } = render(
+      <Table
+        dataSource={data}
+        columns={baseColumns}
+        rowKey="key"
+        resizable
+        direction="rtl"
+        onColumnResize={onColumnResize}
+      />,
+    );
+
+    const handle = container.querySelector('.ant-table-resize-handle') as HTMLElement;
+    // RTL：ArrowLeft 变宽（offsetWidth mock 200 → 210）
+    fireEvent.keyDown(handle, { key: 'ArrowLeft' });
+    expect(onColumnResize).toHaveBeenCalledWith('name', 210);
+
+    // RTL：ArrowRight 变窄（200 → 190）
+    fireEvent.keyDown(handle, { key: 'ArrowRight' });
+    expect(onColumnResize).toHaveBeenCalledWith('name', 190);
+  });
+
+  it('honors direction prop over default ltr and renders rtl class', () => {
+    const { container } = render(
+      <Table dataSource={data} columns={baseColumns} rowKey="key" direction="rtl" resizable />,
+    );
+    expect(container.querySelector('.ant-table-rtl')).toBeInTheDocument();
+  });
+});

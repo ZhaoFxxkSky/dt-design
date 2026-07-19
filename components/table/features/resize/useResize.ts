@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { ColumnsType, ColumnType, Key } from '../../interface';
+import type { ColumnsType, ColumnType, Direction, Key } from '../../interface';
 
 export interface UseResizeOptions {
   columns: ColumnsType;
@@ -19,6 +19,8 @@ export interface UseResizeOptions {
    * 计入总宽可避免 scrollX 覆盖 scroll.x 后内容比预期宽出内部列宽。
    */
   extraFixedWidth?: number;
+  /** 文本方向：RTL 下手柄在列左缘，拖拽 delta 取反 */
+  direction?: Direction;
 }
 
 /**
@@ -67,6 +69,7 @@ function useResize({
   onColumnResize,
   prefixCls,
   extraFixedWidth = 0,
+  direction = 'ltr',
 }: UseResizeOptions) {
   // 扁平化列（仅叶子列可以 resize）
   const flattenColumns = React.useMemo(() => {
@@ -456,8 +459,10 @@ function useResize({
           if (!dragRef.current) return;
           dragRef.current.rafId = null;
 
-          // 使用最新存储的 clientX 计算，而非闭包中的 ev
-          const delta = dragRef.current.latestClientX - dragRef.current.startX;
+          // 使用最新存储的 clientX 计算，而非闭包中的 ev。
+          // RTL 下手柄在列左缘：向左拖（delta 为负）变宽，delta 取反
+          const rawDelta = dragRef.current.latestClientX - dragRef.current.startX;
+          const delta = direction === 'rtl' ? -rawDelta : rawDelta;
           let newWidth = dragRef.current.startWidth + delta;
           newWidth = Math.max(newWidth, dragRef.current.minWidth);
           if (dragRef.current.maxWidth != null) {
@@ -538,7 +543,7 @@ function useResize({
         document.removeEventListener('mouseup', onUp);
       };
     },
-    [getResizeConfig, updateLinePosition, hideLine],
+    [getResizeConfig, updateLinePosition, hideLine, direction],
   );
 
   // 获取列的渲染宽度（= 用户宽度 + 剩余空间分配）

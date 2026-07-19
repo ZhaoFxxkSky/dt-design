@@ -1,6 +1,6 @@
 import * as React from 'react';
 import TableMeasureRowContext from '../../TableMeasureRowContext';
-import type { ColumnType } from '../../interface';
+import type { ColumnType, Direction } from '../../interface';
 
 export interface ResizeHandleProps {
   /** 列对象 */
@@ -11,6 +11,8 @@ export interface ResizeHandleProps {
   onKeyboardResize: (col: ColumnType, newWidth: number) => void;
   /** prefixCls */
   prefixCls: string;
+  /** RTL 下手柄在列左缘，键盘方向键语义镜像 */
+  direction?: Direction;
 }
 
 /** 键盘步进(px) */
@@ -29,8 +31,11 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({
   onStartResize,
   onKeyboardResize,
   prefixCls,
+  direction,
 }) => {
   const inMeasureRow = React.useContext(TableMeasureRowContext);
+  // RTL 下手柄在列左缘，左右方向键语义镜像
+  const isRtl = direction === 'rtl';
 
   const handleMouseDown = React.useCallback(
     (e: React.MouseEvent) => {
@@ -43,7 +48,7 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({
       const actualWidth = th ? th.offsetWidth : undefined;
       onStartResize(e, column, actualWidth);
     },
-    [column, onStartResize],
+    [column, onStartResize, inMeasureRow],
   );
 
   const handleKeyDown = React.useCallback(
@@ -57,12 +62,16 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({
       const minWidth = column.minWidth ?? 60;
       const maxWidth = column.maxWidth;
 
+      // LTR：ArrowLeft 变窄 / ArrowRight 变宽；RTL 手柄在左缘，语义镜像
+      const shrinkKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
+      const growKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
+
       switch (e.key) {
-        case 'ArrowLeft':
+        case shrinkKey:
           e.preventDefault();
           onKeyboardResize(column, currentWidth - KEYBOARD_STEP);
           break;
-        case 'ArrowRight':
+        case growKey:
           e.preventDefault();
           onKeyboardResize(column, currentWidth + KEYBOARD_STEP);
           break;
@@ -76,7 +85,7 @@ const ResizeHandle: React.FC<ResizeHandleProps> = ({
           break;
       }
     },
-    [column, onKeyboardResize],
+    [column, onKeyboardResize, isRtl, inMeasureRow],
   );
 
   // aria 属性需要数值类型

@@ -61,6 +61,30 @@
   }
 }
 
+// RTL：手柄镜像到列左缘
+.@{table-prefix-cls}-rtl {
+  .@{table-prefix-cls}-resize-handle {
+    right: auto;
+    left: -5px;
+
+    &::after {
+      right: auto;
+      left: 4px;
+    }
+  }
+
+  // RTL 下 DOM 最后一列是视觉最左列，手柄限制在单元格内
+  .@{table-prefix-cls}-thead > tr > th:last-child .@{table-prefix-cls}-resize-handle {
+    right: auto;
+    left: 0;
+
+    &:hover::after {
+      right: auto;
+      left: 0;
+    }
+  }
+}
+
 // 拖拽进行中时，通过 wrapper 级联隐藏所有 hover 高亮
 .@{table-prefix-cls}-wrapper-resizing {
   .@{table-prefix-cls}-resize-handle::after,
