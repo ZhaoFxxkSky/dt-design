@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { INTERNAL_HOOKS } from './constant';
+import { INTERNAL_COLUMN_DEFAULT_WIDTH, INTERNAL_HOOKS } from './constant';
 import { convertChildrenToColumns } from './features/columns/useColumns';
 import type {
   ColumnsType,
@@ -280,12 +280,89 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   const tblRef = React.useRef<RcReference>(null);
 
   // ========================= Column Resize (hook needs rootRef) =========================
+  // 内部功能列（rowSelection / expand）无 key，不参与 resize 宽度分配，
+  // 但占据固定宽度——计入 resize 总宽，避免 scrollX 覆盖 scroll.x 后内容比容器宽。
+  // 宽度取值优先级：显式 columnWidth（数字 / 数字字符串 / 相对 scroll.x 的百分比）
+  // > RcTable 实测上报（CSS 覆盖也能跟随）> 默认 32/48
+  const [measuredInternalWidths, setMeasuredInternalWidths] = React.useState<
+    Record<string, number>
+  >({});
+  const handleAutoColumnMeasure = React.useCallback((columnType: string, width: number) => {
+    setMeasuredInternalWidths((prev) =>
+      prev[columnType] === width ? prev : { ...prev, [columnType]: width },
+    );
+  }, []);
+
+  const internalColumnsWidth = React.useMemo(() => {
+    const resolveWidth = (
+      raw: number | string | undefined,
+      measured: number | undefined,
+      fallback: number,
+    ): number => {
+      if (typeof raw === 'number' && raw > 0) {
+        return raw;
+      }
+      if (typeof raw === 'string') {
+        // 百分比：相对用户显式设置的 scroll.x 解析（与 useWidthColumns 的 parseColWidth 一致）
+        if (raw.endsWith('%') && typeof scroll?.x === 'number') {
+          const pct = Number.parseFloat(raw);
+          if (!Number.isNaN(pct)) {
+            return (scroll.x * pct) / 100;
+          }
+        }
+        const num = Number(raw);
+        if (!Number.isNaN(num) && num > 0) {
+          return num;
+        }
+      }
+      return measured ?? fallback;
+    };
+
+    let width = 0;
+    if (customizeRowSelection) {
+      width += resolveWidth(
+        (customizeRowSelection as TableRowSelection<RecordType>).columnWidth,
+        measuredInternalWidths.SELECTION_COLUMN,
+        INTERNAL_COLUMN_DEFAULT_WIDTH.SELECTION_COLUMN,
+      );
+    }
+    if (expandable?.expandedRowRender || expandedRowRender) {
+      width += resolveWidth(
+        expandable?.columnWidth,
+        measuredInternalWidths.EXPAND_COLUMN,
+        INTERNAL_COLUMN_DEFAULT_WIDTH.EXPAND_COLUMN,
+      );
+    }
+    return width;
+  }, [customizeRowSelection, expandable, expandedRowRender, measuredInternalWidths, scroll?.x]);
+
+  // 叶子列总数（含内部功能列），写入 wrapper 的 --columns-count CSS 变量：
+  // resize 竖线的 z-index 需要压过按列数计算的固定列/阴影层级（见 fixed.less）
+  const totalColumnCount = React.useMemo(() => {
+    let count = 0;
+    const walk = (cols: ColumnsType<RecordType>) => {
+      cols.forEach((col) => {
+        const subColumns = (col as { children?: ColumnsType<RecordType> }).children;
+        if (Array.isArray(subColumns) && subColumns.length > 0) {
+          walk(subColumns);
+        } else {
+          count += 1;
+        }
+      });
+    };
+    walk(mergedColumns);
+    if (customizeRowSelection) count += 1;
+    if (expandable?.expandedRowRender || expandedRowRender) count += 1;
+    return count;
+  }, [mergedColumns, customizeRowSelection, expandable, expandedRowRender]);
+
   const resizeResult = useResize({
     columns: mergedColumns as ColumnsType,
     enabled: resizable,
     containerRef: rootRef,
     onColumnResize: onColumnResizeProp,
     prefixCls,
+    extraFixedWidth: internalColumnsWidth,
   });
 
   const mergedComponents = React.useMemo<RcTableProps<RecordType>['components']>(() => {
@@ -963,7 +1040,11 @@ onKeyboardResize: resizeResult.setColumnWidth,
   // 竖线 DOM 通过 ref 直接操作，不需要 React state 驱动
 
   return (
-    <div ref={rootRef} className={wrappercls} style={style}>
+    <div
+      ref={rootRef}
+      className={wrappercls}
+      style={{ ...style, ['--columns-count' as any]: totalColumnCount }}
+    >
       {hasResizableColumns && (
         <div ref={resizeResult.lineRef} className={`${prefixCls}-resize-line`} />
       )}
@@ -976,6 +1057,7 @@ onKeyboardResize: resizeResult.setColumnWidth,
               {...tableProps}
               components={mergedComponents}
               scroll={mergedScroll}
+              onAutoColumnMeasure={handleAutoColumnMeasure}
               ref={tblRef}
               columns={finalColumns as RcTableProps<RecordType>['columns']}
               direction={'ltr'}

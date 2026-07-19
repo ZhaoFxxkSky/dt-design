@@ -12,15 +12,17 @@ import type { ColumnsType, ColumnType, Direction, TableLayout } from '../../inte
 function useColumnWidth(colWidths: readonly number[], columCount: number) {
   return useMemo(() => {
     const cloneColumns: number[] = [];
+    let hasValue = false;
     for (let i = 0; i < columCount; i += 1) {
       const val = colWidths[i];
+      cloneColumns[i] = val;
       if (val !== undefined) {
-        cloneColumns[i] = val;
-      } else {
-        return null;
+        hasValue = true;
       }
     }
-    return cloneColumns;
+    // 逐列容忍 undefined（虚拟模式 auto 内部列不写内联宽度，由 CSS 类驱动）；
+    // 仅当全部列都未提供宽度时回退原始 colGroup
+    return hasValue ? cloneColumns : null;
   }, [colWidths.join('_'), columCount]);
 }
 

@@ -8,7 +8,7 @@ demo:
 
 # Table 表格
 
-企业级表格组件，完全对齐 antd v5 Table API，支持 React 17 + LESS。
+企业级表格组件，提供大数据量虚拟滚动、固定列与粘性表头、列宽拖拽、可编辑单元格、批量编辑等能力。
 
 ## 何时使用
 
@@ -87,9 +87,14 @@ demo:
 
 <code src="./demos/comprehensive.tsx" description="固定列 + 固定表头 + 行展开 + 合计行 + 排序 的综合示例。">综合示例</code>
 
-## 列宽拖拽
+## 列宽
 
-<code src="./demos/resize.tsx" description="通过 `resizable` 属性和 `column.resize` 配置实现表头拖拽改变列宽。鼠标悬停到列右边框高亮，拖拽时显示竖线指示器，松开后改变宽度。">拖拽调整列宽</code>
+设置 `column.width` 控制列宽。列宽分配遵循一个原则：**`width` 是下限，不会变窄，只会变宽**——容器有富余空间时，优先分配给未设置 `width` 的列；若所有列都设置了 `width`，则按比例放大撑满容器。
+
+- 未设置 `width` 的列是弹性列：富余时优先变宽，容器不足时优先收缩（最小收缩到 `minWidth`，默认 `60`），仍超出容器时出现横向滚动条。
+- 选择列 / 展开列默认宽 `32px` / `48px`，可通过 `rowSelection.columnWidth` / `expandable.columnWidth` 或 Less 变量 `@table-selection-column-width` / `@table-expand-column-width` 调整，虚拟滚动下自动跟随。
+
+<code src="./demos/resize.tsx" description="通过 `resizable` 属性和列上的 `minWidth` / `maxWidth` 配置实现表头拖拽改变列宽。鼠标悬停到列右边框高亮，拖拽时显示竖线指示器，松开后改变宽度；拖拽过的列会冻结在拖拽后的宽度。">拖拽调整列宽</code>
 
 ## 可编辑单元格
 
@@ -167,9 +172,8 @@ demo:
 | style | 列的样式 | `CSSProperties` | - |
 | onCell | 设置单元格属性 | `(record, index) => HTMLAttributes` | - |
 | onHeaderCell | 设置头部单元格属性 | `(column) => HTMLAttributes` | - |
-| resize | 列宽拖拽配置 | `{ resizable?: boolean; minWidth?: number; maxWidth?: number }` | - |
 | resizable | 是否可拖拽调整列宽，覆盖 Table.resizable | `boolean` | - |
-| minWidth | 最小列宽（拖拽限制） | `number` | `60` |
+| minWidth | 最小列宽（拖拽与弹性收缩的下限） | `number` | `60` |
 | maxWidth | 最大列宽（拖拽限制） | `number` | - |
 | onResize | 列宽变化回调 | `(width: number) => void` | - |
 | editable | 可编辑配置，可为 `boolean` 或详细配置对象 | `boolean \| EditableConfig` | - |

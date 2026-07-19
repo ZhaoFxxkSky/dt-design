@@ -5,6 +5,8 @@ import * as React from 'react';
 import TableContext, { responseImmutable } from '../../shared/context/TableContext';
 import useFlattenRecords from '../../features/virtual/useFlattenRecords';
 import type { FlattenData } from '../../features/virtual/useFlattenRecords';
+import { getAutoColumnHintWidth, isAutoWidthColumn } from '../../shared/utils/legacyUtil';
+import { getColumnsKey } from '../../shared/utils/valueUtil';
 import type {
   ColumnType,
   OnCustomizeScroll,
@@ -43,6 +45,7 @@ const Grid = React.forwardRef<GridRef, GridProps>((props, ref) => {
     childrenColumnName,
     scrollX,
     direction,
+    colWidths,
   } = useContext(TableContext, [
     'flattenColumns',
     'onColumnResize',
@@ -52,6 +55,7 @@ const Grid = React.forwardRef<GridRef, GridProps>((props, ref) => {
     'childrenColumnName',
     'scrollX',
     'direction',
+    'colWidths',
   ]);
 
   const {
@@ -70,13 +74,22 @@ const Grid = React.forwardRef<GridRef, GridProps>((props, ref) => {
 
   // ========================== Column ==========================
   const columnsWidth = React.useMemo<[key: React.Key, width: number, total: number][]>(() => {
+    const columnsKey = getColumnsKey(flattenColumns);
     let total = 0;
-    return flattenColumns.map(({ width, minWidth, key }) => {
-      const finalWidth = Math.max((width as number) || 0, (minWidth as number) || 0);
+    return flattenColumns.map((column, index) => {
+      const { width, minWidth } = column;
+      // auto 内部列（rowSelection / expand 未显式设宽）：取测量管线回写的真实
+      // CSS 宽度，未测量到时回退首帧提示值。
+      // 普通列：与表头同源于 useWidthColumns 填充后的 width（resize 渲染宽）。
+      // 不能用 max(width, minWidth)：resize 收缩后的渲染宽可能小于 minWidth，
+      // max 兜底会让 body 单元格比表头 col 宽，导致表头/body 列错位。
+      const finalWidth = isAutoWidthColumn(column)
+        ? colWidths[index] || getAutoColumnHintWidth(column)
+        : (width as number) || (minWidth as number) || 0;
       total += finalWidth;
-      return [key as React.Key, finalWidth, total];
+      return [columnsKey[index], finalWidth, total];
     });
-  }, [flattenColumns]);
+  }, [flattenColumns, colWidths]);
 
   const columnsOffset = React.useMemo<number[]>(
     () => columnsWidth.map((colWidth) => colWidth[2]),

@@ -55,6 +55,7 @@ import { useTimeoutLock } from '../features/virtual/useFrame';
 import useHover from '../features/hover/useHover';
 import useSticky from '../features/sticky/useSticky';
 import useStickyOffsets from '../features/fixed/useStickyOffsets';
+import useAutoColumnMeasure from '../features/virtual/useAutoColumnMeasure';
 import type {
   ColumnsType,
   ColumnType,
@@ -77,6 +78,7 @@ import Panel from './Panel';
 import StickyScrollBar from '../features/sticky/stickyScrollBar';
 
 import { getColumnsKey, validateValue, validNumberValue } from '../shared/utils/valueUtil';
+import { getAutoColumnHintWidth, getInternalColumnType, INTERNAL_COL_DEFINE, isAutoWidthColumn } from '../shared/utils/legacyUtil';
 
 export type CompareProps<T extends React.ComponentType<any>> = (
   prevProps: Readonly<React.ComponentProps<T>>,
@@ -191,6 +193,17 @@ export interface TableProps<RecordType = any>
    * !!! DO NOT USE IN PRODUCTION ENVIRONMENT !!!
    */
   measureRowRender?: (measureRow: React.ReactNode) => React.ReactNode;
+
+  /**
+   * @private Internal usage, may remove by refactor.
+   *
+   * !!! DO NOT USE IN PRODUCTION ENVIRONMENT !!!
+   *
+   * auto 内部列（rowSelection / expand 未显式设宽）实测宽度上报。
+   * 虚拟模式来自 useAutoColumnMeasure，非虚拟模式来自 MeasureRow，
+   * 统一在 colsWidths 更新后上报，供 InternalTable 的 resize 总宽账目使用。
+   */
+  onAutoColumnMeasure?: (columnType: string, width: number) => void;
 }
 
 function defaultEmpty() {
@@ -247,6 +260,7 @@ const Table = <RecordType extends DefaultRecordType>(
     internalRefs,
     tailor,
     getContainerWidth,
+    onAutoColumnMeasure,
 
     sticky,
     rowHoverable = true,
@@ -320,6 +334,9 @@ const Table = <RecordType extends DefaultRecordType>(
   // ====================== Column ======================
   const scrollX = scroll?.x;
   const [componentWidth, setComponentWidth] = React.useState(0);
+  // 列实测宽度（测量行 / 虚拟测量管线回写）。需先于 useColumns 声明：
+  // 虚拟模式下 auto 内部列的实测宽度会回传给 useWidthColumns 参与弹性分配。
+  const [colsWidths, updateColsWidths] = React.useState(() => new Map<React.Key, number>());
 
   const [columns, flattenColumns, flattenScrollX] = useColumns(
     {
@@ -336,6 +353,7 @@ const Table = <RecordType extends DefaultRecordType>(
       direction,
       scrollWidth: useInternalHooks && tailor && typeof scrollX === 'number' ? scrollX : undefined,
       clientWidth: componentWidth,
+      measuredWidths: colsWidths,
     },
     // `useColumns` guards the call with `if (transformColumns)`, so `null`
     // ("no transform") is a valid runtime value here.
@@ -396,14 +414,46 @@ const Table = <RecordType extends DefaultRecordType>(
   const scrollSummaryRef = React.useRef<HTMLDivElement>(null);
   const [shadowStart, setShadowStart] = React.useState(false);
   const [shadowEnd, setShadowEnd] = React.useState(false);
-  const [colsWidths, updateColsWidths] = React.useState(() => new Map<React.Key, number>());
 
   // Convert map to number width
   const colsKeys = getColumnsKey(flattenColumns);
-  const pureColWidths = colsKeys.map((columnKey) => colsWidths.get(columnKey));
+  const pureColWidths = flattenColumns.map((column, index) => {
+    const measured = colsWidths.get(colsKeys[index]);
+    // 虚拟模式 auto 内部列：实测值就绪前先填提示值，
+    // 避免首帧固定列偏移（stickyOffsets）按 0 计算造成闪动
+    if (
+      measured === undefined &&
+      typeof customizeScrollBody === 'function' &&
+      isAutoWidthColumn(column)
+    ) {
+      return getAutoColumnHintWidth(column);
+    }
+    return measured;
+  });
   // `Map.get` may yield `undefined` for unmeasured columns; all consumers
   // (`useStickyOffsets`, `FixedHolder`, `ColGroup`) tolerate that at runtime.
   const colWidths = React.useMemo(() => pureColWidths as number[], [pureColWidths.join('_')]);
+
+  // auto 内部列实测宽度上报（供 InternalTable 的 resize 总宽账目）：
+  // 虚拟模式由 useAutoColumnMeasure 写入，非虚拟由 MeasureRow 写入，统一在此上报
+  const autoMeasureReportedRef = React.useRef<Record<string, number>>({});
+  React.useEffect(() => {
+    if (!onAutoColumnMeasure) {
+      return;
+    }
+    const columnsKey = getColumnsKey(flattenColumns);
+    flattenColumns.forEach((column, index) => {
+      if (!isAutoWidthColumn(column)) {
+        return;
+      }
+      const columnType = getInternalColumnType(column) as string;
+      const width = colsWidths.get(columnsKey[index]);
+      if (width && autoMeasureReportedRef.current[columnType] !== width) {
+        autoMeasureReportedRef.current[columnType] = width;
+        onAutoColumnMeasure(columnType, width);
+      }
+    });
+  }, [colsWidths, flattenColumns, onAutoColumnMeasure]);
   const stickyOffsets = useStickyOffsets(colWidths, flattenColumns);
   const fixHeader = !!scroll && validateValue(scroll.y);
   const horizonScroll = (scroll && validateValue(mergedScrollX)) || Boolean(expandableConfig.fixed);
@@ -462,6 +512,18 @@ const Table = <RecordType extends DefaultRecordType>(
       return widths;
     });
   }, []);
+
+  // 虚拟模式：测量 auto 内部列（rowSelection / expand 未显式设宽）的真实 CSS 宽度，
+  // 回写 colsWidths 驱动 body 网格 / 固定列偏移 / 弹性分配。
+  // showHeader=false 时没有表头，改用隐藏探针（probeRef）承载 CSS 类宽度
+  const autoColumnProbeRef = React.useRef<HTMLTableElement>(null);
+  useAutoColumnMeasure(
+    typeof customizeScrollBody === 'function',
+    flattenColumns,
+    scrollHeaderRef,
+    onColumnResize,
+    autoColumnProbeRef,
+  );
 
   const [setScrollTarget, getScrollTarget] = useTimeoutLock<object | null>(null);
 
@@ -696,9 +758,26 @@ const Table = <RecordType extends DefaultRecordType>(
         onScroll: onInternalScroll,
       });
 
-      headerProps.colWidths = flattenColumns.map(({ width }, index) => {
+      // 表头最后一列需为纵向滚动条让出宽度；若最后一列是 auto 内部列
+      // （宽度由 CSS 驱动，不可内联调整），则由最后一个非 auto 列承担
+      let lastWidthColumnIndex = -1;
+      flattenColumns.forEach((column, index) => {
+        if (!isAutoWidthColumn(column)) {
+          lastWidthColumnIndex = index;
+        }
+      });
+
+      headerProps.colWidths = flattenColumns.map((column, index) => {
+        const { width } = column;
+
+        // auto 内部列（rowSelection / expand 未显式设宽）：不写内联宽度，
+        // 交由 CSS 类驱动（LESS 变量 / 用户覆盖均可生效），实测宽度由测量管线同步
+        if (isAutoWidthColumn(column)) {
+          return undefined as unknown as number;
+        }
+
         const colWidth =
-          index === flattenColumns.length - 1 ? (width as number) - scrollbarSize : width;
+          index === lastWidthColumnIndex ? (width as number) - scrollbarSize : width;
         if (typeof colWidth === 'number' && !Number.isNaN(colWidth)) {
           return colWidth;
         }
@@ -859,6 +938,42 @@ const Table = <RecordType extends DefaultRecordType>(
       ref={fullTableRef}
       {...dataProps}
     >
+      {/* showHeader=false 的虚拟表格没有表头可测 auto 内部列宽，
+          渲染隐藏探针承载同样的 CSS 类（col 类宽 + th padding）供测量 */}
+      {typeof customizeScrollBody === 'function' &&
+        showHeader === false &&
+        flattenColumns.some(isAutoWidthColumn) && (
+          <table
+            aria-hidden
+            ref={autoColumnProbeRef}
+            style={{
+              position: 'absolute',
+              insetInlineStart: -99999,
+              top: 0,
+              visibility: 'hidden',
+              tableLayout: 'fixed',
+              pointerEvents: 'none',
+            }}
+          >
+            <colgroup>
+              {flattenColumns.filter(isAutoWidthColumn).map((column, index) => {
+                const { columnType, ...restAdditionalProps } =
+                  (column as Record<string, any>)[INTERNAL_COL_DEFINE] || {};
+                return <col key={columnType || index} {...restAdditionalProps} />;
+              })}
+            </colgroup>
+            <tbody>
+              <tr>
+                {flattenColumns.filter(isAutoWidthColumn).map((column, index) => {
+                  const { columnType } = (column as Record<string, any>)[INTERNAL_COL_DEFINE] || {};
+                  return (
+                    <th key={columnType || index} className={column.className as string} />
+                  );
+                })}
+              </tr>
+            </tbody>
+          </table>
+        )}
       {title && (
         <Panel
           className={clsx(`${prefixCls}-title`, classNames?.title)}

@@ -13,6 +13,12 @@ export interface UseResizeOptions {
   onColumnResize?: (key: Key, width: number) => void;
   /** 样式前缀，用于查找表格本体容器 */
   prefixCls: string;
+  /**
+   * 内部功能列（rowSelection / expand）占据的固定宽度。
+   * 这些列无 key/dataIndex，不参与宽度分配与拖拽，但占据表格宽度；
+   * 计入总宽可避免 scrollX 覆盖 scroll.x 后内容比预期宽出内部列宽。
+   */
+  extraFixedWidth?: number;
 }
 
 /**
@@ -30,16 +36,19 @@ function getColumnKey(col: ColumnType): Key | null {
  *
  * 核心交互策略：
  *
- * **初始弹性分配**：
- * - 初始所有列为"弹性列"，按 baseWidth 比例分配容器剩余空间，填满容器
- * - remainder > 0：弹性列膨胀；remainder < 0：弹性列收缩（不低于 minWidth）
+ * **初始弹性分配**（显式 width 列只增不减）：
+ * - 显式设了 width 的列：宽度是下限，绝不收缩；容器有富余且没有无宽列时，
+ *   所有未冻结列等比放大撑满容器（对齐 antd useWidthColumns 的 scale-up）
+ * - 未设 width 的列为"弹性列"（基础宽 defaultMinWidth）：富余优先膨胀给它，
+ *   容器不足时先收缩它（下限各自的 minWidth），显式列不动
+ * - 收缩到底仍超出容器时出现横向滚动条
  *
  * **拖拽冻结**：
  * - 松手时，将所有列的 baseWidth 冻结为当前渲染宽度，并全部标记为固定列
  * - 这样松手后 remainder ≈ 0，不会触发 flex 重分配
  * - 列边界精确停留在鼠标位置（跟手）
  * - 总宽 = 渲染宽度之和，可能 ≠ containerWidth（出现滚动条或空白）
- * - 用户可调用 resetColumnWidths 恢复所有列为弹性列
+ * - 用户可调用 resetColumnWidths 恢复无宽列为弹性列
  *
  * **拖拽精度**：
  * - 使用 th.offsetWidth（实际渲染宽度）作为拖拽起点
@@ -57,6 +66,7 @@ function useResize({
   containerRef,
   onColumnResize,
   prefixCls,
+  extraFixedWidth = 0,
 }: UseResizeOptions) {
   // 扁平化列（仅叶子列可以 resize）
   const flattenColumns = React.useMemo(() => {
@@ -221,21 +231,21 @@ function useResize({
   // renderWidths: 实际传给 colgroup 的宽度
   // scrollX: renderWidths 的总和，用于覆盖 scroll.x
   //
-  // 策略（对齐 Element Plus updateColumnsWidth）：
-  //   1. 收集所有列的 baseWidth，计算 totalWidth
-  //   2. flexColumns = 未在 resizedKeys 中的列（弹性列）
+  // 策略（显式 width 列只增不减，对齐 antd useWidthColumns）：
+  //   1. 收集所有列的 baseWidth，计算 totalWidth（含内部功能列固定宽）
+  //   2. flexColumns = 未显式设 width 且未在 resizedKeys 中的列（弹性列）
   //   3. remainder = containerWidth - totalWidth
-  //   4. remainder ≠ 0 且有弹性列时，按 baseWidth 比例分配 remainder 给弹性列
-  //      - remainder > 0：弹性列膨胀（吸收剩余空间）
-  //      - remainder < 0：弹性列收缩（让出超出空间），但不低于 minWidth
-  //      - 第一个弹性列吸收舍入误差，确保 totalRender === containerWidth
-  //   5. remainder = 0 或无弹性列时，使用 baseWidth
+  //   4. remainder > 0（膨胀）：富余优先按 baseWidth 比例分配给弹性列；
+  //      无弹性列（全是显式 width 列）时等比放大所有未冻结列撑满容器
+  //   5. remainder < 0（收缩）：只从弹性列扣除，下限各自的 minWidth；
+  //      显式 width 列不缩，扣完仍超出则出现横向滚动条
+  //   6. remainder = 0 时，使用 baseWidth
   const { renderWidths, scrollX } = React.useMemo(() => {
     const map = new Map<Key, number>();
 
-    // 1. 收集每列的基础宽度
-    const entries: { key: Key; width: number; flex: boolean }[] = [];
-    let totalWidth = 0;
+    // 1. 收集每列的基础宽度（totalWidth 含内部功能列固定宽，确保弹性分配为其预留空间）
+    const entries: { key: Key; width: number; flex: boolean; minWidth: number }[] = [];
+    let totalWidth = extraFixedWidth;
 
     flattenColumns.forEach((col) => {
       const key = getColumnKey(col);
@@ -244,72 +254,78 @@ function useResize({
       const mapWidth = columnWidths.get(key);
       // Guard against NaN: non-numeric string widths are treated as missing
       const rawW = col.width != null ? Number(col.width) : 0;
-      // 未设 width 且未被拖拽冻结的列：以 defaultMinWidth 为基础宽度参与弹性分配，
-      // 避免渲染宽度被覆盖为 0 而塌陷为 0~1px
-      const baseWidth = mapWidth ?? (Number.isNaN(rawW) || rawW <= 0 ? defaultMinWidth : rawW);
-      const flex = !resizedKeys.has(key) && baseWidth > 0;
-      entries.push({ key, width: baseWidth, flex });
+      const hasExplicitWidth = !Number.isNaN(rawW) && rawW > 0;
+      // 未设 width 且未被拖拽冻结的列：以 minWidth（若有，否则 defaultMinWidth）为
+      // 基础宽度参与弹性分配，避免渲染宽度被覆盖为 0 而塌陷为 0~1px
+      const baseWidth = mapWidth ?? (hasExplicitWidth ? rawW : Math.max(defaultMinWidth, col.minWidth ?? 0));
+      // 弹性列 = 未显式设 width 且未被拖拽冻结的列；
+      // 显式 width 列只增不减（膨胀时等比放大，收缩时不动）
+      const flex = !resizedKeys.has(key) && !hasExplicitWidth;
+      entries.push({ key, width: baseWidth, flex, minWidth: col.minWidth ?? defaultMinWidth });
       totalWidth += baseWidth;
     });
 
-    // 2. 收集弹性列
+    // 2. 收集弹性列（无宽列，膨胀/收缩都优先作用于它们）
     const flexEntries = entries.filter((e) => e.flex);
 
     // 3. 计算剩余空间
-    const remainder =
-      containerWidth > 0 && flexEntries.length > 0 ? containerWidth - totalWidth : 0;
+    const remainder = containerWidth > 0 ? containerWidth - totalWidth : 0;
 
-    // 4. 分配（remainder > 0 膨胀，remainder < 0 收缩）
-    if (remainder !== 0) {
-      const flexTotal = flexEntries.reduce((sum, e) => sum + e.width, 0);
+    // 4. 分配
+    if (remainder > 0) {
+      // 膨胀：富余优先给弹性列；全是显式 width 列时，等比放大所有未冻结列
+      // 撑满容器（对齐 antd useWidthColumns 的 scale-up：显式列只增不减）。
+      // 冻结列（已拖拽）不参与，保证松手后的布局不漂移。
+      const growEntries =
+        flexEntries.length > 0 ? flexEntries : entries.filter((e) => !resizedKeys.has(e.key));
+      const growTotal = growEntries.reduce((sum, e) => sum + e.width, 0);
 
-      if (remainder > 0) {
-        // 膨胀：按 baseWidth 比例分配剩余空间
-        const ratio = remainder / flexTotal;
+      if (growEntries.length > 0 && growTotal > 0) {
+        const ratio = remainder / growTotal;
         let assigned = 0;
-        flexEntries.forEach((entry, index) => {
-          if (index === 0) return; // 第一个弹性列最后计算，吸收舍入误差
-          const flex = Math.floor(entry.width * ratio);
-          assigned += flex;
-          map.set(entry.key, entry.width + flex);
+        growEntries.forEach((entry, index) => {
+          if (index === 0) return; // 第一个列最后计算，吸收舍入误差
+          const grow = Math.floor(entry.width * ratio);
+          assigned += grow;
+          map.set(entry.key, entry.width + grow);
         });
-        // 第一个弹性列 = remainder - 其他弹性列已分配的量
-        const firstFlex = remainder - assigned;
-        map.set(flexEntries[0].key, flexEntries[0].width + firstFlex);
-      } else {
-        // 收缩：按 baseWidth 比例从弹性列中扣除超出空间（对齐 Element Plus）
-        const deficit = -remainder; // 需要扣除的总量
-        const ratio = deficit / flexTotal;
-
-        // 先计算每列的扣除量，确保不低于 minWidth
-        let actualDeducted = 0;
-        const deductions = flexEntries.map((entry, index) => {
-          if (index === 0) return 0; // 第一个弹性列最后计算
-          const maxDeduct = Math.max(0, entry.width - defaultMinWidth);
-          const deduct = Math.min(Math.floor(entry.width * ratio), maxDeduct);
-          actualDeducted += deduct;
-          return deduct;
-        });
-
-        // 第一个弹性列扣除剩余量，但不低于 minWidth
-        const firstDeduct = Math.min(
-          deficit - actualDeducted,
-          Math.max(0, flexEntries[0].width - defaultMinWidth),
-        );
-        deductions[0] = firstDeduct;
-        actualDeducted += firstDeduct;
-
-        // 应用扣除
-        flexEntries.forEach((entry, index) => {
-          map.set(entry.key, entry.width - deductions[index]);
-        });
-
-        // 如果弹性列全部到 minWidth 仍然不够扣除，totalRender > containerWidth，出现滚动条
+        map.set(growEntries[0].key, growEntries[0].width + (remainder - assigned));
       }
+    } else if (remainder < 0 && flexEntries.length > 0) {
+      // 收缩：只从无宽弹性列扣除，下限各自的 minWidth（显式 width 列一像素不动）
+      const deficit = -remainder; // 需要扣除的总量
+      const flexTotal = flexEntries.reduce((sum, e) => sum + e.width, 0);
+      const ratio = deficit / flexTotal;
+
+      // 先计算每列的扣除量，确保不低于 minWidth
+      let actualDeducted = 0;
+      const deductions = flexEntries.map((entry, index) => {
+        if (index === 0) return 0; // 第一个弹性列最后计算
+        const maxDeduct = Math.max(0, entry.width - entry.minWidth);
+        const deduct = Math.min(Math.floor(entry.width * ratio), maxDeduct);
+        actualDeducted += deduct;
+        return deduct;
+      });
+
+      // 第一个弹性列扣除剩余量，但不低于 minWidth
+      const firstDeduct = Math.min(
+        deficit - actualDeducted,
+        Math.max(0, flexEntries[0].width - flexEntries[0].minWidth),
+      );
+      deductions[0] = firstDeduct;
+
+      // 应用扣除
+      flexEntries.forEach((entry, index) => {
+        map.set(entry.key, entry.width - deductions[index]);
+      });
+
+      // 弹性列全部到 minWidth 仍不够扣除：totalRender > containerWidth，
+      // 出现横向滚动条（显式 width 列依然不缩）
     }
 
     // 非弹性列 + remainder = 0 时的弹性列，使用 baseWidth
-    let totalRender = 0;
+    // totalRender 含内部功能列固定宽（extraFixedWidth）
+    let totalRender = extraFixedWidth;
     entries.forEach((entry) => {
       if (!map.has(entry.key)) {
         map.set(entry.key, entry.width);
@@ -322,7 +338,7 @@ function useResize({
     const sx = containerWidth > 0 ? totalRender : null;
 
     return { renderWidths: map, scrollX: sx };
-  }, [flattenColumns, columnWidths, containerWidth, resizedKeys, defaultMinWidth]);
+  }, [flattenColumns, columnWidths, containerWidth, resizedKeys, defaultMinWidth, extraFixedWidth]);
 
   // 同步 renderWidths 到 ref（供 onUp 中读取当前渲染宽度）
   renderWidthsRef.current = renderWidths;
