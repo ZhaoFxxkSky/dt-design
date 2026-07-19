@@ -112,6 +112,7 @@ function useColumns<RecordType>(
     fixed,
     scrollWidth,
     clientWidth,
+    measuredWidths,
   }: {
     prefixCls?: string;
     columns?: ColumnsType<RecordType>;
@@ -131,6 +132,8 @@ function useColumns<RecordType>(
     fixed?: FixedType;
     scrollWidth?: number | null;
     expandedRowOffset?: number;
+    /** auto 内部列的实测宽度（虚拟模式测量管线回写），用于弹性分配时为其预留空间 */
+    measuredWidths?: ReadonlyMap<Key, number>;
   },
   transformColumns: (columns: ColumnsType<RecordType>) => ColumnsType<RecordType>,
 ): [
@@ -275,6 +278,7 @@ function useColumns<RecordType>(
     // verbatim, so pass the value through as-is.
     scrollWidth as number,
     clientWidth,
+    measuredWidths,
   );
 
   return [mergedColumns, filledColumns, realScrollWidth];

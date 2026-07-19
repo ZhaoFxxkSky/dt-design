@@ -150,6 +150,26 @@ describe('Resize — Handle Rendering', () => {
     expect(handles.length).toBe(2);
   });
 
+  it('sets --columns-count (incl. internal columns) on wrapper for resize line z-index', () => {
+    mockElementWidths(200, 0);
+    const cols: ColumnsType = [
+      { title: 'Name', dataIndex: 'name', key: 'name', width: 150, resizable: true },
+      { title: 'Age', dataIndex: 'age', key: 'age', width: 100 },
+    ];
+    const { container } = render(
+      <Table
+        dataSource={data}
+        columns={cols}
+        rowKey="key"
+        resizable
+        rowSelection={{ type: 'checkbox' }}
+      />,
+    );
+    const wrapper = container.querySelector<HTMLElement>('.ant-table-wrapper');
+    // 2 数据列 + 1 选择列 = 3（resize 竖线 z-index 需压过 2N+3 的阴影/固定层级）
+    expect(wrapper!.style.getPropertyValue('--columns-count')).toBe('3');
+  });
+
   it('renders resize line element when resizable', () => {
     mockElementWidths(200, 0);
     const { container } = render(
@@ -542,7 +562,31 @@ describe('Resize — Flex Distribution', () => {
     restoreElementWidths();
   });
 
-  it('distributes remainder to flex columns proportionally', () => {
+  it('distributes remainder to flex (no-width) columns, keeps explicit width exact', () => {
+    const cols: ColumnsType = [
+      { title: 'A', dataIndex: 'a', key: 'a', width: 100, resizable: true, minWidth: 60 },
+      { title: 'B', dataIndex: 'b', key: 'b', resizable: true, minWidth: 60 },
+      { title: 'C', dataIndex: 'c', key: 'c', resizable: true, minWidth: 60 },
+    ];
+    const { container } = render(
+      <Table dataSource={data} columns={cols} rowKey="key" resizable />,
+    );
+
+    // A 显式 100 固定不动；B/C 无宽 → 弹性列（base 60）
+    // remainder = 1000 - (100 + 60 + 60) = 780，B/C 按比例各得 390 → 450/450
+    const colgroup = container.querySelectorAll('colgroup col');
+    expect(colgroup.length).toBe(3);
+    const widths = Array.from(colgroup).map((col) => {
+      const style = col.getAttribute('style') || '';
+      return Number.parseInt(style.match(/(\d+)px/)?.[1] || '0', 10);
+    });
+    expect(widths[0]).toBe(100); // 显式 width 精确，不重分配
+    expect(widths[1]).toBe(450);
+    expect(widths[2]).toBe(450);
+    expect(widths[0] + widths[1] + widths[2]).toBe(1000);
+  });
+
+  it('grows proportionally when all columns have explicit width (grow-only)', () => {
     const cols: ColumnsType = [
       { title: 'A', dataIndex: 'a', key: 'a', width: 100, resizable: true, minWidth: 60 },
       { title: 'B', dataIndex: 'b', key: 'b', width: 100, resizable: true, minWidth: 60 },
@@ -552,38 +596,55 @@ describe('Resize — Flex Distribution', () => {
       <Table dataSource={data} columns={cols} rowKey="key" resizable />,
     );
 
-    // Total base = 300, container = 1000, remainder = 700
-    // ratio = 700 / 300 ≈ 2.333
-    // First flex (index 0, key 'a'): absorbs rounding, gets 100 + (700 - 233*2) = 100 + 234 = 334
-    // Second flex (index 1, key 'b'): 100 + floor(100 * 2.333) = 100 + 233 = 333
-    // Third flex (index 2, key 'c'): 100 + floor(100 * 2.333) = 100 + 233 = 333
+    // 全显式（总 300）< 容器 1000 → 等比放大未冻结列撑满：334/333/333
     const colgroup = container.querySelectorAll('colgroup col');
-    expect(colgroup.length).toBe(3);
-    const widths = Array.from(colgroup).map((col) => col.getAttribute('style'));
-    // Each should have a width style
-    expect(widths[0]).toContain('width');
-    expect(widths[1]).toContain('width');
-    expect(widths[2]).toContain('width');
-    // Total should equal containerWidth
-    const w0 = Number.parseInt(widths[0]!.match(/(\d+)px/)?.[1] || '0', 10);
-    const w1 = Number.parseInt(widths[1]!.match(/(\d+)px/)?.[1] || '0', 10);
-    const w2 = Number.parseInt(widths[2]!.match(/(\d+)px/)?.[1] || '0', 10);
-    expect(w0 + w1 + w2).toBe(1000);
+    const widths = Array.from(colgroup).map((col) => {
+      const style = col.getAttribute('style') || '';
+      return Number.parseInt(style.match(/(\d+)px/)?.[1] || '0', 10);
+    });
+    expect(widths[0] + widths[1] + widths[2]).toBe(1000);
+    widths.forEach((w) => expect(w).toBeGreaterThanOrEqual(100));
+  });
+
+  it('never shrinks explicit width columns; shrink hits no-width columns only (minWidth floor)', () => {
+    const cols: ColumnsType = [
+      { title: 'A', dataIndex: 'a', key: 'a', width: 300, resizable: true, minWidth: 60 },
+      { title: 'B', dataIndex: 'b', key: 'b', width: 300, resizable: true, minWidth: 60 },
+      { title: 'C', dataIndex: 'c', key: 'c', resizable: true, minWidth: 100 },
+    ];
+    const readWidths = (container: HTMLElement) =>
+      Array.from(container.querySelectorAll('colgroup col')).map((col) => {
+        const style = col.getAttribute('style') || '';
+        return Number.parseInt(style.match(/(\d+)px/)?.[1] || '0', 10);
+      });
+
+    // 容器 1000：C 为弹性列（base = minWidth 100），富余全给 C → 400
+    const { container: wide } = render(
+      <Table dataSource={data} columns={cols} rowKey="key" resizable />,
+    );
+    expect(readWidths(wide)).toEqual([300, 300, 400]);
+
+    // 容器 500：deficit = 700 - 500 = 200，只从 C 扣，下限 minWidth 100 → C = 100；
+    // A/B 显式列保持 300 不动，总宽 700 > 500（出现横向滚动）
+    mockElementWidths(200, 500);
+    const { container: narrow } = render(
+      <Table dataSource={data} columns={cols} rowKey="key" resizable />,
+    );
+    expect(readWidths(narrow)).toEqual([300, 300, 100]);
   });
 
   it('freezes all column widths after a drag (no flex redistribution)', () => {
     const onColumnResize = jest.fn();
     const cols: ColumnsType = [
       { title: 'A', dataIndex: 'a', key: 'a', width: 100, resizable: true, minWidth: 60 },
-      { title: 'B', dataIndex: 'b', key: 'b', width: 100, resizable: true, minWidth: 60 },
-      { title: 'C', dataIndex: 'c', key: 'c', width: 100, resizable: true, minWidth: 60 },
+      { title: 'B', dataIndex: 'b', key: 'b', resizable: true, minWidth: 60 },
+      { title: 'C', dataIndex: 'c', key: 'c', resizable: true, minWidth: 60 },
     ];
     const { container } = render(
       <Table dataSource={data} columns={cols} rowKey="key" resizable onColumnResize={onColumnResize} />,
     );
 
-    // Before drag: all columns are flex, total = containerWidth (1000)
-    // A = 334, B = 333, C = 333 (ratio-based distribution)
+    // Before drag: A 显式 100 固定；B/C 弹性各 450；total = 1000
     let colgroup = container.querySelectorAll('colgroup col');
     let widths = Array.from(colgroup).map((col) => {
       const style = col.getAttribute('style') || '';
@@ -596,16 +657,15 @@ describe('Resize — Flex Distribution', () => {
     expect(onColumnResize).toHaveBeenCalledWith('a', 250);
 
     // After drag: all columns are frozen at their pre-drag rendered widths
-    // A = 250 (user-dragged), B = 333 (frozen), C = 333 (frozen)
-    // Total = 250 + 333 + 333 = 916 ≠ 1000 (no flex redistribution)
+    // A = 250 (user-dragged), B = 450 (frozen), C = 450 (frozen)
     colgroup = container.querySelectorAll('colgroup col');
     widths = Array.from(colgroup).map((col) => {
       const style = col.getAttribute('style') || '';
       return Number.parseInt(style.match(/(\d+)px/)?.[1] || '0', 10);
     });
     expect(widths[0]).toBe(250); // Column A at user-dragged width
-    expect(widths[1]).toBe(333); // Column B frozen
-    expect(widths[2]).toBe(333); // Column C frozen
+    expect(widths[1]).toBe(450); // Column B frozen
+    expect(widths[2]).toBe(450); // Column C frozen
   });
 
   it('does not distribute remainder when no flex columns', () => {

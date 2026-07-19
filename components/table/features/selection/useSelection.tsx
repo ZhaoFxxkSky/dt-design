@@ -733,7 +733,7 @@ const useSelection = <RecordType extends AnyObject = AnyObject>(
         render: renderSelectionCell,
         onCell: rowSelection.onCell,
         align: rowSelection.align,
-        [INTERNAL_COL_DEFINE]: { className: columnCls },
+        [INTERNAL_COL_DEFINE]: { className: columnCls, columnType: 'SELECTION_COLUMN' },
       };
 
       return cloneColumns.map((col) => (col === SELECTION_COLUMN ? selectionColumn : col));
