@@ -390,10 +390,14 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     getPopupContainer: getContextPopupContainer,
   } = React.useContext(ConfigContext);
 
+  // 兼容 deprecated 的 filterCheckall，统一转为 filterCheckAll
+  const { filterCheckall: ctxFilterCheckall, ...ctxTable } = contextLocale?.Table ?? {};
+  const { filterCheckAll, filterCheckall, ...restLocale } = locale ?? {};
+
   const tableLocale: TableLocale = {
-    ...contextLocale.Table,
-    ...locale,
-    filterCheckAll: locale?.filterCheckAll || locale?.filterCheckall || contextLocale?.Table?.filterCheckall,
+    ...ctxTable,
+    ...restLocale,
+    filterCheckAll: filterCheckAll || filterCheckall || ctxFilterCheckall,
   };
 
   const rawData: readonly RecordType[] = dataSource || EMPTY_LIST;
