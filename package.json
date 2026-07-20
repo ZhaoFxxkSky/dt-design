@@ -25,6 +25,7 @@
     "dist/*",
     "es/**/style/*",
     "lib/**/style/*",
+    "components/**/style/*",
     "**/*.less"
   ],
   "exports": {
