@@ -1,0 +1,26 @@
+{
+  "name": "@dtjoy/babel-plugin-import-lib-to-es",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Babel plugin that rewrites `/lib/` subpath imports of antd-style packages to `/es/` for ESM builds",
+  "license": "MIT",
+  "keywords": [
+    "babel-plugin",
+    "antd",
+    "esm"
+  ],
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "test": "jest internals/babel-plugin-import-lib-to-es"
+  },
+  "peerDependencies": {
+    "@babel/core": "^7.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.6",
+    "babel-plugin-import": "^1.13.8"
+  }
+}

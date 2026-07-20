@@ -5,7 +5,10 @@ export default defineConfig({
     input: 'components',
     output: 'es',
     ignores: ['**/demos/**'],
-    extraBabelPlugins: [['import', { libraryName: 'antd', style: false }]],
+    extraBabelPlugins: [
+      ['import', { libraryName: 'antd', style: false }],
+      require.resolve('@dtjoy/babel-plugin-import-lib-to-es'),
+    ],
   },
   cjs: {
     input: 'components',
