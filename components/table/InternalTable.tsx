@@ -393,7 +393,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   const tableLocale: TableLocale = {
     ...contextLocale.Table,
     ...locale,
-    filterCheckAll: contextLocale?.Table?.filterCheckall || locale?.filterCheckall || locale?.filterCheckAll
+    filterCheckAll: locale?.filterCheckAll || locale?.filterCheckall || contextLocale?.Table?.filterCheckall,
   };
 
   const rawData: readonly RecordType[] = dataSource || EMPTY_LIST;
