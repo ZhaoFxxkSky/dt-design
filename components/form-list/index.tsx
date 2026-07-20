@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 import React, { useMemo } from 'react';
 import { Utils } from '@dtinsight/dt-utils';
-import type { FormListFieldData, TableProps } from 'antd';
+import type { FormItemProps, FormListFieldData, TableProps } from 'antd';
 import { Form, Table } from 'antd';
 import { globalConfig } from 'antd/lib/config-provider';
-import type { FormItemProps, FormListProps, Rule, RuleObject, RuleRender } from 'antd/lib/form';
+import type { FormListProps, Rule, RuleObject, RuleRender } from 'antd/lib/form';
 import type { ColumnsType, ColumnType as TableColumnType } from 'antd/lib/table';
 import clsx from 'clsx';
 

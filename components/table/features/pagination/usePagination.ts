@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { mergeProps } from '../../../_util/rcUtil';
 
 import { isFunction, isPlainObject } from '../../../_util/is';
-import type { PaginationProps } from 'antd/lib/pagination';
+import type { PaginationProps } from 'antd';
 import type { TablePaginationConfig } from '../../interface';
 
 export const DEFAULT_PAGE_SIZE = 10;
@@ -33,35 +33,31 @@ function usePagination(
   onChange: (current: number, pageSize: number) => void,
   pagination?: TablePaginationConfig | false,
 ): readonly [TablePaginationConfig, (current?: number, pageSize?: number) => void] {
-  // 从用户传入的 pagination 中分离出 current/pageSize 和其余配置。
-  // current/pageSize 均为受控值：传入时每次渲染都以 props 为准（见下方 merge 处注释）；
-  // 未传入时作为初始值，后续由 innerPagination 管理（showSizeChanger 才能正常工作）
-  const {
-    total: paginationTotal = 0,
-    current: userCurrent,
-    pageSize: userPageSize,
-    ...restPaginationObj
-  } = isPlainObject(pagination) ? (pagination as any) : {};
+  const { total: paginationTotal = 0, ...paginationObj } = isPlainObject(pagination)
+    ? pagination
+    : {};
 
   const [innerPagination, setInnerPagination] = useState<{ current?: number; pageSize?: number }>(
     () => ({
-      current: userCurrent ?? restPaginationObj.defaultCurrent ?? 1,
-      pageSize: userPageSize ?? restPaginationObj.defaultPageSize ?? DEFAULT_PAGE_SIZE,
+      current: 'defaultCurrent' in paginationObj ? paginationObj.defaultCurrent : 1,
+      pageSize:
+        'defaultPageSize' in paginationObj ? paginationObj.defaultPageSize : DEFAULT_PAGE_SIZE,
     }),
   );
 
-  // merge 时：restPaginationObj（showSizeChanger, pageSizeOptions 等）在外层
-  // innerPagination（current, pageSize）覆盖 restPaginationObj 中的同名字段
-  // 受控语义（对齐 antd）：props.pagination.current / pageSize 每次渲染都生效，覆盖内部值；
-  // mergeProps 跳过 undefined — 未受控的字段回退到 innerPagination 对应值
-  const mergedPagination = mergeProps(restPaginationObj as any, innerPagination as any, {
+  // ============ Basic Pagination Config ============
+  const mergedPagination = mergeProps<{
+    current?: number;
+    pageSize?: number;
+    total?: number;
+  }>(innerPagination, paginationObj, {
     total: paginationTotal > 0 ? paginationTotal : total,
-    current: userCurrent,
-    pageSize: userPageSize,
-  }) as any;
+  });
 
+  // Reset `current` if data length or pageSize changed
   const maxPage = Math.ceil((paginationTotal || total) / mergedPagination.pageSize!);
   if (mergedPagination.current! > maxPage) {
+    // Prevent a maximum page count of 0
     mergedPagination.current = maxPage || 1;
   }
 

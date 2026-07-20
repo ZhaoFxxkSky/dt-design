@@ -6,8 +6,8 @@ import { clsx } from 'clsx';
 
 import { isFunction, isNumber, isPlainObject } from '../../../_util/is';
 import type { AnyObject } from '../../../_util/type';
-import type { TooltipProps } from 'antd/lib/tooltip';
-import Tooltip from 'antd/lib/tooltip';
+import type { TooltipProps } from 'antd';
+import { Tooltip } from 'antd';
 import type {
   ColumnGroupType,
   ColumnSorter,

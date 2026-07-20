@@ -38,10 +38,10 @@ import { devUseWarning } from '../_util/warning';
 
 import { useBreakpoint } from '../_util/hooks/useBreakpoint';
 import useCssVar from '../_util/hooks/useCssVar';
-import Pagination from 'antd/lib/pagination';
-import type { SpinProps } from 'antd/lib/spin';
-import Spin from 'antd/lib/spin';
+import type { SpinProps } from 'antd';
+import { Pagination, Spin } from 'antd';
 import { ConfigContext, globalConfig } from 'antd/lib/config-provider';
+import enUS from 'antd/lib/locale/en_US';
 import renderExpandIcon from './components/ExpandIcon';
 import useContainerWidth from './shared/hooks/useContainerWidth';
 import useFilledColumns from './features/columns/useFilledColumns';
@@ -385,31 +385,15 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   }, [components, hasAriaProps]);
 
   const {
-    locale: contextLocale,
+    locale: contextLocale = enUS,
     renderEmpty,
     getPopupContainer: getContextPopupContainer,
   } = React.useContext(ConfigContext);
 
   const tableLocale: TableLocale = {
-    filterTitle: 'Filter',
-    filterConfirm: 'OK',
-    filterReset: 'Reset',
-    filterEmptyText: 'No filters',
-    filterCheckAll: 'Select all items',
-    filterSearchPlaceholder: 'Search in filters',
-    emptyText: renderEmpty?.('Table') || 'No data',
-    selectAll: 'Select current page',
-    selectInvert: 'Invert current page',
-    selectNone: 'Clear all data',
-    selectionAll: 'Select all data',
-    sortTitle: 'Sort',
-    expand: 'Expand row',
-    collapse: 'Collapse row',
-    triggerDesc: 'Click to sort descending',
-    triggerAsc: 'Click to sort ascending',
-    cancelSort: 'Click to cancel sorting',
-    ...contextLocale?.Table,
+    ...contextLocale.Table,
     ...locale,
+    filterCheckAll: contextLocale?.Table?.filterCheckall || locale?.filterCheckall || locale?.filterCheckAll
   };
 
   const rawData: readonly RecordType[] = dataSource || EMPTY_LIST;
@@ -512,7 +496,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
 
   // 分页控制 ref — validate 时用于自动跳转到错误行所在页
   // useEditable 在 usePagination 之前调用，所以用 ref 传递
-  const resetPaginationRef = React.useRef<(current?: number, pageSize?: number) => void>(() => {});
+  const resetPaginationRef = React.useRef<(current?: number, pageSize?: number) => void>(() => { });
   const paginationInfoRef = React.useRef<{ current: number; pageSize: number; enabled: boolean }>({
     current: 1,
     pageSize: 10,
@@ -590,9 +574,9 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   // validate 不传参数，内部用 dataRef.current 获取最新数据
   editableMethodsRef.current = hasEditableColumns
     ? {
-        validate: () => editableResult.validateAll(),
-        resetErrors: editableResult.resetErrors,
-      }
+      validate: () => editableResult.validateAll(),
+      resetErrors: editableResult.resetErrors,
+    }
     : null;
 
   // 用于稳定 validate / resetErrors 引用，配合 useProxyImperativeHandle deps=[]
@@ -903,14 +887,14 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
       );
       // 在 transformColumns 链末端注入 resize（resize 依赖最终列结构）
       if (hasResizableColumns) {
-result = transformResizableColumns(result, {
-prefixCls,
-enabled: hasResizableColumns,
-isColumnResizable: resizeResult.isColumnResizable,
-onStartResize: resizeResult.onStartResize,
-onKeyboardResize: resizeResult.setColumnWidth,
-direction,
-});
+        result = transformResizableColumns(result, {
+          prefixCls,
+          enabled: hasResizableColumns,
+          isColumnResizable: resizeResult.isColumnResizable,
+          onStartResize: resizeResult.onStartResize,
+          onKeyboardResize: resizeResult.setColumnWidth,
+          direction,
+        });
       }
       return result;
     },
