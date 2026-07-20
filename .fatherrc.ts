@@ -24,6 +24,16 @@ export default defineConfig({
       filename: 'dt-design.min.js',
     },
     name: 'DtDesign',
+    chainWebpack(memo) {
+      // Fix SSR: `self` is not defined in Node.js
+      memo.output.set(
+        'globalObject',
+        "typeof self !== 'undefined' ? self : this",
+      );
+      // Prevent lodash from requiring Node.js `util` module
+      memo.resolve.fallback.set('util', false);
+      return memo;
+    },
     externals: {
       react: {
         commonjs: 'react',
@@ -49,15 +59,6 @@ export default defineConfig({
         amd: '@ant-design/icons',
         root: 'icons',
       },
-    },
-    chainWebpack(memo) {
-      // lodash may require Node.js 'util' module,
-      // fallback to false to avoid runtime error in browser UMD.
-      memo.resolve.fallback.set('util', false);
-      // Universal global object, so requiring the UMD bundle
-      // in Node/SSR does not throw `self is not defined`.
-      memo.output.set('globalObject', "typeof self !== 'undefined' ? self : this");
-      return memo;
     },
   },
 });

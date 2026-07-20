@@ -1,5 +1,6 @@
 {
   "name": "@dtjoy/dt-design",
+  "type": "commonjs",
   "version": "1.1.5",
   "packageManager": "pnpm@11.4.0+sha512.f0febc7e37552ab485494a914241b338e0b3580b93d54ce31f00933015880863129038a1b4ae4e414a0ee63ac35bf21197e990172c4a68256450b5636310968f",
   "description": "react-component",
@@ -9,7 +10,10 @@
     "url": "https://github.com/ZhaoFxxkSky/dt-design"
   },
   "license": "MIT",
-  "repository": "https://github.com/ZhaoFxxkSky/dt-design",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZhaoFxxkSky/dt-design.git"
+  },
   "keywords": [
     "react",
     "react-component",
@@ -21,25 +25,37 @@
     "dist/*",
     "es/**/style/*",
     "lib/**/style/*",
-    "components/**/style/*"
+    "**/*.less"
   ],
+  "exports": {
+    ".": {
+      "import": "./es/index.js",
+      "require": "./lib/index.js"
+    },
+    "./es/*": "./es/*",
+    "./lib/*": "./lib/*",
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
+  },
   "main": "lib/index.js",
   "module": "es/index.js",
   "unpkg": "dist/dt-design.min.js",
-  "typings": "es/index.d.ts",
+  "typings": "lib/index.d.ts",
   "files": [
     "dist",
     "es",
     "lib"
   ],
+  "engines": {
+    "node": ">=16"
+  },
   "browserslist": [
     "defaults and not op_mini all"
   ],
   "scripts": {
     "start": "npm run dev",
     "dev": "dumi dev",
-    "build": "father build",
-    "build:dts": "tsc -p tsconfig.build.json",
+    "build": "father build && node scripts/compile-less.mjs",
     "build:watch": "father dev",
     "format": "prettier --write .",
     "lint:script": "eslint . --cache",
@@ -53,9 +69,9 @@
     "lint:css-fix": "stylelint \"components/**/*.{css,less,scss}\" \".dumi/**/*.{css,less,scss}\" --fix",
     "lint:css": "stylelint \"components/**/*.{css,less,scss}\" \".dumi/**/*.{css,less,scss}\"",
     "lint:es": "eslint \"components/**/*.{js,jsx,ts,tsx}\" \".dumi/**/*.{js,jsx,ts,tsx}\"",
-    "prepublishOnly": "npm run build && npm run build:dts",
+    "prepublishOnly": "npm run build",
     "deploy": "npm run docs:build && gh-pages -d docs-dist",
-    "release": "node -e \"const{execSync:e}=require('child_process');const v=require('./package.json').version;e('git tag v'+v+' && git push origin v'+v,{stdio:'inherit'})\"",
+    "release": "node scripts/release.mjs",
     "tsc": "tsc --noEmit"
   },
   "commitlint": {
@@ -85,6 +101,7 @@
     "@antfu/eslint-config": "^6.6.1",
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
+    "@dtjoy/babel-plugin-import-lib-to-es": "workspace:*",
     "@eslint-react/eslint-plugin": "^2.5.0",
     "@faker-js/faker": "^7.6.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
@@ -94,6 +111,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^14.4.3",
+    "@types/fs-extra": "^11.0.4",
     "@types/jest": "^29.2.3",
     "@types/lodash": "^4.17.12",
     "@types/node": "^24.3.1",
@@ -113,11 +131,13 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.26",
     "father": "4.6.13",
+    "fs-extra": "^11.3.6",
     "gh-pages": "^6.3.0",
     "husky": "^8.0.1",
     "jest": "^29.3.1",
     "jest-environment-jsdom": "^29.3.1",
     "ko-lint-config": "2.2.21",
+    "less": "4.6.6",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
     "publint": "^0.3.21",
@@ -133,7 +153,8 @@
     "stylelint-declaration-block-no-ignored-properties": "^2.1.0",
     "stylelint-order": "^5.0.0",
     "ts-jest": "^29.0.3",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.64.0"
   },
   "config": {
     "commitizen": {
