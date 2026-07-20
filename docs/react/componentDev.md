@@ -28,7 +28,6 @@ dt-design/
 ├── package.json
 ├── pnpm-lock.yaml
 ├── tsconfig.json       # TypeScript 配置
-├── tsconfig.build.json # 构建用 TypeScript 配置
 ├── tests/              # Jest 辅助文件
 │   ├── fileTransformer.js
 │   ├── setupTests.js

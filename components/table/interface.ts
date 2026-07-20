@@ -1,10 +1,7 @@
 import type * as React from 'react';
 import type { Breakpoint } from '../_util/hooks/useBreakpoint';
 import type { AnyObject } from '../_util/type';
-import type { CheckboxProps } from 'antd/lib/checkbox';
-import type { DropdownProps } from 'antd/lib/dropdown';
-import type { PaginationProps } from 'antd/lib/pagination';
-import type { TooltipProps } from 'antd/lib/tooltip';
+import type { CheckboxProps, DropdownProps, PaginationProps, TooltipProps } from 'antd';
 import type { INTERNAL_SELECTION_ITEM } from './features/selection/useSelection';
 import type { InternalTableProps, TableProps } from './InternalTable';
 

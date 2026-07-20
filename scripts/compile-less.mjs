@@ -1,0 +1,147 @@
+/**
+ * Post-build style compiler.
+ *
+ * After `father build` produces `es/` and `lib/`, this script:
+ *   1. Compiles every `style/index.less` to `style/index.css`.
+ *   2. Generates a matching `style/css.js` that imports the `.css` files
+ *      instead of `.less`, so consumers without a less-loader can still
+ *      import styles on demand (mirrors antd's `css.js` pattern).
+ *   3. Generates an empty `style/css.d.ts` next to each `css.js` so that
+ *      TypeScript consumers in strict mode don't get "no declaration file" errors.
+ *
+ * Usage: node scripts/compile-less.mjs
+ */
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import less from 'less';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const cwd = join(__dirname, '..');
+const targets = ['lib', 'es'];
+
+/**
+ * Recursively collect every `style/` directory that contains an `index.less`.
+ */
+function findStyleEntries(rootDir) {
+  const entries = [];
+
+  function walk(dir) {
+    let items;
+    try {
+      items = readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+
+    for (const item of items) {
+      const full = join(dir, item.name);
+      if (!item.isDirectory()) continue;
+
+      if (item.name === 'style' && existsSync(join(full, 'index.less'))) {
+        entries.push(full);
+      } else {
+        walk(full);
+      }
+    }
+  }
+
+  walk(rootDir);
+  return entries;
+}
+
+/**
+ * Derive the content of `css.js` from the already-generated `index.js`.
+ *
+ * `index.less` already `@import`s all sub-files, so the compiled `index.css`
+ * is self-contained. We therefore drop any sub-less imports (e.g. `./virtual.less`)
+ * and keep only the root and local `index.less` references, rewritten to `.css`.
+ */
+function buildCssJsContent(styleDir, target) {
+  const indexJsPath = join(styleDir, 'index.js');
+  if (!existsSync(indexJsPath)) return null;
+
+  const content = readFileSync(indexJsPath, 'utf-8');
+  const isCjs = target === 'lib';
+
+  const kept = content
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => {
+      if (!line) return false;
+      // keep only references to the root style/index.less or local ./index.less
+      const isRootStyle = /['"](\.\.\/)+style\/index\.less['"]/.test(line);
+      const isLocalIndex = /['"]\.\/index\.less['"]/.test(line);
+      return isRootStyle || isLocalIndex;
+    })
+    .map((line) => line.replace(/\.less(['"])/g, '.css$1'));
+
+  const body = kept.join('\n');
+  return isCjs ? `"use strict";\n\n${body}\n` : `${body}\n`;
+}
+
+/**
+ * less plugin that strips the leading `~` used by less-loader to denote
+ * node_modules paths. Plain `less.render` does not understand `~`.
+ */
+const stripTildePlugin = {
+  install(_less, pluginManager) {
+    pluginManager.addPreProcessor({
+      process(src) {
+        return src.replace(/~(?=[^'"\s;]+)/g, '');
+      },
+    });
+  },
+};
+
+async function compileOne(styleDir, target) {
+  const lessFile = join(styleDir, 'index.less');
+  const cssFile = join(styleDir, 'index.css');
+  const lessContent = readFileSync(lessFile, 'utf-8');
+
+  const result = await less.render(lessContent, {
+    filename: lessFile,
+    javascriptEnabled: true,
+    paths: [join(cwd, 'node_modules')],
+    plugins: [stripTildePlugin],
+  });
+
+  writeFileSync(cssFile, result.css, 'utf-8');
+
+  const cssJsContent = buildCssJsContent(styleDir, target);
+  if (cssJsContent) {
+    writeFileSync(join(styleDir, 'css.js'), cssJsContent, 'utf-8');
+    // Generate empty css.d.ts so TS strict consumers don't error
+    writeFileSync(join(styleDir, 'css.d.ts'), '', 'utf-8');
+  }
+}
+
+async function main() {
+  let count = 0;
+  let failed = false;
+
+  for (const target of targets) {
+    const targetDir = join(cwd, target);
+    if (!existsSync(targetDir)) {
+      console.warn(`[compile-less] skip ${target}/ (not found)`);
+      continue;
+    }
+
+    const entries = findStyleEntries(targetDir);
+    for (const styleDir of entries) {
+      try {
+        await compileOne(styleDir, target);
+        count++;
+        console.log(`[compile-less] ${relative(cwd, styleDir)}/index.css`);
+      } catch (err) {
+        failed = true;
+        console.error(`[compile-less] FAIL ${relative(cwd, styleDir)}: ${err.message}`);
+      }
+    }
+  }
+
+  console.log(`[compile-less] done, ${count} files compiled`);
+  if (failed) process.exit(1);
+}
+
+main();

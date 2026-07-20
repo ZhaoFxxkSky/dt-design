@@ -1,4 +1,6 @@
 # eslint-disable pnpm/yaml-enforce-settings
+packages:
+  - 'internals/*'
 allowBuilds:
   '@parcel/watcher': true
   '@swc/core': true

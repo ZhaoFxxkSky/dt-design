@@ -42,9 +42,6 @@ jobs:
       - name: Build package
         run: pnpm build
 
-      - name: Generate type declarations
-        run: pnpm build:dts
-
       - name: Lint package
         run: pnpm lint:pkg
 
@@ -52,6 +49,13 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
+          # Verify tag matches package.json version
+          PKG_VERSION="v$(node -p 'require("./package.json").version')"
+          if [[ "${PKG_VERSION}" != "${GITHUB_REF_NAME}" ]]; then
+            echo "ERROR: Tag ${GITHUB_REF_NAME} does not match package.json version ${PKG_VERSION}"
+            exit 1
+          fi
+
           TAG_NAME="${GITHUB_REF_NAME}"
           if [[ "$TAG_NAME" == *"-"* ]]; then
             DIST_TAG=$(echo "$TAG_NAME" | sed -E 's/^v[0-9]+\.[0-9]+\.[0-9]+-([a-zA-Z]+).*/\1/')

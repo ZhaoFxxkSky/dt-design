@@ -9,19 +9,12 @@ import { useSyncState } from '../../../_util/hooks/useSyncState';
 import { isFunction, isNumber } from '../../../_util/is';
 import type { AnyObject } from '../../../_util/type';
 import { devUseWarning } from '../../../_util/warning';
-import Button from 'antd/lib/button';
+import type { DropdownProps, MenuProps } from 'antd';
+import { Button, Checkbox, Dropdown, Empty, Menu, Radio, Tree } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/lib/checkbox';
-import Checkbox from 'antd/lib/checkbox';
 import { ConfigContext } from 'antd/lib/config-provider';
-import type { DropdownProps } from 'antd/lib/dropdown';
-import Dropdown from 'antd/lib/dropdown';
-import Empty from 'antd/lib/empty';
-import type { MenuProps } from 'antd/lib/menu';
-import Menu from 'antd/lib/menu';
 import OverrideProvider from 'antd/lib/menu/OverrideContext';
-import Radio from 'antd/lib/radio';
 import type { EventDataNode } from 'antd/lib/tree';
-import Tree from 'antd/lib/tree';
 import type {
   ColumnFilterItem,
   ColumnType,
