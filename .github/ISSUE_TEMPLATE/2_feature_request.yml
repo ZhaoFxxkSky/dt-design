@@ -1,7 +1,7 @@
 name: 💡 Feature Request
-Description: 提交一个新功能建议
+description: 提交一个新功能建议
 title: '[Feature]: '
-labels: ['feature']
+labels: ['enhancement']
 body:
   - type: markdown
     attributes:

@@ -1,5 +1,5 @@
 name: ❓ Question
-Description: 提出一个使用或咨询问题
+description: 提出一个使用或咨询问题
 title: '[Question]: '
 labels: ['question']
 body:
