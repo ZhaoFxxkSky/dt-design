@@ -3,7 +3,12 @@
 // ============================================================
 // === bordered.ts: genBorderedStyle ===
 // ============================================================
+@nested-border-var: ~'--@{ant-prefix}-table-nested-border-top';
+@nested-border-fallback: ~'var(@{nested-border-var}, @table-border)';
+
 .@{table-prefix-cls}-wrapper {
+  @{nested-border-var}: @table-border;
+
   .@{table-prefix-cls}.@{table-prefix-cls}-bordered {
     // ============================ Title =============================
     > .@{table-prefix-cls}-title {
@@ -15,6 +20,10 @@
     > .@{table-prefix-cls}-container {
       border-inline-start: @table-border;
       border-top: @table-border;
+
+      &:first-child {
+        border-top: @nested-border-fallback;
+      }
 
       > .@{table-prefix-cls}-content,
       > .@{table-prefix-cls}-header,
@@ -76,8 +85,9 @@
 
   // ============================ Nested ============================
   .@{table-prefix-cls}-cell {
-    .@{table-prefix-cls}-container:first-child {
-      border-top: 0;
+    > .@{table-prefix-cls}-wrapper:only-child,
+    > .@{table-prefix-cls}-expanded-row-fixed > .@{table-prefix-cls}-wrapper:only-child {
+      @{nested-border-var}: 0;
     }
   }
 }
