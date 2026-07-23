@@ -10,27 +10,38 @@ permissions:
 jobs:
   reply:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - name: Need reproduction
-        if: github.event.label.name == 'need reproduction'
-        uses: actions-cool/issues-helper@v3
+      - uses: actions/github-script@v7
         with:
-          actions: 'create-comment'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.issue.number }}
-          body: |
-            你好 @${{ github.event.issue.user.login }}，请提供一个最小复现链接（CodeSandbox / StackBlitz / GitHub 仓库），方便我们定位问题。
+          script: |
+            const { issue, label } = context.payload;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
 
-            Hi @${{ github.event.issue.user.login }}, please provide a minimal reproduction link (CodeSandbox / StackBlitz / GitHub repo) so we can investigate.
+            const messages = {
+              'help wanted': `该 issue 标记为 \`help wanted\`，欢迎社区贡献者认领。如果你有兴趣实现，请在下方留言。\n\nThis issue is marked as \`help wanted\`. Community contributions are welcome.`,
+              'bug': `已确认该 Bug，已加入修复计划。\n\nBug confirmed, added to the fix backlog.`,
+              'invalid': `该 issue 被标记为 \`invalid\`，即将关闭。如有疑问请重新提供更多信息后 reopen。\n\nThis issue is marked as \`invalid\` and will be closed.`,
+              'wontfix': `该 issue 被标记为 \`wontfix\`，当前不会修复。感谢你的反馈。\n\nThis issue is marked as \`wontfix\`. Thank you for your feedback.`,
+            };
 
-      - name: Help wanted
-        if: github.event.label.name == 'help wanted'
-        uses: actions-cool/issues-helper@v3
-        with:
-          actions: 'create-comment'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.issue.number }}
-          body: |
-            该 issue 标记为 `help wanted`，欢迎社区贡献者认领。如果你有兴趣实现，请在下方留言，维护者会协助 review。
+            const msg = messages[label.name];
+            if (!msg) return;
 
-            This issue is marked as `help wanted`. Community contributions are welcome. Please comment below if you'd like to work on it.
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: issue.number,
+              body: msg,
+            });
+
+            // invalid 和 wontfix 自动关闭
+            if (label.name === 'invalid' || label.name === 'wontfix') {
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: issue.number,
+                state: 'closed',
+              });
+            }

@@ -1,0 +1,50 @@
+name: Issue Open Check
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  issue-open-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const { issue } = context.payload;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            // Ensure 'unconfirmed' label exists
+            const labelName = 'unconfirmed';
+            try {
+              await github.rest.issues.getLabel({
+                owner,
+                repo,
+                name: labelName,
+              });
+            } catch {
+              await github.rest.issues.createLabel({
+                owner,
+                repo,
+                name: labelName,
+                color: 'fbca04',
+                description: '尚未确认的 Issue',
+              });
+            }
+
+            // Add label to issue
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: issue.number,
+              labels: [labelName],
+            });
