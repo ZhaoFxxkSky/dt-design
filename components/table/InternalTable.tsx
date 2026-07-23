@@ -3,7 +3,6 @@ import { INTERNAL_COLUMN_DEFAULT_WIDTH, INTERNAL_HOOKS } from './constant';
 import { convertChildrenToColumns } from './features/columns/useColumns';
 import type {
   ColumnsType,
-  ColumnTitleProps,
   ColumnType,
   EditableValidateResult,
   ExpandableConfig,
@@ -43,6 +42,7 @@ import { Pagination, Spin } from 'antd';
 import { ConfigContext, globalConfig } from 'antd/lib/config-provider';
 import enUS from 'antd/lib/locale/en_US';
 import renderExpandIcon from './components/ExpandIcon';
+import useColumnTitleProps from './hooks/useColumnTitleProps';
 import useContainerWidth from './shared/hooks/useContainerWidth';
 import useFilledColumns from './features/columns/useFilledColumns';
 import type { FilterConfig, FilterState } from './features/filter/useFilter';
@@ -55,6 +55,7 @@ import usePagination, {
 import useSelection from './features/selection/useSelection';
 import type { SortState } from './features/sort/useSorter';
 import useSorter, { getSortData } from './features/sort/useSorter';
+import useSpinProps from './hooks/useSpinProps';
 import useTitleColumns from './features/columns/useTitleColumns';
 
 import RcTable from './components/RcTable';
@@ -758,18 +759,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   changeEventInfo.filterStates = filterStates;
 
   // ============================ Column ============================
-  const columnTitleProps = React.useMemo<ColumnTitleProps<RecordType>>(() => {
-    const mergedFilters: Record<string, FilterValue> = {};
-    Object.keys(filters).forEach((filterKey) => {
-      if (filters[filterKey] !== null) {
-        mergedFilters[filterKey] = filters[filterKey]!;
-      }
-    });
-    return {
-      ...sorterTitleProps,
-      filters: mergedFilters,
-    };
-  }, [sorterTitleProps, filters]);
+  const columnTitleProps = useColumnTitleProps<RecordType>(sorterTitleProps, filters);
 
   const [transformTitleColumns] = useTitleColumns(columnTitleProps);
 
@@ -970,15 +960,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
   }
 
   // >>>>>>>>> Spinning
-  const spinProps = React.useMemo<SpinProps | undefined>(() => {
-    if (typeof loading === 'boolean') {
-      return { spinning: loading };
-    } else if (isPlainObject(loading)) {
-      return { spinning: true, ...loading };
-    } else {
-      return undefined;
-    }
-  }, [loading]);
+  const spinProps = useSpinProps(loading);
 
   const wrappercls = clsx(
     `${prefixCls}-wrapper`,
