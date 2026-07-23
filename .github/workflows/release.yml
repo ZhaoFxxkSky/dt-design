@@ -45,6 +45,15 @@ jobs:
       - name: Lint package
         run: pnpm lint:pkg
 
+      - name: Check if version already published
+        run: |
+          PKG_VERSION=$(node -p 'require("./package.json").version')
+          if npm view "@dtjoy/dt-design@$PKG_VERSION" version 2>/dev/null; then
+            echo "ERROR: Version $PKG_VERSION already published to npm"
+            exit 1
+          fi
+          echo "Version $PKG_VERSION is available for publishing"
+
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -7,9 +7,6 @@ on:
   pull_request:
     branches:
       - main
-      - 'feat/**'
-      - 'fix/**'
-      - 'release/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -18,35 +15,9 @@ concurrency:
 jobs:
   lint-test-build:
     name: Lint, Test & Build (Node ${{ matrix.node-version }})
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [22, 24]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Test
-        run: pnpm test
-
-      - name: Build package
-        run: pnpm build
-
-      - name: Lint package
-        run: pnpm lint:pkg
+    uses: ./.github/workflows/_ci-build.yml
+    with:
+      node-version: ${{ matrix.node-version }}
