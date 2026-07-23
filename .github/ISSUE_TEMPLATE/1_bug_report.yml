@@ -1,5 +1,5 @@
 name: 🐛 Bug Report
-Description: 提交一个 Bug 报告
+description: 提交一个 Bug 报告
 title: '[Bug]: '
 labels: ['bug']
 body:
